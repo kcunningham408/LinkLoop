@@ -442,14 +442,14 @@ const styles = StyleSheet.create({
   rangeTabTextActive: { color: '#fff' },
 
   // Summary
-  summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E' },
+  summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between' },
   summaryPill: { alignItems: 'center', flex: 1 },
   summaryValue: { fontSize: 20, fontWeight: 'bold', marginBottom: 4 },
   summaryLabel: { fontSize: 11, color: '#888' },
 
   // Tab switcher
-  tabRow: { flexDirection: 'row', backgroundColor: '#1C1C1E', borderRadius: 12, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E' },
+  tabRow: { flexDirection: 'row', backgroundColor: '#1C1C1E', borderRadius: 12, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   tab: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   tabActive: { backgroundColor: '#4A90D9' },
   tabText: { fontSize: 14, color: '#A0A0A0', fontWeight: '700' },
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   refreshButtonText: { fontSize: 14, color: '#4A90D9', fontWeight: '700' },
 
   // Trends tab
-  trendsHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E' },
+  trendsHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   trendsHeaderIcon: { fontSize: 30, marginRight: 12 },
   trendsHeaderTitle: { fontSize: 17, fontWeight: '700', color: '#fff' },
   trendsHeaderSub: { fontSize: 12, color: '#888', marginTop: 2 },
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   trendMessage: { fontSize: 14, color: '#C0C0C0', lineHeight: 21 },
 
   // Disclaimer
-  disclaimerBox: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E' },
+  disclaimerBox: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   disclaimerIcon: { fontSize: 22, marginRight: 10, marginTop: 2 },
   disclaimerText: { flex: 1, fontSize: 12, color: '#888', lineHeight: 18 },
 });

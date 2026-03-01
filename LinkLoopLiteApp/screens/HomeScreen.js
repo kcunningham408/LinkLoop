@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
 
   // Glucose Card
-  glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E' },
+  glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   staleWarning: { backgroundColor: 'rgba(255,165,0,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.4)' },
   staleWarningText: { fontSize: 12, color: '#FFA500', fontWeight: '600' },
   glucoseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   glucoseEmpty: { fontSize: 14, color: '#888', marginTop: 4 },
 
   // Stats Card
-  statsCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E' },
+  statsCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   statsTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 14 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   statBox: { flex: 1, alignItems: 'center' },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActionsTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 12 },
   quickActions: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  quickAction: { flex: 1, alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, paddingVertical: 16, marginHorizontal: 4, borderWidth: 1, borderColor: '#2C2C2E' },
+  quickAction: { flex: 1, alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, paddingVertical: 16, marginHorizontal: 4, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   quickActionInner: { position: 'relative', marginBottom: 6 },
   quickActionEmoji: { fontSize: 28 },
   quickActionBadge: { position: 'absolute', top: -6, right: -10, backgroundColor: '#FF6B6B', borderRadius: 10, minWidth: 18, height: 18, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   quickActionLabel: { fontSize: 12, color: '#A0A0A0', fontWeight: '600' },
 
   // Disclaimer
-  disclaimer: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E' },
+  disclaimer: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   disclaimerIcon: { fontSize: 18, marginRight: 10, marginTop: 1 },
   disclaimerText: { flex: 1, fontSize: 12, color: '#888', lineHeight: 18 },
 });

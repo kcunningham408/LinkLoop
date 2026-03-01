@@ -2,6 +2,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import TYPE from '../config/typography';
 import { FadeIn, ScalePop, stagger } from '../config/animations';
 import { useAuth } from '../context/AuthContext';
@@ -112,6 +113,28 @@ export default function HomeScreen({ navigation }) {
     ? Math.floor((Date.now() - new Date(latestGlucose.timestamp).getTime()) / 60000)
     : null;
 
+  // ── Glucose card glow ──
+  const glowColor = latestGlucose ? getGlucoseColor(latestGlucose.value) : accent;
+  const isOutOfRange = latestGlucose && (latestGlucose.value < lowThreshold || latestGlucose.value > highThreshold);
+
+  const glowPulse = useSharedValue(0.35);
+  useEffect(() => {
+    glowPulse.value = withRepeat(
+      withTiming(isOutOfRange ? 0.8 : 0.5, { duration: isOutOfRange ? 1200 : 2400, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+  }, [isOutOfRange]);
+
+  const glowAnimatedStyle = useAnimatedStyle(() => ({
+    shadowOpacity: glowPulse.value,
+    shadowColor: glowColor,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: isOutOfRange ? 16 : 10,
+    elevation: 10,
+    borderColor: glowColor + (isOutOfRange ? '60' : '30'),
+  }));
+
   return (
     <ScrollView
       style={styles.container}
@@ -150,6 +173,7 @@ export default function HomeScreen({ navigation }) {
       </FadeIn>      <View style={styles.content}>
         {/* Glucose Card */}
         <FadeIn delay={stagger(0, 100)}>
+        <Animated.View style={[styles.glucoseGlow, glowAnimatedStyle]}>
         <TouchableOpacity style={styles.glucoseCard} onPress={() => navigation.navigate('CGM')} activeOpacity={0.8}>
           {latestGlucose ? (
             <View>
@@ -200,6 +224,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           )}
         </TouchableOpacity>
+        </Animated.View>
         </FadeIn>
 
         {/* Today's Overview */}
@@ -342,7 +367,8 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
 
   // Glucose Card
-  glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  glucoseGlow: { borderRadius: 16, marginBottom: 16, borderWidth: 1.5, borderColor: 'rgba(74,144,217,0.3)' },
+  glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, overflow: 'hidden' },
   staleWarning: { backgroundColor: 'rgba(255,165,0,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.4)' },
   staleWarningText: { fontSize: TYPE.sm, color: '#FFA500', fontWeight: TYPE.semibold },
   glucoseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { achievementsAPI } from '../services/api';
 
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
-  progressTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+  progressTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff' },
   progressSubtitle: { fontSize: 13, color: '#A0A0A0', marginTop: 3 },
   progressCircle: {
     width: 56,
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  progressPct: { fontSize: 16, fontWeight: 'bold', color: '#4A90D9' },
+  progressPct: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#4A90D9' },
   progressBarBg: {
     height: 10,
     backgroundColor: '#2C2C2E',
@@ -269,8 +270,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   quickStatItem: { alignItems: 'center' },
-  quickStatValue: { fontSize: 18, fontWeight: 'bold', color: '#4A90D9' },
-  quickStatLabel: { fontSize: 10, color: '#888', marginTop: 3 },
+  quickStatValue: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#4A90D9' },
+  quickStatLabel: { fontSize: TYPE.xs, color: '#888', marginTop: 3 },
 
   // Check Button
   checkButton: {
@@ -283,14 +284,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2A3A50',
   },
-  checkButtonIcon: { fontSize: 24, marginRight: 12 },
-  checkButtonText: { fontSize: 15, fontWeight: 'bold', color: '#fff' },
-  checkButtonSub: { fontSize: 12, color: '#A0A0A0', marginTop: 2 },
+  checkButtonIcon: { fontSize: TYPE.h3, marginRight: 12 },
+  checkButtonText: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff' },
+  checkButtonSub: { fontSize: TYPE.sm, color: '#A0A0A0', marginTop: 2 },
 
   // Categories
   categorySection: { marginBottom: 25 },
-  categoryTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  categoryDesc: { fontSize: 12, color: '#888', marginBottom: 12 },
+  categoryTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 4 },
+  categoryDesc: { fontSize: TYPE.sm, color: '#888', marginBottom: 12 },
 
   // Badge Grid
   badgeGrid: {
@@ -319,12 +320,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1E',
     borderColor: '#2C2C2E',
   },
-  badgeEmoji: { fontSize: 32, marginBottom: 6 },
+  badgeEmoji: { fontSize: TYPE.h1, marginBottom: 6 },
   badgeEmojiLocked: { opacity: 0.4 },
-  badgeTitle: { fontSize: 13, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 4 },
+  badgeTitle: { fontSize: 13, fontWeight: TYPE.bold, color: '#fff', textAlign: 'center', marginBottom: 4 },
   badgeTitleLocked: { color: '#666' },
   badgeDesc: { fontSize: 11, color: '#888', textAlign: 'center', lineHeight: 15 },
-  badgeDate: { fontSize: 10, color: '#4A90D9', marginTop: 6 },
+  badgeDate: { fontSize: TYPE.xs, color: '#4A90D9', marginTop: 6 },
 
   // Info Card
   infoCard: {

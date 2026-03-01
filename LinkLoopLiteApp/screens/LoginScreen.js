@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import { authAPI, circleAPI, pingServer } from '../services/api';
 
 // mode: 'landing' | 'login' | 'register' | 'join' | 'forgot' | 'reset'
@@ -310,7 +311,7 @@ export default function LoginScreen() {
             <Text style={styles.inputLabel}>6-Digit Reset Code</Text>
             <TextInput
               ref={resetCodeRef}
-              style={[styles.input, { textAlign: 'center', letterSpacing: 6, fontSize: 22, fontWeight: '800' }]}
+              style={[styles.input, { textAlign: 'center', letterSpacing: 6, fontSize: TYPE.xxl, fontWeight: TYPE.extrabold }]}
               placeholder="000000"
               placeholderTextColor="#555"
               value={resetCode}
@@ -438,12 +439,12 @@ const styles = StyleSheet.create({
   },
   topLogoSymbol: {
     fontSize: 38,
-    fontWeight: '900',
+    fontWeight: TYPE.black,
     color: '#4A90D9',
   },
   topLogoText: {
     fontSize: 34,
-    fontWeight: '800',
+    fontWeight: TYPE.extrabold,
     color: '#fff',
     letterSpacing: -0.5,
   },
@@ -460,8 +461,8 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
-  logoSymbol: { fontSize: 52, fontWeight: '900', color: '#4A90D9' },
-  logoText: { fontSize: 46, fontWeight: '800', color: '#fff', letterSpacing: -1 },
+  logoSymbol: { fontSize: 52, fontWeight: TYPE.black, color: '#4A90D9' },
+  logoText: { fontSize: 46, fontWeight: TYPE.extrabold, color: '#fff', letterSpacing: -1 },
   tagline: {
     fontSize: 17,
     color: '#A0A0A0',
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 14,
   },
-  btnSignInText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  btnSignInText: { color: '#fff', fontSize: 17, fontWeight: TYPE.bold },
 
   btnJoinCircle: {
     width: '100%',
@@ -490,11 +491,11 @@ const styles = StyleSheet.create({
     borderColor: '#34C759',
     marginBottom: 32,
   },
-  btnJoinCircleText: { color: '#34C759', fontSize: 17, fontWeight: '700' },
+  btnJoinCircleText: { color: '#34C759', fontSize: 17, fontWeight: TYPE.bold },
 
   signUpLink: { paddingVertical: 8 },
-  signUpLinkText: { color: '#666', fontSize: 14, textAlign: 'center' },
-  signUpLinkBold: { color: '#4A90D9', fontWeight: '700' },
+  signUpLinkText: { color: '#666', fontSize: TYPE.md, textAlign: 'center' },
+  signUpLinkBold: { color: '#4A90D9', fontWeight: TYPE.bold },
 
   // ── Form card ──
   formCard: {
@@ -507,9 +508,9 @@ const styles = StyleSheet.create({
     borderColor: '#2C2C2E',
   },
   backBtn: { marginBottom: 20 },
-  backBtnText: { color: '#4A90D9', fontSize: 15, fontWeight: '600' },
-  formTitle: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 6 },
-  formSubtitle: { fontSize: 14, color: '#777', marginBottom: 28, lineHeight: 20 },
+  backBtnText: { color: '#4A90D9', fontSize: 15, fontWeight: TYPE.semibold },
+  formTitle: { fontSize: TYPE.h3, fontWeight: TYPE.extrabold, color: '#fff', marginBottom: 6 },
+  formSubtitle: { fontSize: TYPE.md, color: '#777', marginBottom: 28, lineHeight: 20 },
 
   methodToggle: {
     flexDirection: 'row',
@@ -522,25 +523,25 @@ const styles = StyleSheet.create({
     flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center',
   },
   methodTabActive: { backgroundColor: '#4A90D9' },
-  methodTabText: { fontSize: 14, color: '#777', fontWeight: '600' },
+  methodTabText: { fontSize: TYPE.md, color: '#777', fontWeight: TYPE.semibold },
   methodTabActiveText: { color: '#fff' },
 
   inputGroup: { marginBottom: 18 },
-  inputLabel: { fontSize: 13, fontWeight: '600', color: '#999', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
+  inputLabel: { fontSize: 13, fontWeight: TYPE.semibold, color: '#999', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
   input: {
     backgroundColor: '#111',
     borderRadius: 12,
     padding: 15,
-    fontSize: 16,
+    fontSize: TYPE.lg,
     borderWidth: 1,
     borderColor: '#2C2C2E',
     color: '#fff',
   },
   inviteInput: {
-    fontSize: 22,
+    fontSize: TYPE.xxl,
     textAlign: 'center',
     letterSpacing: 8,
-    fontWeight: '800',
+    fontWeight: TYPE.extrabold,
     color: '#34C759',
     borderColor: '#34C759',
     borderWidth: 2,
@@ -553,10 +554,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2C2C2E',
   },
-  passwordInput: { flex: 1, padding: 15, fontSize: 16, color: '#fff' },
+  passwordInput: { flex: 1, padding: 15, fontSize: TYPE.lg, color: '#fff' },
   eyeBtn: { paddingHorizontal: 16, paddingVertical: 12 },
-  eyeBtnText: { color: '#555', fontSize: 13, fontWeight: '600' },
-  hint: { fontSize: 12, color: '#555', marginTop: 6 },
+  eyeBtnText: { color: '#555', fontSize: 13, fontWeight: TYPE.semibold },
+  hint: { fontSize: TYPE.sm, color: '#555', marginTop: 6 },
 
   submitBtn: {
     backgroundColor: '#4A90D9',
@@ -567,9 +568,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   submitBtnGreen: { backgroundColor: '#34C759' },
-  submitBtnText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  submitBtnText: { color: '#fff', fontSize: 17, fontWeight: TYPE.bold },
 
   crossLink: { paddingTop: 20, alignItems: 'center' },
-  crossLinkText: { color: '#555', fontSize: 14 },
-  crossLinkBold: { color: '#4A90D9', fontWeight: '700' },
+  crossLinkText: { color: '#555', fontSize: TYPE.md },
+  crossLinkBold: { color: '#4A90D9', fontWeight: TYPE.bold },
 });

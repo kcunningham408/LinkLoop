@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { suppliesAPI } from '../services/api';
 
@@ -199,7 +200,7 @@ export default function SuppliesScreen() {
               <View key={s._id} style={styles.reminderItem}>
                 <Text style={styles.reminderEmoji}>🔔</Text>
                 <Text style={styles.reminderText}>
-                  <Text style={{ fontWeight: 'bold' }}>{s.name}</Text> is running low — only {getActualDaysLeft(s)} day{getActualDaysLeft(s) !== 1 ? 's' : ''} left
+                  <Text style={{ fontWeight: TYPE.bold }}>{s.name}</Text> is running low — only {getActualDaysLeft(s)} day{getActualDaysLeft(s) !== 1 ? 's' : ''} left
                 </Text>
               </View>
             ))
@@ -278,57 +279,57 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111111' },
   content: { padding: 20 },
   summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  summaryTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 15, textAlign: 'center' },
+  summaryTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15, textAlign: 'center' },
   summaryRow: { flexDirection: 'row' },
   summaryItem: { flex: 1, alignItems: 'center' },
-  summaryNumber: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  summaryLabel: { fontSize: 12, color: '#A0A0A0' },
+  summaryNumber: { fontSize: TYPE.h2, fontWeight: TYPE.bold, color: '#fff', marginBottom: 4 },
+  summaryLabel: { fontSize: TYPE.sm, color: '#A0A0A0' },
   emptyState: { alignItems: 'center', paddingVertical: 40 },
   emptyEmoji: { fontSize: 50, marginBottom: 10 },
-  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 6 },
-  emptyText: { fontSize: 14, color: '#888', textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
+  emptyTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
+  emptyText: { fontSize: TYPE.md, color: '#888', textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
   supplyCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 15, marginBottom: 12, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   supplyEmoji: { fontSize: 36, marginRight: 15 },
   supplyInfo: { flex: 1 },
-  supplyName: { fontSize: 16, fontWeight: '600', color: '#fff', marginBottom: 4 },
+  supplyName: { fontSize: TYPE.lg, fontWeight: TYPE.semibold, color: '#fff', marginBottom: 4 },
   supplyQuantity: { fontSize: 13, color: '#A0A0A0' },
   supplyStatus: { alignItems: 'flex-end' },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginBottom: 4 },
-  statusText: { fontSize: 12, fontWeight: '600' },
+  statusText: { fontSize: TYPE.sm, fontWeight: TYPE.semibold },
   daysLeft: { fontSize: 11, color: '#888' },
   addButton: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 2, borderColor: '#4A90D9', borderStyle: 'dashed', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  addButtonIcon: { fontSize: 24, marginRight: 10 },
-  addButtonText: { fontSize: 16, fontWeight: '600', color: '#4A90D9' },
+  addButtonIcon: { fontSize: TYPE.h3, marginRight: 10 },
+  addButtonText: { fontSize: TYPE.lg, fontWeight: TYPE.semibold, color: '#4A90D9' },
   insightsCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
+  sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
   insightItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
-  insightEmoji: { fontSize: 24, marginRight: 12 },
+  insightEmoji: { fontSize: TYPE.h3, marginRight: 12 },
   insightInfo: { flex: 1 },
-  insightTitle: { fontSize: 14, color: '#A0A0A0', marginBottom: 2 },
-  insightValue: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+  insightTitle: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 2 },
+  insightValue: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff' },
   remindersCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   reminderItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
   reminderEmoji: { fontSize: 20, marginRight: 10 },
-  reminderText: { fontSize: 14, color: '#E0E0E0', flex: 1, lineHeight: 20 },
+  reminderText: { fontSize: TYPE.md, color: '#E0E0E0', flex: 1, lineHeight: 20 },
   tipsCard: { backgroundColor: '#1A2235', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2A3A50' },
   tipItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8 },
-  tipEmoji: { fontSize: 18, marginRight: 10, marginTop: 2 },
-  tipText: { fontSize: 14, color: '#C0C0C0', flex: 1, lineHeight: 20 },
+  tipEmoji: { fontSize: TYPE.xl, marginRight: 10, marginTop: 2 },
+  tipText: { fontSize: TYPE.md, color: '#C0C0C0', flex: 1, lineHeight: 20 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 25, paddingBottom: 40 },
-  modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 20, textAlign: 'center' },
-  inputLabel: { fontSize: 14, fontWeight: '600', color: '#E0E0E0', marginBottom: 8, marginTop: 10 },
-  input: { backgroundColor: '#2C2C2E', borderRadius: 10, padding: 14, fontSize: 16, borderWidth: 1, borderColor: '#3A3A3C', color: '#fff' },
+  modalTitle: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 20, textAlign: 'center' },
+  inputLabel: { fontSize: TYPE.md, fontWeight: TYPE.semibold, color: '#E0E0E0', marginBottom: 8, marginTop: 10 },
+  input: { backgroundColor: '#2C2C2E', borderRadius: 10, padding: 14, fontSize: TYPE.lg, borderWidth: 1, borderColor: '#3A3A3C', color: '#fff' },
   inputRow: { flexDirection: 'row', marginTop: 5 },
   catScroll: { marginBottom: 5 },
   catChip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#2C2C2E', flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A3C', marginRight: 8 },
   catChipActive: { backgroundColor: '#4A90D9', borderColor: '#4A90D9' },
-  catEmoji: { fontSize: 16, marginRight: 6 },
+  catEmoji: { fontSize: TYPE.lg, marginRight: 6 },
   catLabel: { fontSize: 13, color: '#A0A0A0' },
-  catLabelActive: { color: '#fff', fontWeight: '600' },
+  catLabelActive: { color: '#fff', fontWeight: TYPE.semibold },
   modalButtons: { flexDirection: 'row', marginTop: 25, gap: 12 },
   cancelButton: { flex: 1, paddingVertical: 14, borderRadius: 10, backgroundColor: '#2C2C2E', alignItems: 'center' },
-  cancelButtonText: { fontSize: 16, color: '#A0A0A0', fontWeight: '600' },
+  cancelButtonText: { fontSize: TYPE.lg, color: '#A0A0A0', fontWeight: TYPE.semibold },
   saveButton: { flex: 1, paddingVertical: 14, borderRadius: 10, backgroundColor: '#4A90D9', alignItems: 'center' },
-  saveButtonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
+  saveButtonText: { fontSize: TYPE.lg, color: '#fff', fontWeight: TYPE.bold },
 });

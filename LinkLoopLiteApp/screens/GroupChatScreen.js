@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import { chatAPI } from '../services/api';
 
 export default function GroupChatScreen({ navigation }) {
@@ -73,7 +74,7 @@ export default function GroupChatScreen({ navigation }) {
       title: '\uD83D\uDC65 Care Circle Group',
       headerStyle: { backgroundColor: '#1C1C1E' },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold' },
+      headerTitleStyle: { fontWeight: TYPE.bold },
     });
   }, [navigation, groupInfo]);
 
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111111' },
   flex: { flex: 1 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 10, color: '#888', fontSize: 14 },
+  loadingText: { marginTop: 10, color: '#888', fontSize: TYPE.md },
 
   chatBanner: {
     flexDirection: 'row',
@@ -297,9 +298,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#2C2C2E',
   },
-  chatBannerEmoji: { fontSize: 32, marginRight: 12 },
+  chatBannerEmoji: { fontSize: TYPE.h1, marginRight: 12 },
   bannerTextWrap: { flex: 1 },
-  chatBannerName: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  chatBannerName: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff' },
   chatBannerMembers: { fontSize: 11, color: '#888', marginTop: 2 },
 
   messagesList: { paddingHorizontal: 12, paddingVertical: 8 },
@@ -312,20 +313,20 @@ const styles = StyleSheet.create({
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: '#1A2235', justifyContent: 'center', alignItems: 'center', marginRight: 6,
   },
-  avatarText: { fontSize: 16 },
+  avatarText: { fontSize: TYPE.lg },
 
   bubble: { maxWidth: '80%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
   bubbleMe: { backgroundColor: '#4A90D9', borderBottomRightRadius: 4 },
   bubbleOther: { backgroundColor: '#1C1C1E', borderBottomLeftRadius: 4 },
   bubbleSending: { opacity: 0.6 },
 
-  senderName: { fontSize: 11, fontWeight: '700', color: '#4A90D9', marginBottom: 2 },
+  senderName: { fontSize: 11, fontWeight: TYPE.bold, color: '#4A90D9', marginBottom: 2 },
 
   msgText: { fontSize: 15, lineHeight: 20 },
   msgTextMe: { color: '#fff' },
   msgTextOther: { color: '#E0E0E0' },
 
-  timeText: { fontSize: 10, marginTop: 4 },
+  timeText: { fontSize: TYPE.xs, marginTop: 4 },
   timeTextMe: { color: 'rgba(255,255,255,0.7)', textAlign: 'right' },
   timeTextOther: { color: '#666' },
 
@@ -333,35 +334,35 @@ const styles = StyleSheet.create({
     alignSelf: 'center', backgroundColor: '#2C2C2E', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 6, marginVertical: 8,
   },
-  systemMsgText: { fontSize: 12, color: '#A0A0A0', textAlign: 'center' },
+  systemMsgText: { fontSize: TYPE.sm, color: '#A0A0A0', textAlign: 'center' },
 
   alertMsgContainer: {
     flexDirection: 'row', backgroundColor: '#2A1A1A', borderRadius: 14,
     padding: 14, marginVertical: 6, borderLeftWidth: 4, borderLeftColor: '#D32F2F', alignSelf: 'stretch',
   },
-  alertMsgIcon: { fontSize: 28, marginRight: 10 },
+  alertMsgIcon: { fontSize: TYPE.h2, marginRight: 10 },
   alertMsgContent: { flex: 1 },
-  alertMsgLabel: { fontSize: 11, fontWeight: '800', color: '#FF6B6B', marginBottom: 4, letterSpacing: 0.5 },
-  alertMsgText: { fontSize: 14, color: '#E0E0E0', lineHeight: 20 },
-  alertMsgTime: { fontSize: 10, color: '#666', marginTop: 4 },
+  alertMsgLabel: { fontSize: 11, fontWeight: TYPE.extrabold, color: '#FF6B6B', marginBottom: 4, letterSpacing: 0.5 },
+  alertMsgText: { fontSize: TYPE.md, color: '#E0E0E0', lineHeight: 20 },
+  alertMsgTime: { fontSize: TYPE.xs, color: '#666', marginTop: 4 },
 
   ackMsgContainer: {
     flexDirection: 'row', backgroundColor: '#1A2E1A', borderRadius: 14,
     padding: 14, marginVertical: 6, borderLeftWidth: 4, borderLeftColor: '#4CAF50', alignSelf: 'stretch',
   },
-  ackMsgIcon: { fontSize: 28, marginRight: 10 },
+  ackMsgIcon: { fontSize: TYPE.h2, marginRight: 10 },
   ackMsgContent: { flex: 1 },
-  ackMsgLabel: { fontSize: 11, fontWeight: '800', color: '#4CAF50', marginBottom: 4 },
-  ackMsgText: { fontSize: 14, color: '#E0E0E0', lineHeight: 20 },
-  ackMsgTime: { fontSize: 10, color: '#666', marginTop: 4 },
+  ackMsgLabel: { fontSize: 11, fontWeight: TYPE.extrabold, color: '#4CAF50', marginBottom: 4 },
+  ackMsgText: { fontSize: TYPE.md, color: '#E0E0E0', lineHeight: 20 },
+  ackMsgTime: { fontSize: TYPE.xs, color: '#666', marginTop: 4 },
 
   emptyChat: {
     alignItems: 'center', paddingVertical: 60,
     transform: [{ scaleY: -1 }],
   },
   emptyChatEmoji: { fontSize: 50, marginBottom: 12 },
-  emptyChatTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 6 },
-  emptyChatText: { fontSize: 14, color: '#888', textAlign: 'center' },
+  emptyChatTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
+  emptyChatText: { fontSize: TYPE.md, color: '#888', textAlign: 'center' },
 
   inputBar: {
     flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 10,
@@ -376,5 +377,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   sendButtonDisabled: { backgroundColor: '#2C2C2E' },
-  sendButtonText: { fontSize: 20, color: '#fff', fontWeight: 'bold' },
+  sendButtonText: { fontSize: 20, color: '#fff', fontWeight: TYPE.bold },
 });

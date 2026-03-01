@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 
 /**
  * Unified screen header with themed accent gradient bar.
@@ -56,13 +57,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '800',
+    fontWeight: TYPE.extrabold,
     color: '#fff',
     letterSpacing: -0.3,
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: TYPE.md,
     color: '#A0A0A0',
     lineHeight: 20,
   },

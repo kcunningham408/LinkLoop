@@ -3,6 +3,7 @@ import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, Toucha
 
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { insightsAPI } from '../services/api';
 
@@ -429,8 +430,8 @@ const styles = StyleSheet.create({
 
   // Daily motivation
   motivationCard: { backgroundColor: '#4A90D9', borderRadius: 16, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#3A7BC8' },
-  motivationLabel: { fontSize: 12, fontWeight: '700', color: '#fff', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 },
-  motivationText: { fontSize: 16, color: '#fff', lineHeight: 24, fontStyle: 'italic' },
+  motivationLabel: { fontSize: TYPE.sm, fontWeight: TYPE.bold, color: '#fff', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 },
+  motivationText: { fontSize: TYPE.lg, color: '#fff', lineHeight: 24, fontStyle: 'italic' },
   motivationLoading: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4 },
   motivationLoadingText: { fontSize: 13, color: '#fff', marginLeft: 10 },
 
@@ -438,46 +439,46 @@ const styles = StyleSheet.create({
   rangeRow: { flexDirection: 'row', backgroundColor: '#2C2C2E', borderRadius: 12, padding: 4, marginBottom: 20 },
   rangeTab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   rangeTabActive: { backgroundColor: '#4A90D9' },
-  rangeTabText: { fontSize: 14, color: '#A0A0A0', fontWeight: '600' },
+  rangeTabText: { fontSize: TYPE.md, color: '#A0A0A0', fontWeight: TYPE.semibold },
   rangeTabTextActive: { color: '#fff' },
 
   // Summary
   summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between' },
   summaryPill: { alignItems: 'center', flex: 1 },
-  summaryValue: { fontSize: 20, fontWeight: 'bold', marginBottom: 4 },
+  summaryValue: { fontSize: 20, fontWeight: TYPE.bold, marginBottom: 4 },
   summaryLabel: { fontSize: 11, color: '#888' },
 
   // Tab switcher
   tabRow: { flexDirection: 'row', backgroundColor: '#1C1C1E', borderRadius: 12, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   tab: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   tabActive: { backgroundColor: '#4A90D9' },
-  tabText: { fontSize: 14, color: '#A0A0A0', fontWeight: '700' },
+  tabText: { fontSize: TYPE.md, color: '#A0A0A0', fontWeight: TYPE.bold },
   tabTextActive: { color: '#fff' },
 
   // Status badges
   statusRow: { flexDirection: 'row', gap: 8, marginBottom: 20, flexWrap: 'wrap' },
   statusBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20 },
-  statusBadgeText: { fontSize: 13, fontWeight: '700' },
+  statusBadgeText: { fontSize: 13, fontWeight: TYPE.bold },
 
   // Loading / empty
   loadingBox: { alignItems: 'center', paddingVertical: 60 },
-  loadingText: { fontSize: 14, color: '#888', marginTop: 15 },
+  loadingText: { fontSize: TYPE.md, color: '#888', marginTop: 15 },
   emptyState: { alignItems: 'center', paddingVertical: 50 },
   emptyEmoji: { fontSize: 60, marginBottom: 15 },
-  emptyTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 8 },
-  emptyText: { fontSize: 14, color: '#888', textAlign: 'center', lineHeight: 22 },
+  emptyTitle: { fontSize: 20, fontWeight: TYPE.bold, color: '#fff', marginBottom: 8 },
+  emptyText: { fontSize: TYPE.md, color: '#888', textAlign: 'center', lineHeight: 22 },
 
   // Insight cards
   insightCard: { borderRadius: 12, padding: 18, marginBottom: 14, borderLeftWidth: 5 },
   insightTop: { flexDirection: 'row', alignItems: 'flex-start' },
-  insightIcon: { fontSize: 32, marginRight: 14 },
+  insightIcon: { fontSize: TYPE.h1, marginRight: 14 },
   insightBody: { flex: 1 },
   insightTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
-  insightTitle: { fontSize: 16, fontWeight: '700', color: '#fff', flex: 1, marginRight: 8 },
+  insightTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', flex: 1, marginRight: 8 },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 },
-  typeBadgeText: { fontSize: 11, fontWeight: '700' },
-  insightSummary: { fontSize: 14, color: '#C0C0C0', lineHeight: 21 },
+  typeBadgeText: { fontSize: 11, fontWeight: TYPE.bold },
+  insightSummary: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 21 },
   insightDetail: { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
   insightDetailText: { fontSize: 13, color: '#A0A0A0', lineHeight: 20, fontStyle: 'italic' },
   expandHint: { fontSize: 11, color: '#666', textAlign: 'center', marginTop: 10 },
@@ -485,38 +486,38 @@ const styles = StyleSheet.create({
   // AI card
   aiCard: { backgroundColor: '#1A2235', borderRadius: 14, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: '#2A3A50' },
   aiCardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  aiCardIcon: { fontSize: 24, marginRight: 8 },
-  aiCardTitle: { fontSize: 17, fontWeight: '700', color: '#fff', flex: 1 },
-  aiCardBadge: { backgroundColor: '#4A90D9', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, fontSize: 11, fontWeight: '700', color: '#fff', overflow: 'hidden' },
-  aiCardText: { fontSize: 14, color: '#C0C0C0', lineHeight: 22 },
+  aiCardIcon: { fontSize: TYPE.h3, marginRight: 8 },
+  aiCardTitle: { fontSize: 17, fontWeight: TYPE.bold, color: '#fff', flex: 1 },
+  aiCardBadge: { backgroundColor: '#4A90D9', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, fontSize: 11, fontWeight: TYPE.bold, color: '#fff', overflow: 'hidden' },
+  aiCardText: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 22 },
   aiLoadingRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
   aiLoadingText: { fontSize: 13, color: '#4A90D9', marginLeft: 10 },
   aiButton: { backgroundColor: '#4A90D9', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  aiButtonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  aiButtonText: { color: '#fff', fontSize: 15, fontWeight: TYPE.bold },
   refreshButton: { alignSelf: 'center', marginTop: 14, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20, backgroundColor: '#2A3A50', borderWidth: 1, borderColor: '#4A90D9' },
-  refreshButtonText: { fontSize: 14, color: '#4A90D9', fontWeight: '700' },
+  refreshButtonText: { fontSize: TYPE.md, color: '#4A90D9', fontWeight: TYPE.bold },
 
   // Trends tab
   trendsHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   trendsHeaderIcon: { fontSize: 30, marginRight: 12 },
-  trendsHeaderTitle: { fontSize: 17, fontWeight: '700', color: '#fff' },
-  trendsHeaderSub: { fontSize: 12, color: '#888', marginTop: 2 },
+  trendsHeaderTitle: { fontSize: 17, fontWeight: TYPE.bold, color: '#fff' },
+  trendsHeaderSub: { fontSize: TYPE.sm, color: '#888', marginTop: 2 },
   trendsRefreshBtn: { padding: 8, borderRadius: 20, backgroundColor: '#1A2235' },
-  trendsRefreshText: { fontSize: 18 },
+  trendsRefreshText: { fontSize: TYPE.xl },
 
   // Trend cards
   trendCard: { borderRadius: 12, padding: 16, marginBottom: 12, borderLeftWidth: 5 },
   trendTop: { flexDirection: 'row', alignItems: 'flex-start' },
-  trendIcon: { fontSize: 28, marginRight: 12 },
+  trendIcon: { fontSize: TYPE.h2, marginRight: 12 },
   trendBody: { flex: 1 },
   trendTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
-  trendTitle: { fontSize: 15, fontWeight: '700', color: '#fff', flex: 1, marginRight: 8 },
+  trendTitle: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff', flex: 1, marginRight: 8 },
   categoryBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 },
-  categoryBadgeText: { fontSize: 10, fontWeight: '700', textTransform: 'capitalize' },
-  trendMessage: { fontSize: 14, color: '#C0C0C0', lineHeight: 21 },
+  categoryBadgeText: { fontSize: TYPE.xs, fontWeight: TYPE.bold, textTransform: 'capitalize' },
+  trendMessage: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 21 },
 
   // Disclaimer
   disclaimerBox: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  disclaimerIcon: { fontSize: 22, marginRight: 10, marginTop: 2 },
-  disclaimerText: { flex: 1, fontSize: 12, color: '#888', lineHeight: 18 },
+  disclaimerIcon: { fontSize: TYPE.xxl, marginRight: 10, marginTop: 2 },
+  disclaimerText: { flex: 1, fontSize: TYPE.sm, color: '#888', lineHeight: 18 },
 });

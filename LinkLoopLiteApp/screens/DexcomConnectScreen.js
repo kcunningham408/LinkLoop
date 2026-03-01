@@ -13,6 +13,7 @@ import {
     View,
 } from 'react-native';
 import { dexcomAPI } from '../services/api';
+import TYPE from '../config/typography';
 
 export default function DexcomConnectScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: TYPE.bold,
     color: '#fff',
     marginBottom: 8,
     textAlign: 'center',
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: TYPE.bold,
     color: '#00D4AA',
     marginBottom: 6,
     textTransform: 'uppercase',
@@ -242,8 +243,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: TYPE.md,
+    fontWeight: TYPE.semibold,
     color: '#E0E0E0',
     marginBottom: 8,
     marginTop: 16,
@@ -252,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2C2C2E',
     borderRadius: 10,
     padding: 14,
-    fontSize: 16,
+    fontSize: TYPE.lg,
     color: '#fff',
     borderWidth: 1,
     borderColor: '#3A3A3C',
@@ -294,12 +295,12 @@ const styles = StyleSheet.create({
     borderColor: '#00D4AA',
   },
   regionFlag: {
-    fontSize: 18,
+    fontSize: TYPE.xl,
   },
   regionBtnText: {
-    fontSize: 14,
+    fontSize: TYPE.md,
     color: '#A0A0A0',
-    fontWeight: '600',
+    fontWeight: TYPE.semibold,
   },
   regionBtnTextActive: {
     color: '#00D4AA',
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   },
   connectButtonText: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: TYPE.bold,
     color: '#fff',
   },
   cancelLink: {
@@ -341,12 +342,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   securityIcon: {
-    fontSize: 16,
+    fontSize: TYPE.lg,
     marginTop: 1,
   },
   securityText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: TYPE.sm,
     color: '#666',
     lineHeight: 18,
   },

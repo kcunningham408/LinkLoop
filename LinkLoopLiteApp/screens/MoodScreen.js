@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { moodAPI } from '../services/api';
 
@@ -375,13 +376,13 @@ const styles = StyleSheet.create({
     borderColor: '#4A90D9',
     backgroundColor: '#1A2235',
   },
-  moodEmoji: { fontSize: 32, marginBottom: 4 },
+  moodEmoji: { fontSize: TYPE.h1, marginBottom: 4 },
   moodLabel: { fontSize: 11, color: '#A0A0A0', textAlign: 'center' },
-  moodLabelSelected: { color: '#4A90D9', fontWeight: 'bold' },
+  moodLabelSelected: { color: '#4A90D9', fontWeight: TYPE.bold },
 
   // Note Input
   noteContainer: { marginBottom: 20 },
-  noteLabel: { fontSize: 14, color: '#A0A0A0', marginBottom: 8 },
+  noteLabel: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 8 },
   noteInput: {
     backgroundColor: '#1C1C1E',
     borderRadius: 12,
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logButtonDisabled: { backgroundColor: '#2A3A50', opacity: 0.6 },
-  logButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  logButtonText: { color: '#fff', fontSize: TYPE.lg, fontWeight: TYPE.bold },
 
   // AI Info Card
   aiInfoCard: {
@@ -439,16 +440,16 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  statsTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
+  statsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 15 },
   statBox: { alignItems: 'center' },
-  statValue: { fontSize: 24, fontWeight: 'bold', color: '#4A90D9' },
+  statValue: { fontSize: TYPE.h3, fontWeight: TYPE.bold, color: '#4A90D9' },
   statLabel: { fontSize: 11, color: '#A0A0A0', marginTop: 4 },
 
   // Frequency bars
   frequencySection: { marginTop: 5 },
   freqRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  freqEmoji: { fontSize: 18, width: 30 },
+  freqEmoji: { fontSize: TYPE.xl, width: 30 },
   freqBarBg: {
     flex: 1,
     height: 8,
@@ -458,10 +459,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   freqBarFill: { height: 8, backgroundColor: '#4A90D9', borderRadius: 4 },
-  freqCount: { fontSize: 12, color: '#A0A0A0', width: 25, textAlign: 'right' },
+  freqCount: { fontSize: TYPE.sm, color: '#A0A0A0', width: 25, textAlign: 'right' },
 
   // Section
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
+  sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
 
   // Empty state
   emptyState: {
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   emptyEmoji: { fontSize: 40, marginBottom: 10 },
-  emptyTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 6 },
+  emptyTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
   emptyText: { fontSize: 13, color: '#A0A0A0' },
 
   // Entry Cards
@@ -496,10 +497,10 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   entryHeader: { flexDirection: 'row', alignItems: 'center' },
-  entryEmoji: { fontSize: 28, marginRight: 12 },
+  entryEmoji: { fontSize: TYPE.h2, marginRight: 12 },
   entryInfo: { flex: 1 },
-  entryLabel: { fontSize: 15, fontWeight: 'bold', color: '#fff' },
-  entryTime: { fontSize: 12, color: '#888', marginTop: 2 },
+  entryLabel: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff' },
+  entryTime: { fontSize: TYPE.sm, color: '#888', marginTop: 2 },
   entryNote: {
     fontSize: 13,
     color: '#A0A0A0',
@@ -521,13 +522,13 @@ const styles = StyleSheet.create({
   // Edit Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 25, paddingBottom: 40 },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 20, textAlign: 'center' },
+  modalTitle: { fontSize: 20, fontWeight: TYPE.bold, color: '#fff', marginBottom: 20, textAlign: 'center' },
   editMoodGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 15 },
-  editNoteLabel: { fontSize: 14, color: '#A0A0A0', marginBottom: 8 },
+  editNoteLabel: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 8 },
   editNoteInput: { backgroundColor: '#111', borderRadius: 12, padding: 15, color: '#fff', fontSize: 15, minHeight: 70, textAlignVertical: 'top', borderWidth: 1, borderColor: '#2C2C2E', marginBottom: 20 },
   modalButtons: { flexDirection: 'row', gap: 12 },
   cancelButton: { flex: 1, paddingVertical: 14, borderRadius: 10, backgroundColor: '#2C2C2E', alignItems: 'center' },
-  cancelButtonText: { fontSize: 16, color: '#A0A0A0', fontWeight: '600' },
+  cancelButtonText: { fontSize: TYPE.lg, color: '#A0A0A0', fontWeight: TYPE.semibold },
   saveButton: { flex: 1, paddingVertical: 14, borderRadius: 10, backgroundColor: '#4A90D9', alignItems: 'center' },
-  saveButtonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
+  saveButtonText: { fontSize: TYPE.lg, color: '#fff', fontWeight: TYPE.bold },
 });

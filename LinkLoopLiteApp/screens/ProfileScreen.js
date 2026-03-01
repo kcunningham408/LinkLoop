@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
@@ -539,7 +540,7 @@ export default function ProfileScreen() {
                   </View>
                   <Text style={[
                     styles.themeOptionLabel,
-                    isActive && { color: displayColor, fontWeight: '700' },
+                    isActive && { color: displayColor, fontWeight: TYPE.bold },
                   ]}>
                     {p.name}
                   </Text>
@@ -642,40 +643,40 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   profileCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 25, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#4A90D9', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  avatarText: { fontSize: 36, fontWeight: 'bold', color: '#fff' },
-  profileName: { fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  profileEmail: { fontSize: 14, color: '#A0A0A0', marginBottom: 12 },
+  avatarText: { fontSize: 36, fontWeight: TYPE.bold, color: '#fff' },
+  profileName: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 4 },
+  profileEmail: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 12 },
   badgeRow: { flexDirection: 'row' },
   badge: { backgroundColor: '#1A2235', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#4A90D9' },
-  badgeText: { fontSize: 13, color: '#4A90D9', fontWeight: '600' },
+  badgeText: { fontSize: 13, color: '#4A90D9', fontWeight: TYPE.semibold },
   settingsCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
+  sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
   settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
   settingInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  settingIcon: { fontSize: 24, marginRight: 14 },
-  settingTitle: { fontSize: 15, fontWeight: '600', color: '#fff', marginBottom: 2 },
+  settingIcon: { fontSize: TYPE.h3, marginRight: 14 },
+  settingTitle: { fontSize: 15, fontWeight: TYPE.semibold, color: '#fff', marginBottom: 2 },
   settingValue: { fontSize: 13, color: '#A0A0A0' },
-  settingDescription: { fontSize: 12, color: '#888' },
-  chevron: { fontSize: 24, color: '#555', fontWeight: '300' },
+  settingDescription: { fontSize: TYPE.sm, color: '#888' },
+  chevron: { fontSize: TYPE.h3, color: '#555', fontWeight: '300' },
   dexcomActionButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#2A1A1A', borderWidth: 1, borderColor: '#3A2020' },
-  dexcomDisconnectText: { fontSize: 13, color: '#FF6B6B', fontWeight: '600' },
+  dexcomDisconnectText: { fontSize: 13, color: '#FF6B6B', fontWeight: TYPE.semibold },
   dexcomConnectButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#1A2235', borderWidth: 1, borderColor: '#4A90D9' },
-  dexcomConnectText: { fontSize: 13, color: '#4A90D9', fontWeight: '600' },
+  dexcomConnectText: { fontSize: 13, color: '#4A90D9', fontWeight: TYPE.semibold },
   logoutButton: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#3A2020' },
   logoutIcon: { fontSize: 20, marginRight: 10 },
-  logoutText: { fontSize: 16, fontWeight: 'bold', color: '#FF6B6B' },
+  logoutText: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#FF6B6B' },
   deleteAccountButton: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  deleteAccountIcon: { fontSize: 18, marginRight: 10 },
-  deleteAccountText: { fontSize: 14, fontWeight: '600', color: '#888' },
+  deleteAccountIcon: { fontSize: TYPE.xl, marginRight: 10 },
+  deleteAccountText: { fontSize: TYPE.md, fontWeight: TYPE.semibold, color: '#888' },
   disclaimerCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   disclaimerIcon: { fontSize: 20, marginRight: 10, marginTop: 2 },
-  disclaimerText: { fontSize: 12, color: '#888', flex: 1, lineHeight: 18 },
-  nameInput: { flex: 1, backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, color: '#fff', borderWidth: 1, borderColor: '#4A90D9' },
+  disclaimerText: { fontSize: TYPE.sm, color: '#888', flex: 1, lineHeight: 18 },
+  nameInput: { flex: 1, backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: TYPE.md, color: '#fff', borderWidth: 1, borderColor: '#4A90D9' },
   nameSaveBtn: { backgroundColor: '#4A90D9', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, marginLeft: 8 },
-  nameSaveBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  nameSaveBtnText: { color: '#fff', fontSize: 13, fontWeight: TYPE.semibold },
   nameCancelBtn: { paddingHorizontal: 10, paddingVertical: 6, marginLeft: 4 },
   nameCancelBtnText: { color: '#888', fontSize: 13 },
-  thresholdInput: { backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: 18, fontWeight: 'bold', color: '#fff', textAlign: 'center', width: 70, borderWidth: 1, borderColor: '#4A90D9' },
+  thresholdInput: { backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', textAlign: 'center', width: 70, borderWidth: 1, borderColor: '#4A90D9' },
 
   // Theme Picker
   themeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 },
@@ -690,8 +691,8 @@ const styles = StyleSheet.create({
   },
   themeColorRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
   themeColorDot: { width: 24, height: 24, borderRadius: 12 },
-  themeOptionLabel: { fontSize: 13, color: '#A0A0A0', fontWeight: '500' },
-  themeActiveCheck: { position: 'absolute', top: 10, right: 12, fontSize: 16, fontWeight: 'bold' },
+  themeOptionLabel: { fontSize: 13, color: '#A0A0A0', fontWeight: TYPE.medium },
+  themeActiveCheck: { position: 'absolute', top: 10, right: 12, fontSize: TYPE.lg, fontWeight: TYPE.bold },
   themePreview: {
     backgroundColor: '#2C2C2E',
     borderRadius: 12,
@@ -699,11 +700,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
   },
-  themePreviewLabel: { fontSize: 12, color: '#888', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 },
+  themePreviewLabel: { fontSize: TYPE.sm, color: '#888', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 },
   themePreviewRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   themePreviewBtn: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 8 },
-  themePreviewBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  themePreviewBtnText: { color: '#fff', fontSize: 13, fontWeight: TYPE.bold },
   themePreviewBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1.5 },
-  themePreviewBadgeText: { fontSize: 12, fontWeight: '600' },
+  themePreviewBadgeText: { fontSize: TYPE.sm, fontWeight: TYPE.semibold },
   themePreviewDot: { width: 16, height: 16, borderRadius: 8 },
 });

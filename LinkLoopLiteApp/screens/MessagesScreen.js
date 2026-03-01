@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 import { chatAPI } from '../services/api';
 
 function formatTime(dateStr) {
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 14,
+    fontSize: TYPE.md,
     color: '#888',
   },
   errorEmoji: {
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: '#fff',
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: TYPE.semibold,
   },
 
   // Conversation row
@@ -289,14 +290,14 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   personName: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: TYPE.lg,
+    fontWeight: TYPE.bold,
     color: '#fff',
     flex: 1,
     marginRight: 8,
   },
   timestamp: {
-    fontSize: 12,
+    fontSize: TYPE.sm,
     color: '#666',
   },
   rowSub: {
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lastMessage: {
-    fontSize: 14,
+    fontSize: TYPE.md,
     color: '#A0A0A0',
     flex: 1,
   },
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   chevron: {
-    fontSize: 22,
+    fontSize: TYPE.xxl,
     color: '#444',
     marginLeft: 8,
     fontWeight: '300',
@@ -343,13 +344,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: TYPE.bold,
     color: '#fff',
     marginBottom: 10,
     textAlign: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: TYPE.md,
     color: '#888',
     textAlign: 'center',
     lineHeight: 22,

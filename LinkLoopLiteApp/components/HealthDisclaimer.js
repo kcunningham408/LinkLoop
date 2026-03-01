@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
+import TYPE from '../config/typography';
 
 const DISCLAIMER_KEY = '@linkloop_disclaimer_accepted';
 
@@ -75,11 +76,11 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modal: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 25, width: '100%', maxWidth: 400, alignItems: 'center', borderWidth: 1, borderColor: '#2C2C2E' },
   icon: { fontSize: 48, marginBottom: 15 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 15, textAlign: 'center' },
-  text: { fontSize: 14, color: '#C0C0C0', lineHeight: 22, marginBottom: 12, textAlign: 'left', width: '100%' },
-  textSmall: { fontSize: 12, color: '#888', lineHeight: 18, marginBottom: 15, textAlign: 'center' },
-  bold: { fontWeight: 'bold', color: '#fff' },
+  title: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15, textAlign: 'center' },
+  text: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 22, marginBottom: 12, textAlign: 'left', width: '100%' },
+  textSmall: { fontSize: TYPE.sm, color: '#888', lineHeight: 18, marginBottom: 15, textAlign: 'center' },
+  bold: { fontWeight: TYPE.bold, color: '#fff' },
   divider: { width: '100%', height: 1, backgroundColor: '#2C2C2E', marginVertical: 10 },
   acceptButton: { backgroundColor: '#4A90D9', paddingVertical: 14, paddingHorizontal: 40, borderRadius: 10, width: '100%', alignItems: 'center', marginTop: 5 },
-  acceptButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  acceptButtonText: { color: '#fff', fontSize: TYPE.lg, fontWeight: TYPE.bold },
 });

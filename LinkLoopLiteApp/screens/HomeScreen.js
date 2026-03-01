@@ -2,6 +2,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { alertsAPI, glucoseAPI } from '../services/api';
@@ -321,61 +322,61 @@ function StatBox({ label, value, color }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111111' },
   hero: { padding: 24, alignItems: 'center', paddingTop: 35, paddingBottom: 30 },
-  heroTitle: { fontSize: 32, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
+  heroTitle: { fontSize: TYPE.h1, fontWeight: TYPE.bold, color: '#fff', marginBottom: 10 },
   heroBadge: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center' },
-  heroBadgeEmoji: { fontSize: 18, marginRight: 8 },
-  heroBadgeText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  heroBadgeEmoji: { fontSize: TYPE.xl, marginRight: 8 },
+  heroBadgeText: { color: '#fff', fontSize: TYPE.md, fontWeight: TYPE.semibold },
   syncBadge: { marginTop: 8, backgroundColor: 'rgba(255,255,255,0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 },
-  syncBadgeText: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '500' },
+  syncBadgeText: { color: 'rgba(255,255,255,0.85)', fontSize: TYPE.sm, fontWeight: TYPE.medium },
   content: { padding: 16 },
 
   // Glucose Card
   glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   staleWarning: { backgroundColor: 'rgba(255,165,0,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.4)' },
-  staleWarningText: { fontSize: 12, color: '#FFA500', fontWeight: '600' },
+  staleWarningText: { fontSize: TYPE.sm, color: '#FFA500', fontWeight: TYPE.semibold },
   glucoseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   glucoseLeft: {},
-  glucoseLabel: { fontSize: 12, color: '#888', fontWeight: '600', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  glucoseLabel: { fontSize: TYPE.sm, color: '#888', fontWeight: TYPE.semibold, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
   glucoseReadingRow: { flexDirection: 'row', alignItems: 'baseline', marginBottom: 6 },
-  glucoseValue: { fontSize: 44, fontWeight: 'bold' },
-  glucoseUnit: { fontSize: 16, color: '#888', marginLeft: 4 },
-  glucoseTrend: { fontSize: 28, marginLeft: 10, fontWeight: 'bold' },
+  glucoseValue: { fontSize: TYPE.hero, fontWeight: TYPE.bold },
+  glucoseUnit: { fontSize: TYPE.lg, color: '#888', marginLeft: 4 },
+  glucoseTrend: { fontSize: TYPE.h2, marginLeft: 10, fontWeight: TYPE.bold },
   glucoseStatusBadge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10 },
-  glucoseStatusText: { fontSize: 12, fontWeight: 'bold' },
+  glucoseStatusText: { fontSize: TYPE.sm, fontWeight: TYPE.bold },
   glucoseRight: { alignItems: 'flex-end' },
   glucoseTime: { fontSize: 13, color: '#888', marginBottom: 4 },
-  glucoseChevron: { fontSize: 28, color: '#555', fontWeight: '300' },
-  glucoseEmpty: { fontSize: 14, color: '#888', marginTop: 4 },
+  glucoseChevron: { fontSize: TYPE.h2, color: '#555', fontWeight: '300' },
+  glucoseEmpty: { fontSize: TYPE.md, color: '#888', marginTop: 4 },
 
   // Stats Card
   statsCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  statsTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 14 },
+  statsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 14 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 22, fontWeight: 'bold', marginBottom: 4 },
-  statLabel: { fontSize: 10, color: '#A0A0A0', textAlign: 'center' },
+  statValue: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, marginBottom: 4 },
+  statLabel: { fontSize: TYPE.xs, color: '#A0A0A0', textAlign: 'center' },
   emptyStats: { paddingVertical: 12, alignItems: 'center' },
-  emptyStatsText: { fontSize: 14, color: '#888', textAlign: 'center' },
+  emptyStatsText: { fontSize: TYPE.md, color: '#888', textAlign: 'center' },
 
   // Alert Banner
   alertBanner: { backgroundColor: '#2A1A1A', borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 16, borderWidth: 2, borderColor: '#FF6B6B' },
-  alertBannerIcon: { fontSize: 28, marginRight: 12 },
-  alertBannerTitle: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  alertBannerSub: { fontSize: 12, color: '#FF6B6B', marginTop: 2 },
-  alertBannerArrow: { fontSize: 28, color: '#FF6B6B', fontWeight: '300' },
+  alertBannerIcon: { fontSize: TYPE.h2, marginRight: 12 },
+  alertBannerTitle: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff' },
+  alertBannerSub: { fontSize: TYPE.sm, color: '#FF6B6B', marginTop: 2 },
+  alertBannerArrow: { fontSize: TYPE.h2, color: '#FF6B6B', fontWeight: '300' },
 
   // Quick Actions
-  quickActionsTitle: { fontSize: 16, fontWeight: 'bold', color: '#fff', marginBottom: 12 },
+  quickActionsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 12 },
   quickActions: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   quickAction: { flex: 1, alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, paddingVertical: 16, marginHorizontal: 4, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   quickActionInner: { position: 'relative', marginBottom: 6 },
-  quickActionEmoji: { fontSize: 28 },
+  quickActionEmoji: { fontSize: TYPE.h2 },
   quickActionBadge: { position: 'absolute', top: -6, right: -10, backgroundColor: '#FF6B6B', borderRadius: 10, minWidth: 18, height: 18, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
-  quickActionBadgeText: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
-  quickActionLabel: { fontSize: 12, color: '#A0A0A0', fontWeight: '600' },
+  quickActionBadgeText: { fontSize: TYPE.xs, fontWeight: TYPE.bold, color: '#fff' },
+  quickActionLabel: { fontSize: TYPE.sm, color: '#A0A0A0', fontWeight: TYPE.semibold },
 
   // Disclaimer
   disclaimer: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  disclaimerIcon: { fontSize: 18, marginRight: 10, marginTop: 1 },
-  disclaimerText: { flex: 1, fontSize: 12, color: '#888', lineHeight: 18 },
+  disclaimerIcon: { fontSize: TYPE.xl, marginRight: 10, marginTop: 1 },
+  disclaimerText: { flex: 1, fontSize: TYPE.sm, color: '#888', lineHeight: 18 },
 });

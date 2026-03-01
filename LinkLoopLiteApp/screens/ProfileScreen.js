@@ -1,10 +1,10 @@
 import Constants from 'expo-constants';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
-import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
@@ -12,9 +12,10 @@ const APP_VERSION = Constants.expoConfig?.version || Constants.manifest?.version
 
 export default function ProfileScreen() {
   const { user, logout, deleteAccount, updateUser } = useAuth();
-  const { palette, setTheme, palettes } = useTheme();
+  const { palette, setTheme, palettes, getGradient } = useTheme();
   const isMember = user?.role === 'member';
   const accent = isMember ? palette.member : palette.warrior;
+  const gradient = getGradient(isMember);
   const [pushPrefs, setPushPrefs] = useState({
     glucoseAlerts: true,
     acknowledgments: true,
@@ -182,32 +183,62 @@ export default function ProfileScreen() {
     }
   };
 
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : null;
+
   return (
     <ScrollView style={styles.container}>
-      <ScreenHeader
-        title="Profile & Settings"
-        subtitle="Manage your account and app preferences"
-      />
+      {/* ── Hero Banner ── */}
+      <FadeIn delay={0} slideY={0}>
+      <LinearGradient
+        colors={[accent, gradient[1] || accent]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.heroBanner}
+      >
+        {/* Decorative circles */}
+        <View style={styles.heroDecoCircle1} />
+        <View style={styles.heroDecoCircle2} />
 
-      <View style={styles.content}>
-        {/* Profile Card */}
-        <FadeIn delay={stagger(0, 100)}>
-        <View style={styles.profileCard}>
-          <View style={[styles.avatar, { backgroundColor: accent }]}>
+        {/* Avatar with glow ring */}
+        <View style={styles.avatarRing}>
+          <View style={styles.avatar}>
             <Text style={styles.avatarText}>{user?.name?.charAt(0)?.toUpperCase() || '∞'}</Text>
           </View>
-          <Text style={styles.profileName}>{user?.name || 'LinkLoop User'}</Text>
-          <Text style={styles.profileEmail}>{user?.email || ''}</Text>
-          <View style={styles.badgeRow}>
-            <View style={[styles.badge, { borderColor: accent }]}>
-              <Text style={[styles.badgeText, { color: accent }]}>
-                {isMember ? '∞ Loop Member' : '💙 T1D Warrior'}
-              </Text>
+        </View>
+
+        <Text style={styles.heroName}>{user?.name || 'LinkLoop User'}</Text>
+        <Text style={styles.heroEmail}>{user?.email || ''}</Text>
+
+        {/* Role badge */}
+        <View style={styles.heroBadge}>
+          <Text style={styles.heroBadgeText}>
+            {isMember ? '∞ Loop Member' : '💙 T1D Warrior'}
+          </Text>
+        </View>
+
+        {/* Quick stats row */}
+        <View style={styles.heroStatsRow}>
+          {memberSince && (
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatLabel}>Joined</Text>
+              <Text style={styles.heroStatValue}>{memberSince}</Text>
             </View>
+          )}
+          <View style={styles.heroStat}>
+            <Text style={styles.heroStatLabel}>Role</Text>
+            <Text style={styles.heroStatValue}>{isMember ? 'Member' : 'Warrior'}</Text>
+          </View>
+          <View style={styles.heroStat}>
+            <Text style={styles.heroStatLabel}>Version</Text>
+            <Text style={styles.heroStatValue}>v{APP_VERSION}</Text>
           </View>
         </View>
-        </FadeIn>
+      </LinearGradient>
+      </FadeIn>
 
+      <View style={styles.content}>
         <FadeIn delay={stagger(1, 100)}>
         {/* Account Settings */}
         <View style={styles.settingsCard}>
@@ -646,14 +677,81 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111111' },
   content: { padding: 20 },
-  profileCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 25, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#4A90D9', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  avatarText: { fontSize: 36, fontWeight: TYPE.bold, color: '#fff' },
-  profileName: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 4 },
-  profileEmail: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 12 },
-  badgeRow: { flexDirection: 'row' },
-  badge: { backgroundColor: '#1A2235', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#4A90D9' },
-  badgeText: { fontSize: 13, color: '#4A90D9', fontWeight: TYPE.semibold },
+
+  // ── Hero Banner ──
+  heroBanner: {
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 28,
+    paddingHorizontal: 20,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  heroDecoCircle1: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  heroDecoCircle2: {
+    position: 'absolute',
+    bottom: -30,
+    left: -30,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  avatarRing: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  avatar: {
+    width: 98,
+    height: 98,
+    borderRadius: 49,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: { fontSize: 42, fontWeight: TYPE.bold, color: '#fff' },
+  heroName: { fontSize: TYPE.h2, fontWeight: TYPE.extrabold, color: '#fff', marginBottom: 4, letterSpacing: -0.3 },
+  heroEmail: { fontSize: TYPE.md, color: 'rgba(255,255,255,0.7)', marginBottom: 12 },
+  heroBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 20,
+    marginBottom: 18,
+  },
+  heroBadgeText: { fontSize: TYPE.sm, fontWeight: TYPE.bold, color: '#fff' },
+  heroStatsRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    width: '100%',
+    justifyContent: 'space-evenly',
+  },
+  heroStat: { alignItems: 'center', flex: 1 },
+  heroStatLabel: { fontSize: TYPE.xs, color: 'rgba(255,255,255,0.6)', fontWeight: TYPE.medium, marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
+  heroStatValue: { fontSize: TYPE.md, color: '#fff', fontWeight: TYPE.bold },
+
   settingsCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
   settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },

@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { achievementsAPI } from '../services/api';
 
 const CATEGORY_INFO = {
@@ -103,6 +104,7 @@ export default function AchievementsScreen() {
         ) : (
           <>
             {/* Overall Progress Card */}
+            <FadeIn delay={stagger(0, 100)}>
             <View style={styles.progressCard}>
               <View style={styles.progressHeader}>
                 <View>
@@ -141,7 +143,9 @@ export default function AchievementsScreen() {
                 </View>
               )}
             </View>
+            </FadeIn>
 
+            <FadeIn delay={stagger(1, 100)}>
             {/* Check for new achievements button */}
             <TouchableOpacity
               style={styles.checkButton}
@@ -208,6 +212,7 @@ export default function AchievementsScreen() {
                 and using LinkLoop consistently. Keep going — every check-in counts!
               </Text>
             </View>
+            </FadeIn>
           </>
         )}
       </View>

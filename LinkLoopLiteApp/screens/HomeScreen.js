@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import TYPE from '../config/typography';
+import { FadeIn, ScalePop, stagger } from '../config/animations';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { alertsAPI, glucoseAPI } from '../services/api';
@@ -117,6 +118,7 @@ export default function HomeScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />}
     >
       {/* Compact Hero */}
+      <FadeIn delay={0} slideY={0}>
       <LinearGradient
         colors={getGradient(isMember)}
         style={styles.hero}
@@ -145,9 +147,9 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
       </LinearGradient>
-
-      <View style={styles.content}>
+      </FadeIn>      <View style={styles.content}>
         {/* Glucose Card */}
+        <FadeIn delay={stagger(0, 100)}>
         <TouchableOpacity style={styles.glucoseCard} onPress={() => navigation.navigate('CGM')} activeOpacity={0.8}>
           {latestGlucose ? (
             <View>
@@ -198,8 +200,10 @@ export default function HomeScreen({ navigation }) {
             </View>
           )}
         </TouchableOpacity>
+        </FadeIn>
 
         {/* Today's Overview */}
+        <FadeIn delay={stagger(1, 100)}>
         <View style={styles.statsCard}>
           <Text style={styles.statsTitle}>Today's Overview</Text>
           {loading ? (
@@ -219,9 +223,11 @@ export default function HomeScreen({ navigation }) {
             </View>
           )}
         </View>
+        </FadeIn>
 
         {/* Active Alerts Banner */}
         {activeAlertCount > 0 && (
+          <FadeIn delay={stagger(2, 100)}>
           <TouchableOpacity
             style={styles.alertBanner}
             onPress={() => navigation.navigate('Alerts')}
@@ -236,9 +242,11 @@ export default function HomeScreen({ navigation }) {
             </View>
             <Text style={styles.alertBannerArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
+          </FadeIn>
         )}
 
         {/* Quick Actions */}
+        <FadeIn delay={stagger(3, 100)}>
         <Text style={styles.quickActionsTitle}>Quick Actions</Text>
         <View style={styles.quickActions}>
           <QuickAction
@@ -281,14 +289,17 @@ export default function HomeScreen({ navigation }) {
             </>
           )}
         </View>
+        </FadeIn>
 
         {/* Disclaimer */}
+        <FadeIn delay={stagger(4, 100)}>
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerIcon}>{'\uD83D\uDC9A'}</Text>
           <Text style={styles.disclaimerText}>
             LinkLoop is a wellness companion — not a medical device. Always consult your care team.
           </Text>
         </View>
+        </FadeIn>
       </View>
     </ScrollView>
   );

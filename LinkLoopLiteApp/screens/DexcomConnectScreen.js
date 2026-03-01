@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { dexcomAPI } from '../services/api';
 import TYPE from '../config/typography';
+import { FadeIn, stagger } from '../config/animations';
 
 export default function DexcomConnectScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -67,6 +68,7 @@ export default function DexcomConnectScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Header */}
+        <FadeIn delay={stagger(0, 100)} slideY={0}>
         <LinearGradient
           colors={['#00D4AA', '#0099CC']}
           style={styles.header}
@@ -77,7 +79,9 @@ export default function DexcomConnectScreen({ navigation }) {
           <Text style={styles.headerTitle}>Connect Dexcom CGM</Text>
           <Text style={styles.headerSub}>Real-time glucose · Same feed as the Follow app</Text>
         </LinearGradient>
+        </FadeIn>
 
+        <FadeIn delay={stagger(1, 100)}>
         <View style={styles.formCard}>
           {/* How it works */}
           <View style={styles.infoBox}>
@@ -164,6 +168,7 @@ export default function DexcomConnectScreen({ navigation }) {
             <Text style={styles.cancelLinkText}>Cancel</Text>
           </TouchableOpacity>
         </View>
+        </FadeIn>
 
         {/* Security note */}
         <View style={styles.securityNote}>

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { alertsAPI, circleAPI } from '../services/api';
 
 // TODO: Replace with actual App Store / Play Store URLs when live
@@ -209,6 +210,7 @@ export default function CareCircleScreen() {
       />
 
       <View style={styles.content}>
+        <FadeIn delay={stagger(0, 100)}>
         {/* Notifications Banner */}
         <TouchableOpacity
           style={[styles.alertBanner, activeAlertCount > 0 && styles.alertBannerActive]}
@@ -433,6 +435,7 @@ export default function CareCircleScreen() {
           <Text style={[styles.infoCardTitle, { color: accent }]}>Stay Connected</Text>
           <Text style={styles.infoCardDescription}>Your Care Circle helps you share updates with the people who care about you most.</Text>
         </View>
+        </FadeIn>
       </View>
 
       {/* Create Invite Modal */}

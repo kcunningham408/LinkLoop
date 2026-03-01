@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { moodAPI } from '../services/api';
 
 const MOOD_OPTIONS = [
@@ -150,6 +151,7 @@ export default function MoodScreen() {
 
         <View style={styles.content}>
           {/* Mood Picker */}
+          <FadeIn delay={stagger(0, 100)}>
           <View style={styles.moodGrid}>
             {MOOD_OPTIONS.map((mood) => (
               <TouchableOpacity
@@ -168,7 +170,9 @@ export default function MoodScreen() {
               </TouchableOpacity>
             ))}
           </View>
+          </FadeIn>
 
+          <FadeIn delay={stagger(1, 100)}>
           {/* Note Input */}
           <View style={styles.noteContainer}>
             <Text style={styles.noteLabel}>📝 Quick Note (optional)</Text>
@@ -290,6 +294,7 @@ export default function MoodScreen() {
           {entries.length > 0 && (
             <Text style={styles.longPressHint}>Tap to edit · Long press to delete</Text>
           )}
+          </FadeIn>
         </View>
       </ScrollView>
 

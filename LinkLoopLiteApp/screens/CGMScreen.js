@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, Dimensions, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import TYPE from '../config/typography';
+import { FadeIn, stagger } from '../config/animations';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { alertsAPI, dexcomAPI, glucoseAPI, nightscoutAPI, notesAPI } from '../services/api';
@@ -334,12 +335,15 @@ export default function CGMScreen({ navigation }) {
       <View style={styles.content}>
         {/* Warriors only: log reading button */}
         {!isMember && (
+          <FadeIn delay={stagger(0, 100)}>
           <TouchableOpacity style={[styles.addButton, { backgroundColor: accent }]} onPress={() => setShowAddModal(true)}>
             <Text style={styles.addButtonIcon}>➕</Text>
             <Text style={styles.addButtonText}>Log Glucose Reading</Text>
           </TouchableOpacity>
+          </FadeIn>
         )}
 
+        <FadeIn delay={stagger(1, 100)}>
         <View style={styles.chartContainer}>
           <Text style={styles.sectionTitle}>Today's Readings</Text>
           {loading ? (
@@ -381,7 +385,9 @@ export default function CGMScreen({ navigation }) {
             </View>
           )}
         </View>
+        </FadeIn>
 
+        <FadeIn delay={stagger(2, 100)}>
         <View style={styles.statsContainer}>
           <Text style={styles.sectionTitle}>Today's Stats</Text>
           {stats && stats.count > 0 ? (
@@ -395,8 +401,10 @@ export default function CGMScreen({ navigation }) {
             <Text style={styles.noDataText}>Log readings to see your stats</Text>
           )}
         </View>
+        </FadeIn>
 
         {/* Notes Timeline */}
+        <FadeIn delay={stagger(3, 100)}>
         <View style={styles.notesContainer}>
           <View style={styles.notesHeader}>
             <Text style={styles.sectionTitle}>📝 Notes</Text>
@@ -420,9 +428,11 @@ export default function CGMScreen({ navigation }) {
             <Text style={styles.noNotesText}>No notes today — add one to share with your circle</Text>
           )}
         </View>
+        </FadeIn>
 
         {/* Warriors only: connected devices & Dexcom controls */}
         {!isMember && (
+          <FadeIn delay={stagger(4, 100)}>
           <View style={styles.infoCard}>
             <Text style={styles.infoCardTitle}>🔗 Connected Devices</Text>
 
@@ -532,6 +542,7 @@ export default function CGMScreen({ navigation }) {
               </TouchableOpacity>
             )}
           </View>
+          </FadeIn>
         )}
 
       </View>

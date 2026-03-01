@@ -4,6 +4,7 @@ import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, Toucha
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { FadeIn, stagger } from '../config/animations';
 import ScreenHeader from '../components/ScreenHeader';
 import { insightsAPI } from '../services/api';
 
@@ -168,6 +169,7 @@ export default function InsightsScreen() {
 
       <View style={styles.content}>
         {/* Daily Motivation Card — always visible */}
+        <FadeIn delay={0}>
         <View style={[styles.motivationCard, { backgroundColor: accent }]}>
           {motivationLoading ? (
             <View style={styles.motivationLoading}>
@@ -186,8 +188,10 @@ export default function InsightsScreen() {
             </>
           )}
         </View>
+        </FadeIn>
 
         {/* Time Range Selector */}
+        <FadeIn delay={80}>
         <View style={styles.rangeRow}>
           {TIME_RANGES.map(range => (
             <TouchableOpacity
@@ -201,7 +205,9 @@ export default function InsightsScreen() {
             </TouchableOpacity>
           ))}
         </View>
+        </FadeIn>
 
+        <FadeIn delay={stagger(2, 100)}>
         {/* Summary Bar */}
         {summary && (
           <View style={styles.summaryCard}>
@@ -410,6 +416,7 @@ export default function InsightsScreen() {
             Insights and trends are based on patterns in the data you log. They are observations — not medical advice or recommendations. Always work with your care team for health decisions.
           </Text>
         </View>
+        </FadeIn>
       </View>
     </ScrollView>
   );

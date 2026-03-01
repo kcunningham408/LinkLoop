@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { suppliesAPI } from '../services/api';
 
 const SUPPLY_CATEGORIES = [
@@ -103,6 +104,7 @@ export default function SuppliesScreen() {
 
       <View style={styles.content}>
         {/* Supply Summary */}
+        <FadeIn delay={stagger(0, 100)}>
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Supply Summary</Text>
           <View style={styles.summaryRow}>
@@ -120,7 +122,9 @@ export default function SuppliesScreen() {
             </View>
           </View>
         </View>
+        </FadeIn>
 
+        <FadeIn delay={stagger(1, 100)}>
         {/* Supply List */}
         {loading ? (
           <ActivityIndicator size="large" color={accent} style={{ paddingVertical: 40 }} />
@@ -228,6 +232,7 @@ export default function SuppliesScreen() {
             <Text style={styles.tipText}>Reorder supplies early so you never run out of what you need</Text>
           </View>
         </View>
+        </FadeIn>
       </View>
 
       {/* Add Supply Modal */}

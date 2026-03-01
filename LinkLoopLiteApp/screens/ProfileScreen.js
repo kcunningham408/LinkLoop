@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
 const APP_VERSION = Constants.expoConfig?.version || Constants.manifest?.version || '1.1.0';
@@ -190,6 +191,7 @@ export default function ProfileScreen() {
 
       <View style={styles.content}>
         {/* Profile Card */}
+        <FadeIn delay={stagger(0, 100)}>
         <View style={styles.profileCard}>
           <View style={[styles.avatar, { backgroundColor: accent }]}>
             <Text style={styles.avatarText}>{user?.name?.charAt(0)?.toUpperCase() || '∞'}</Text>
@@ -204,7 +206,9 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+        </FadeIn>
 
+        <FadeIn delay={stagger(1, 100)}>
         {/* Account Settings */}
         <View style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
@@ -633,6 +637,7 @@ export default function ProfileScreen() {
             LinkLoop is a personal wellness journal for logging your T1D data. It is not a medical device and does not provide medical advice.
           </Text>
         </View>
+        </FadeIn>
       </View>
     </ScrollView>
   );

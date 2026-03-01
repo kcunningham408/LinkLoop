@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { FadeIn } from '../config/animations';
 import { authAPI, circleAPI, pingServer } from '../services/api';
 
 // mode: 'landing' | 'login' | 'register' | 'join' | 'forgot' | 'reset'
@@ -407,6 +408,7 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          <FadeIn delay={200} duration={500}>
           {/* Show small top logo only when a form is open */}
           {(isLogin || isRegister || isJoin || isForgot || isReset) && (
             <View style={styles.topLogo}>
@@ -417,6 +419,7 @@ export default function LoginScreen() {
 
           {/* Landing CTAs or form */}
           {isLogin || isRegister || isJoin || isForgot || isReset ? renderForm() : renderHero()}
+          </FadeIn>
         </ScrollView>
       </LinearGradient>
     </KeyboardAvoidingView>

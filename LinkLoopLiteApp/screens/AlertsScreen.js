@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
+import { FadeIn, stagger } from '../config/animations';
 import { alertsAPI, glucoseAPI } from '../services/api';
 
 const SEVERITY_CONFIG = {
@@ -340,6 +341,7 @@ export default function AlertsScreen({ navigation }) {
 
       <View style={styles.content}>
         {/* Manual Check Button — subtle, for testing */}
+        <FadeIn delay={stagger(0, 100)}>
         <TouchableOpacity style={styles.checkButton} onPress={handleTriggerCheck}>
           <Text style={styles.checkButtonIcon}>📡</Text>
           <View>
@@ -347,7 +349,9 @@ export default function AlertsScreen({ navigation }) {
             <Text style={styles.checkButtonSub}>Test if current glucose triggers an alert</Text>
           </View>
         </TouchableOpacity>
+        </FadeIn>
 
+        <FadeIn delay={stagger(1, 100)}>
         {/* Filter Tabs */}
         <View style={styles.filterRow}>
           {[
@@ -416,6 +420,7 @@ export default function AlertsScreen({ navigation }) {
             </Text>
           </View>
         </View>
+        </FadeIn>
       </View>
 
       {/* Acknowledge Modal */}

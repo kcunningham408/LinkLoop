@@ -1,9 +1,8 @@
 import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import BloomBackground from '../components/BloomBackground';
 import GlassCard from '../components/GlassCard';
+import LinkLoopBanner from '../components/LinkLoopBanner';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
@@ -200,7 +199,7 @@ export default function ProfileScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 90 }}>
       {/* ── Hero Banner ── */}
       <FadeIn delay={0} slideY={0}>
-      <BloomBackground accent={accent} secondary={gradient[1] || accent} variant="hero" contentStyle={styles.heroBanner}>
+      <LinkLoopBanner accent={accent} secondary={gradient[1] || accent}>
         {/* Decorative circles */}
         <View style={styles.heroDecoCircle1} />
         <View style={styles.heroDecoCircle2} />
@@ -239,7 +238,7 @@ export default function ProfileScreen() {
             <Text style={styles.heroStatValue}>v{APP_VERSION}</Text>
           </View>
         </View>
-      </BloomBackground>
+      </LinkLoopBanner>
       </FadeIn>
 
       <View style={styles.content}>
@@ -683,14 +682,6 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
 
   // ── Hero Banner ──
-  heroBanner: {
-    alignItems: 'center',
-    paddingTop: 50,
-    paddingBottom: 28,
-    paddingHorizontal: 20,
-    overflow: 'hidden',
-    position: 'relative',
-  },
   heroDecoCircle1: {
     position: 'absolute',
     top: -40,

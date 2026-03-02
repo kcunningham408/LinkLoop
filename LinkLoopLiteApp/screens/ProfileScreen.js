@@ -5,6 +5,7 @@ import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, Toucha
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { FadeIn, stagger } from '../config/animations';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
@@ -51,6 +52,7 @@ export default function ProfileScreen() {
   }, []);
 
   const handleLogout = () => {
+    haptic.warning();
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign Out', style: 'destructive', onPress: logout },
@@ -58,6 +60,7 @@ export default function ProfileScreen() {
   };
 
   const handleDeleteAccount = () => {
+    haptic.heavy();
     Alert.alert(
       'Delete Account',
       'Are you sure you want to permanently delete your account? This will remove all your data including glucose readings, care circle, and mood entries. This action cannot be undone.',
@@ -93,9 +96,11 @@ export default function ProfileScreen() {
 
   const handleSaveName = async () => {
     if (!newName.trim()) { Alert.alert('Error', 'Name cannot be empty'); return; }
+    haptic.medium();
     setSavingName(true);
     try {
       await updateUser({ name: newName.trim() });
+      haptic.success();
       setEditingName(false);
     } catch (err) {
       Alert.alert('Error', err.message || 'Could not update name');
@@ -105,6 +110,7 @@ export default function ProfileScreen() {
   };
 
   const handleSaveWarriorName = async () => {
+    haptic.medium();
     setSavingWarriorName(true);
     try {
       await updateUser({ warriorDisplayName: newWarriorName.trim() || null });
@@ -141,6 +147,7 @@ export default function ProfileScreen() {
       return;
     }
     setSavingThresholds(true);
+    haptic.medium();
     try {
       await updateUser({ settings: { lowThreshold: low, highThreshold: high, highAlertDelay: delay } });
       Alert.alert('Saved', 'Your alert settings have been updated.');
@@ -566,7 +573,7 @@ export default function ProfileScreen() {
                     styles.themeOption,
                     isActive && { borderColor: displayColor, borderWidth: 2 },
                   ]}
-                  onPress={() => setTheme(p.id)}
+                  onPress={() => { haptic.selection(); setTheme(p.id); }}
                   activeOpacity={0.7}
                 >
                   <View style={styles.themeColorRow}>

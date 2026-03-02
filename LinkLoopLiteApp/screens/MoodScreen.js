@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { moodAPI } from '../services/api';
@@ -71,10 +72,12 @@ export default function MoodScreen() {
       Alert.alert('Select a Mood', 'Tap how you\'re feeling to log it.');
       return;
     }
+    haptic.medium();
 
     setSaving(true);
     try {
       await moodAPI.log(selectedMood.emoji, selectedMood.label, note.trim());
+      haptic.success();
       setSelectedMood(null);
       setNote('');
       loadData();
@@ -86,6 +89,7 @@ export default function MoodScreen() {
   };
 
   const handleDelete = (id) => {
+    haptic.warning();
     Alert.alert('Delete Entry', 'Remove this mood entry?', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -160,7 +164,7 @@ export default function MoodScreen() {
                   styles.moodOption,
                   selectedMood?.label === mood.label && [styles.moodOptionSelected, { borderColor: accent }],
                 ]}
-                onPress={() => setSelectedMood(mood)}
+                onPress={() => { haptic.selection(); setSelectedMood(mood); }}
               >
                 <Text style={styles.moodEmoji}>{mood.emoji}</Text>
                 <Text style={[

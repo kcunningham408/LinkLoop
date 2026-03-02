@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { FadeIn, ScalePop, stagger } from '../config/animations';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -174,7 +175,7 @@ export default function HomeScreen({ navigation }) {
         {/* Glucose Card */}
         <FadeIn delay={stagger(0, 100)}>
         <Animated.View style={[styles.glucoseGlow, glowAnimatedStyle]}>
-        <TouchableOpacity style={styles.glucoseCard} onPress={() => navigation.navigate('CGM')} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.glucoseCard} onPress={() => { haptic.light(); navigation.navigate('CGM'); }} activeOpacity={0.8}>
           {latestGlucose ? (
             <View>
               {minsOld > 30 && (
@@ -332,7 +333,7 @@ export default function HomeScreen({ navigation }) {
 
 function QuickAction({ emoji, label, onPress, badge }) {
   return (
-    <TouchableOpacity style={styles.quickAction} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.quickAction} onPress={() => { haptic.light(); onPress(); }} activeOpacity={0.7}>
       <View style={styles.quickActionInner}>
         <Text style={styles.quickActionEmoji}>{emoji}</Text>
         {badge ? (

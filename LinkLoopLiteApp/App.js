@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { haptic } from './config/haptics';
 
 // Import context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -32,6 +33,7 @@ function MainTabs() {
   const { palette } = useTheme();
   return (
     <Tab.Navigator
+      screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.warrior,
         tabBarInactiveTintColor: '#888',
@@ -111,6 +113,7 @@ function LoopMemberTabs() {
   const { palette } = useTheme();
   return (
     <Tab.Navigator
+      screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.member,
         tabBarInactiveTintColor: '#888',

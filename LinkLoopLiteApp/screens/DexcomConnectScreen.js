@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { dexcomAPI } from '../services/api';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { FadeIn, stagger } from '../config/animations';
 
 export default function DexcomConnectScreen({ navigation }) {
@@ -32,10 +33,12 @@ export default function DexcomConnectScreen({ navigation }) {
       Alert.alert('Required', 'Please enter your Dexcom password.');
       return;
     }
+    haptic.medium();
 
     setConnecting(true);
     try {
       await dexcomAPI.connectShare(username.trim(), password, region);
+      haptic.success();
       Alert.alert(
         'Connected! 🎉',
         'Dexcom Share is connected. Your glucose readings will sync automatically every 5 minutes.',

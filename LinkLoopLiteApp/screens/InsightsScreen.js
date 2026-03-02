@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import { FadeIn, stagger } from '../config/animations';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { insightsAPI } from '../services/api';
 
@@ -197,7 +198,7 @@ export default function InsightsScreen() {
             <TouchableOpacity
               key={range.hours}
               style={[styles.rangeTab, selectedRange === range.hours && [styles.rangeTabActive, { backgroundColor: accent }]]}
-              onPress={() => setSelectedRange(range.hours)}
+              onPress={() => { haptic.selection(); setSelectedRange(range.hours); }}
             >
               <Text style={[styles.rangeTabText, selectedRange === range.hours && styles.rangeTabTextActive]}>
                 {range.label}
@@ -224,13 +225,13 @@ export default function InsightsScreen() {
         <View style={styles.tabRow}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'insights' && [styles.tabActive, { backgroundColor: accent }]]}
-            onPress={() => setActiveTab('insights')}
+            onPress={() => { haptic.selection(); setActiveTab('insights'); }}
           >
             <Text style={[styles.tabText, activeTab === 'insights' && styles.tabTextActive]}>📋 Insights</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'trends' && [styles.tabActive, { backgroundColor: accent }]]}
-            onPress={() => setActiveTab('trends')}
+            onPress={() => { haptic.selection(); setActiveTab('trends'); }}
           >
             <Text style={[styles.tabText, activeTab === 'trends' && styles.tabTextActive]}>📈 AI Trends</Text>
           </TouchableOpacity>
@@ -309,7 +310,7 @@ export default function InsightsScreen() {
                   <TouchableOpacity
                     key={insight.id}
                     style={[styles.insightCard, { backgroundColor: colors.bg, borderLeftColor: colors.border }]}
-                    onPress={() => setExpandedId(isExpanded ? null : insight.id)}
+                    onPress={() => { haptic.light(); setExpandedId(isExpanded ? null : insight.id); }}
                     activeOpacity={0.7}
                   >
                     <View style={styles.insightTop}>

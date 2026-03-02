@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { chatAPI } from '../services/api';
 
 export default function GroupChatScreen({ navigation }) {
@@ -82,6 +83,7 @@ export default function GroupChatScreen({ navigation }) {
 
   const handleSend = async () => {
     if (!text.trim() || sending) return;
+    haptic.medium();
     const msgText = text.trim();
     setText('');
     setSending(true);

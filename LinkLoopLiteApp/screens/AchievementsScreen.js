@@ -8,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
+import { haptic } from '../config/haptics';
 import { achievementsAPI } from '../services/api';
 
 const CATEGORY_INFO = {
@@ -51,12 +52,14 @@ export default function AchievementsScreen() {
   const onRefresh = () => { setRefreshing(true); loadData(); };
 
   const handleCheckAchievements = async () => {
+    haptic.medium();
     setChecking(true);
     try {
       const result = await achievementsAPI.check();
       setProgress(result.progress);
 
       if (result.newlyUnlocked && result.newlyUnlocked.length > 0) {
+        haptic.success();
         setNewBadges(result.newlyUnlocked);
         // Show celebration
         const badgeNames = result.newlyUnlocked.map(b => `${b.emoji} ${b.title}`).join('\n');

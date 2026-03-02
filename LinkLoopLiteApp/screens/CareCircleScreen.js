@@ -4,6 +4,7 @@ import { ActivityIndicator, Alert, Clipboard, Linking, Modal, Platform, RefreshC
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { alertsAPI, circleAPI } from '../services/api';
@@ -126,6 +127,7 @@ export default function CareCircleScreen() {
   };
 
   const handleShareCode = async () => {
+    haptic.medium();
     try {
       await Share.share({
         message: getInviteMessage(),
@@ -159,6 +161,7 @@ export default function CareCircleScreen() {
   };
 
   const handleRemoveMember = (memberId, name) => {
+    haptic.warning();
     Alert.alert(
       'Remove from Circle',
       `Are you sure you want to remove ${name} from your Care Circle?\n\nThey will lose access to your glucose data, alerts, and group chat.`,

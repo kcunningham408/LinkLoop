@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { alertsAPI, glucoseAPI } from '../services/api';
@@ -109,9 +110,11 @@ export default function AlertsScreen({ navigation }) {
 
   const handleAcknowledge = async () => {
     if (!selectedAlert) return;
+    haptic.medium();
     setSubmitting(true);
     try {
       await alertsAPI.acknowledge(selectedAlert._id, ackMessage.trim());
+      haptic.success();
       Vibration.vibrate(100);
       setShowAckModal(false);
       setSelectedAlert(null);
@@ -125,6 +128,7 @@ export default function AlertsScreen({ navigation }) {
   };
 
   const handleResolve = (alert) => {
+    haptic.warning();
     RNAlert.alert(
       'Resolve Alert',
       'Mark this alert as resolved? This confirms the situation has been handled.',
@@ -146,6 +150,7 @@ export default function AlertsScreen({ navigation }) {
   };
 
   const handleSnooze = (alert) => {
+    haptic.light();
     RNAlert.alert(
       '😴 Snooze Alert',
       'How long would you like to snooze this alert?',

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { chatAPI } from '../services/api';
 
@@ -106,7 +107,7 @@ export default function MessagesScreen({ navigation }) {
     return (
       <TouchableOpacity
         style={styles.row}
-        onPress={() => handleOpenChat(convo)}
+        onPress={() => { haptic.light(); handleOpenChat(convo); }}
         activeOpacity={0.7}
       >
         {/* Accent stripe */}
@@ -177,7 +178,7 @@ export default function MessagesScreen({ navigation }) {
             <>
               <TouchableOpacity
                 style={styles.row}
-                onPress={() => navigation.navigate('GroupChat')}
+                onPress={() => { haptic.light(); navigation.navigate('GroupChat'); }}
                 activeOpacity={0.7}
               >
                 <LinearGradient colors={['#34C759', '#30D158']} style={styles.accentStripe} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} />

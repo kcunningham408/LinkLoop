@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { FadeIn } from '../config/animations';
 import { authAPI, circleAPI, pingServer } from '../services/api';
 
@@ -45,6 +46,7 @@ export default function LoginScreen() {
   }, []);
 
   const resetFields = (newMode) => {
+    haptic.light();
     setMode(newMode);
     setIdentifier('');
     setPassword('');
@@ -58,15 +60,19 @@ export default function LoginScreen() {
   };
 
   const handleSubmit = async () => {
+    haptic.medium();
     if (mode === 'login') {
       if (!identifier || !password) {
+        haptic.error();
         Alert.alert('Error', 'Please enter your email/phone and password');
         return;
       }
       setIsLoading(true);
       try {
         await login(identifier, password);
+        haptic.success();
       } catch (err) {
+        haptic.error();
         Alert.alert('Sign In Failed', err.message || 'Check your credentials and try again');
       } finally {
         setIsLoading(false);
@@ -74,13 +80,16 @@ export default function LoginScreen() {
 
     } else if (mode === 'register') {
       if (!identifier || !password || !name) {
+        haptic.error();
         Alert.alert('Error', 'Please fill in all fields');
         return;
       }
       setIsLoading(true);
       try {
         await register(identifier, password, name, 'warrior');
+        haptic.success();
       } catch (err) {
+        haptic.error();
         Alert.alert('Sign Up Failed', err.message || 'Something went wrong');
       } finally {
         setIsLoading(false);
@@ -88,6 +97,7 @@ export default function LoginScreen() {
 
     } else if (mode === 'join') {
       if (!inviteCode || !name || !identifier || !password) {
+        haptic.error();
         Alert.alert('Error', 'Please fill in all fields');
         return;
       }
@@ -95,7 +105,9 @@ export default function LoginScreen() {
       try {
         await register(identifier, password, name, 'member');
         await circleAPI.joinCircle(inviteCode.trim().toUpperCase());
+        haptic.success();
       } catch (err) {
+        haptic.error();
         Alert.alert('Join Failed', err.message || 'Invalid invite code or sign-up issue');
       } finally {
         setIsLoading(false);
@@ -103,6 +115,7 @@ export default function LoginScreen() {
 
     } else if (mode === 'forgot') {
       if (!identifier) {
+        haptic.error();
         Alert.alert('Error', 'Please enter your email or phone number');
         return;
       }

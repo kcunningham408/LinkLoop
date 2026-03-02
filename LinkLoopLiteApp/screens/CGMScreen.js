@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, Dimensions, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import { FadeIn, stagger } from '../config/animations';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -234,6 +235,7 @@ export default function CGMScreen({ navigation }) {
 
   const handleAddNote = async () => {
     if (!newNoteText.trim()) return;
+    haptic.medium();
     setNoteSaving(true);
     try {
       await notesAPI.add(newNoteText.trim());
@@ -248,6 +250,7 @@ export default function CGMScreen({ navigation }) {
   };
 
   const handleDeleteNote = (id) => {
+    haptic.warning();
     Alert.alert('Delete Note', 'Remove this note?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {

@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { suppliesAPI } from '../services/api';
@@ -76,6 +77,7 @@ export default function SuppliesScreen() {
   };
 
   const handleDeleteSupply = (id, name) => {
+    haptic.warning();
     Alert.alert('Delete Supply', `Remove ${name} from your supplies?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
@@ -161,7 +163,7 @@ export default function SuppliesScreen() {
         )}
 
         {/* Add Supply Button */}
-        <TouchableOpacity style={[styles.addButton, { borderColor: accent }]} onPress={() => setShowAddModal(true)}>
+        <TouchableOpacity style={[styles.addButton, { borderColor: accent }]} onPress={() => { haptic.light(); setShowAddModal(true); }}>
           <Text style={styles.addButtonIcon}>➕</Text>
           <Text style={[styles.addButtonText, { color: accent }]}>Add Supply</Text>
         </TouchableOpacity>

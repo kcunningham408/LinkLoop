@@ -8,6 +8,7 @@ import { chatAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import TYPE from '../config/typography';
+import { haptic } from '../config/haptics';
 
 export default function ChatScreen({ route, navigation }) {
   const { circleId, memberName, memberEmoji, relationship } = route.params;
@@ -67,6 +68,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const handleSend = async () => {
     if (!text.trim() || sending) return;
+    haptic.medium();
     const msgText = text.trim();
     setText('');
     setSending(true);

@@ -179,6 +179,19 @@ async function syncUserViaShare(user, GlucoseReading) {
   const password = decryptPassword(user.dexcomShare.passwordEncrypted);
   const region   = user.dexcomShare.region || 'us';
 
+  // ── Helper: full re-auth (both accountId + sessionId) ──────────
+  // Called when the stored session is stale, e.g. after a sensor change,
+  // app reinstall, or Dexcom-side session expiry.
+  async function fullReAuth() {
+    console.log(`[DexcomShare] Full re-auth for user ${user._id}...`);
+    const newAccountId = await getAccountId(user.dexcomShare.username, password, region);
+    user.dexcomShare.accountId = newAccountId;
+    const newSessionId = await getSessionId(newAccountId, password, region);
+    user.dexcomShare.sessionId = newSessionId;
+    await user.save();
+    return { accountId: newAccountId, sessionId: newSessionId };
+  }
+
   // Re-authenticate if we don't have a valid sessionId
   let { accountId, sessionId } = user.dexcomShare;
 
@@ -202,26 +215,49 @@ async function syncUserViaShare(user, GlucoseReading) {
     rawRecords = await fetchShareReadings(sessionId, region, 1440, 288);
   } catch (err) {
     const code = err.response?.data?.Code;
-    // Session expired — clear and retry once
-    if (code === 'SessionIdNotFound' || code === 'SessionNotValid') {
-      console.log(`[DexcomShare] Session expired for user ${user._id}, re-authenticating...`);
-      user.dexcomShare.sessionId = null;
-      sessionId = await getSessionId(accountId, password, region);
-      user.dexcomShare.sessionId = sessionId;
-      rawRecords = await fetchShareReadings(sessionId, region, 1440, 288);
+    const status = err.response?.status;
+    // Session or account expired / invalid — full re-auth and retry once.
+    // This commonly happens after a sensor change, app reinstall, or long idle period.
+    // Dexcom can return various error codes: SessionIdNotFound, SessionNotValid,
+    // AccountIdNotFound, InvalidArgument, or just a 500/401.
+    if (code === 'SessionIdNotFound' || code === 'SessionNotValid' ||
+        code === 'AccountIdNotFound' || code === 'InvalidArgument' ||
+        status === 401 || status === 500) {
+      console.log(`[DexcomShare] Session/account invalid for user ${user._id} (code=${code}, status=${status}), full re-auth...`);
+      try {
+        ({ accountId, sessionId } = await fullReAuth());
+        rawRecords = await fetchShareReadings(sessionId, region, 1440, 288);
+      } catch (retryErr) {
+        console.error(`[DexcomShare] Re-auth retry also failed for user ${user._id}:`, retryErr.response?.data || retryErr.message);
+        // Clear stale session so next cron cycle starts fresh
+        user.dexcomShare.sessionId = null;
+        user.dexcomShare.accountId = null;
+        await user.save();
+        throw retryErr;
+      }
     } else {
+      // Unknown error — clear stale session so next cycle retries cleanly
+      user.dexcomShare.sessionId = null;
+      await user.save();
       throw err;
     }
   }
 
-  // Empty result can also mean a silently-expired session — force re-auth once
+  // Empty result can also mean a silently-expired session (common after sensor
+  // change — the old session returns [] instead of an error). Full re-auth once.
   if (!rawRecords || rawRecords.length === 0) {
-    console.log(`[DexcomShare] Empty result for user ${user._id}, forcing re-auth...`);
-    user.dexcomShare.sessionId = null;
-    sessionId = await getSessionId(accountId, password, region);
-    user.dexcomShare.sessionId = sessionId;
-    await user.save();
-    rawRecords = await fetchShareReadings(sessionId, region, 1440, 288);
+    console.log(`[DexcomShare] Empty result for user ${user._id}, forcing full re-auth...`);
+    try {
+      ({ accountId, sessionId } = await fullReAuth());
+      rawRecords = await fetchShareReadings(sessionId, region, 1440, 288);
+    } catch (retryErr) {
+      console.error(`[DexcomShare] Re-auth on empty also failed for user ${user._id}:`, retryErr.response?.data || retryErr.message);
+      // If the new sensor is still in warmup, Dexcom legitimately returns nothing.
+      // Save what we have and let the next cron cycle try again.
+      user.dexcomShare.lastSync = new Date();
+      await user.save();
+      return { synced: 0 };
+    }
   }
 
   await user.save();

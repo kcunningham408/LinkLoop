@@ -415,13 +415,21 @@ router.post('/share-sync', auth, async (req, res) => {
     res.json({
       message: result.synced > 0
         ? `Synced ${result.synced} new reading${result.synced !== 1 ? 's' : ''} from Dexcom`
-        : 'No new readings found',
+        : 'No new readings yet — if you recently changed your sensor, it may still be warming up. Readings should appear within 2 hours.',
       synced: result.synced,
       latestValue: result.latestValue || null,
     });
   } catch (err) {
     console.error('Dexcom Share sync error:', err.response?.data || err.message);
-    res.status(500).json({ message: 'Failed to sync via Dexcom Share' });
+    const dexCode = err.response?.data?.Code;
+    // If the error is auth-related, tell the user to re-enter credentials
+    if (dexCode === 'SSO_AuthenticateAccountNotFound' || dexCode === 'SSO_InternalError' ||
+        err.response?.status === 401) {
+      return res.status(401).json({
+        message: 'Dexcom login session expired. Please disconnect and reconnect Dexcom Share with your credentials.',
+      });
+    }
+    res.status(500).json({ message: 'Failed to sync via Dexcom Share. If you just changed your sensor, try again in a few minutes.' });
   }
 });
 

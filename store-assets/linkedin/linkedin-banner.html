@@ -16,10 +16,10 @@
   .banner {
     width:1584px; height:396px; position:relative; overflow:hidden;
     background:
-      radial-gradient(ellipse 600px 400px at 20% 40%, rgba(74,144,217,0.18) 0%, transparent 70%),
-      radial-gradient(ellipse 500px 350px at 55% 60%, rgba(52,199,89,0.12) 0%, transparent 65%),
+      radial-gradient(ellipse 600px 400px at 45% 40%, rgba(74,144,217,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 350px at 65% 55%, rgba(52,199,89,0.12) 0%, transparent 65%),
       radial-gradient(ellipse 400px 300px at 80% 30%, rgba(155,89,182,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 300px 200px at 40% 80%, rgba(74,144,217,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse 300px 200px at 55% 75%, rgba(74,144,217,0.05) 0%, transparent 50%),
       #0A0A0F;
   }
 
@@ -30,17 +30,17 @@
   }
   .blob.blue {
     width:420px; height:360px;
-    top:-60px; left:80px;
+    top:-60px; left:350px;
     background: rgba(74,144,217,0.14);
   }
   .blob.green {
     width:380px; height:320px;
-    top:40px; right:200px;
+    top:40px; right:120px;
     background: rgba(52,199,89,0.10);
   }
   .blob.purple {
     width:280px; height:240px;
-    bottom:-40px; left:40%;
+    bottom:-40px; left:50%;
     background: rgba(155,89,182,0.06);
   }
   .blob.accent-right {
@@ -53,7 +53,7 @@
   .glass-card {
     position:absolute; z-index:3;
     width:200px; height:200px; border-radius:50%;
-    top:50%; left:160px; transform:translateY(-50%);
+    top:50%; left:480px; transform:translateY(-50%);
     background: rgba(255,255,255,0.015);
     border:1px solid rgba(255,255,255,0.04);
     box-shadow: inset 0 0 40px rgba(74,144,217,0.03);
@@ -63,14 +63,14 @@
   .loop-svg {
     position:absolute; z-index:5;
     width:140px; height:140px;
-    top:50%; left:160px; transform:translate(-50%, -50%) translateX(100px);
+    top:50%; left:580px; transform:translate(-50%, -50%);
     filter: drop-shadow(0 0 30px rgba(74,144,217,0.35)) drop-shadow(0 0 60px rgba(52,199,89,0.12));
   }
 
   /* ── Main wordmark ── */
   .wordmark {
     position:absolute; z-index:10;
-    left:380px; top:72px;
+    left:700px; top:72px;
     font-size:72px; font-weight:900; letter-spacing:-3px; line-height:1;
     background: linear-gradient(135deg, #7BB3FF 0%, #4A90D9 35%, #34C759 100%);
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
@@ -79,7 +79,7 @@
   /* ── Tagline ── */
   .tagline {
     position:absolute; z-index:10;
-    left:384px; top:152px;
+    left:704px; top:152px;
     font-size:15px; font-weight:700;
     color:rgba(255,255,255,0.20);
     letter-spacing:10px; text-transform:uppercase;
@@ -88,14 +88,14 @@
   /* ── Shayla's name — personalized ── */
   .shayla {
     position:absolute; z-index:10;
-    left:384px; top:202px;
+    left:704px; top:202px;
     font-size:22px; font-weight:800; letter-spacing:-0.5px;
     background: linear-gradient(135deg, #34C759 0%, #5FE89D 60%, #7BB3FF 100%);
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
   }
   .shayla-role {
     position:absolute; z-index:10;
-    left:384px; top:232px;
+    left:704px; top:232px;
     font-size:12px; font-weight:600;
     color:rgba(255,255,255,0.14);
     letter-spacing:3px; text-transform:uppercase;
@@ -145,7 +145,7 @@
 
   /* ── Care circle dots ── */
   .circle-dots {
-    position:absolute; right:340px; top:50%; transform:translateY(-50%); z-index:8;
+    position:absolute; left:440px; top:50%; transform:translateY(-50%); z-index:8;
     display:flex; flex-direction:column; gap:10px;
     opacity:0.55;
   }
@@ -171,9 +171,9 @@
     text-transform:uppercase;
     color:rgba(255,255,255,0.12);
   }
-  .pill-1 { right:420px; bottom:50px; }
-  .pill-2 { right:280px; bottom:48px; }
-  .pill-3 { right:120px; bottom:52px; }
+  .pill-1 { left:700px; bottom:50px; }
+  .pill-2 { left:840px; bottom:48px; }
+  .pill-3 { left:980px; bottom:52px; }
 
   /* ── Ambient grid dots ── */
   .grid-dots {
@@ -225,7 +225,7 @@
 
   /* ── VibeCMD ── */
   .vibecmd {
-    position:absolute; bottom:16px; left:24px; z-index:12;
+    position:absolute; bottom:16px; right:24px; z-index:12;
     display:flex; align-items:center; gap:5px;
   }
   .vibecmd .td { width:5px; height:5px; border-radius:50%; }
@@ -249,8 +249,8 @@
   /* ── Left-side subtle vignette ── */
   .fade-left {
     position:absolute; z-index:6;
-    top:0; left:0; bottom:0; width:60px;
-    background: linear-gradient(270deg, transparent 0%, rgba(10,10,15,0.3) 100%);
+    top:0; left:0; bottom:0; width:300px;
+    background: linear-gradient(270deg, transparent 0%, rgba(10,10,15,0.5) 100%);
   }
 </style>
 </head>

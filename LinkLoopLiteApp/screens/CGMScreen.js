@@ -115,7 +115,7 @@ export default function CGMScreen({ navigation }) {
     };
   }, [loadData]);
 
-  const onRefresh = () => { setRefreshing(true); loadData(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadData(); };
 
   const handleAddReading = async () => {
     const val = parseInt(newValue);

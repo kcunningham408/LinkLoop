@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -135,6 +136,7 @@ export default function InsightsScreen() {
   }, [activeTab, loading]);
 
   const onRefresh = () => {
+    haptic.light();
     setRefreshing(true);
     setAiSummary(null);
     setAiTrends([]);
@@ -211,18 +213,18 @@ export default function InsightsScreen() {
         <FadeIn delay={stagger(2, 100)}>
         {/* Summary Bar */}
         {summary && (
-          <View style={styles.summaryCard}>
+          <GlassCard style={styles.summaryCard}>
             <View style={styles.summaryRow}>
               <SummaryPill label="Readings" value={summary.readingCount} color="#666" />
               <SummaryPill label="Avg" value={summary.average + ''} color="#FFA500" />
               <SummaryPill label="TIR" value={summary.timeInRange + '%'} color="#4CAF50" />
               <SummaryPill label="Range" value={summary.min + '-' + summary.max} color="#666" />
             </View>
-          </View>
+          </GlassCard>
         )}
 
         {/* Tab Switcher: Insights vs Trends */}
-        <View style={styles.tabRow}>
+        <GlassCard style={styles.tabRow}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'insights' && [styles.tabActive, { backgroundColor: accent }]]}
             onPress={() => { haptic.selection(); setActiveTab('insights'); }}
@@ -235,7 +237,7 @@ export default function InsightsScreen() {
           >
             <Text style={[styles.tabText, activeTab === 'trends' && styles.tabTextActive]}>📈 AI Trends</Text>
           </TouchableOpacity>
-        </View>
+        </GlassCard>
 
         {/* ======== INSIGHTS TAB ======== */}
         {activeTab === 'insights' && (
@@ -263,7 +265,7 @@ export default function InsightsScreen() {
 
             {/* AI Summary Card */}
             {!loading && insights.length > 0 && (
-              <View style={styles.aiCard}>
+              <GlassCard style={styles.aiCard}>
                 <View style={styles.aiCardHeader}>
                   <Text style={styles.aiCardIcon}>🤖</Text>
                   <Text style={styles.aiCardTitle}>AI Analysis</Text>
@@ -286,7 +288,7 @@ export default function InsightsScreen() {
                     <Text style={[styles.refreshButtonText, { color: accent }]}>✨ Generate AI Insight</Text>
                   </TouchableOpacity>
                 )}
-              </View>
+              </GlassCard>
             )}
 
             {/* Insights List */}
@@ -348,7 +350,7 @@ export default function InsightsScreen() {
         {activeTab === 'trends' && (
           <>
             {/* Trends Header */}
-            <View style={styles.trendsHeader}>
+            <GlassCard style={styles.trendsHeader}>
               <Text style={styles.trendsHeaderIcon}>📈</Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.trendsHeaderTitle}>AI Trend Notifications</Text>
@@ -359,7 +361,7 @@ export default function InsightsScreen() {
                   <Text style={styles.trendsRefreshText}>🔄</Text>
                 </TouchableOpacity>
               )}
-            </View>
+            </GlassCard>
 
             {trendsLoading ? (
               <View style={styles.loadingBox}>
@@ -411,12 +413,12 @@ export default function InsightsScreen() {
         )}
 
         {/* Disclaimer */}
-        <View style={styles.disclaimerBox}>
+        <GlassCard style={styles.disclaimerBox}>
           <Text style={styles.disclaimerIcon}>💚</Text>
           <Text style={styles.disclaimerText}>
             Insights and trends are based on patterns in the data you log. They are observations — not medical advice or recommendations. Always work with your care team for health decisions.
           </Text>
-        </View>
+        </GlassCard>
         </FadeIn>
       </View>
     </ScrollView>
@@ -433,8 +435,8 @@ function SummaryPill({ label, value, color }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111111' },
-  content: { padding: 20 },
+  container: { flex: 1, backgroundColor: '#0A0A0F' },
+  content: { padding: 20, paddingBottom: 90 },
 
   // Daily motivation
   motivationCard: { backgroundColor: '#4A90D9', borderRadius: 16, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#3A7BC8' },
@@ -444,21 +446,21 @@ const styles = StyleSheet.create({
   motivationLoadingText: { fontSize: 13, color: '#fff', marginLeft: 10 },
 
   // Time range
-  rangeRow: { flexDirection: 'row', backgroundColor: '#2C2C2E', borderRadius: 12, padding: 4, marginBottom: 20 },
+  rangeRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   rangeTab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   rangeTabActive: { backgroundColor: '#4A90D9' },
   rangeTabText: { fontSize: TYPE.md, color: '#A0A0A0', fontWeight: TYPE.semibold },
   rangeTabTextActive: { color: '#fff' },
 
   // Summary
-  summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  summaryCard: { borderRadius: 12, padding: 16, marginBottom: 20 },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between' },
   summaryPill: { alignItems: 'center', flex: 1 },
   summaryValue: { fontSize: 20, fontWeight: TYPE.bold, marginBottom: 4 },
   summaryLabel: { fontSize: 11, color: '#888' },
 
   // Tab switcher
-  tabRow: { flexDirection: 'row', backgroundColor: '#1C1C1E', borderRadius: 12, padding: 4, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  tabRow: { flexDirection: 'row', borderRadius: 12, padding: 4, marginBottom: 20 },
   tab: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   tabActive: { backgroundColor: '#4A90D9' },
   tabText: { fontSize: TYPE.md, color: '#A0A0A0', fontWeight: TYPE.bold },
@@ -492,7 +494,7 @@ const styles = StyleSheet.create({
   expandHint: { fontSize: 11, color: '#666', textAlign: 'center', marginTop: 10 },
 
   // AI card
-  aiCard: { backgroundColor: '#1A2235', borderRadius: 14, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: '#2A3A50' },
+  aiCard: { borderRadius: 14, padding: 18, marginBottom: 20 },
   aiCardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   aiCardIcon: { fontSize: TYPE.h3, marginRight: 8 },
   aiCardTitle: { fontSize: 17, fontWeight: TYPE.bold, color: '#fff', flex: 1 },
@@ -502,15 +504,15 @@ const styles = StyleSheet.create({
   aiLoadingText: { fontSize: 13, color: '#4A90D9', marginLeft: 10 },
   aiButton: { backgroundColor: '#4A90D9', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
   aiButtonText: { color: '#fff', fontSize: 15, fontWeight: TYPE.bold },
-  refreshButton: { alignSelf: 'center', marginTop: 14, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20, backgroundColor: '#2A3A50', borderWidth: 1, borderColor: '#4A90D9' },
+  refreshButton: { alignSelf: 'center', marginTop: 14, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: '#4A90D9' },
   refreshButtonText: { fontSize: TYPE.md, color: '#4A90D9', fontWeight: TYPE.bold },
 
   // Trends tab
-  trendsHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  trendsHeader: { flexDirection: 'row', alignItems: 'center', borderRadius: 14, padding: 16, marginBottom: 16 },
   trendsHeaderIcon: { fontSize: 30, marginRight: 12 },
   trendsHeaderTitle: { fontSize: 17, fontWeight: TYPE.bold, color: '#fff' },
   trendsHeaderSub: { fontSize: TYPE.sm, color: '#888', marginTop: 2 },
-  trendsRefreshBtn: { padding: 8, borderRadius: 20, backgroundColor: '#1A2235' },
+  trendsRefreshBtn: { padding: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)' },
   trendsRefreshText: { fontSize: TYPE.xl },
 
   // Trend cards
@@ -525,7 +527,7 @@ const styles = StyleSheet.create({
   trendMessage: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 21 },
 
   // Disclaimer
-  disclaimerBox: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  disclaimerBox: { borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30 },
   disclaimerIcon: { fontSize: TYPE.xxl, marginRight: 10, marginTop: 2 },
   disclaimerText: { flex: 1, fontSize: TYPE.sm, color: '#888', lineHeight: 18 },
 });

@@ -91,7 +91,7 @@ export default function MessagesScreen({ navigation }) {
     }, [loadConversations])
   );
 
-  const onRefresh = () => { setRefreshing(true); loadConversations(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadConversations(); };
 
   const handleOpenChat = (convo) => {
     navigation.navigate('Chat', {

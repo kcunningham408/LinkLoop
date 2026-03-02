@@ -87,7 +87,7 @@ export default function CareCircleScreen() {
   }, []);
 
   useEffect(() => { loadMembers(); loadBadges(); }, [loadMembers, loadBadges]);
-  const onRefresh = () => { setRefreshing(true); loadMembers(); loadBadges(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadMembers(); loadBadges(); };
 
   const handleCreateInvite = async () => {
     if (!newName.trim()) { Alert.alert('Error', 'Please enter a name'); return; }

@@ -87,6 +87,28 @@ router.post('/join', auth, async (req, res) => {
 
     const owner = await User.findById(invitation.ownerId).select('name profileEmoji');
 
+    // Notify other circle members that someone new joined
+    const joiner = await User.findById(req.user.userId).select('name');
+    const joinerName = joiner?.name || 'Someone';
+    const otherMembers = await CareCircle.find({
+      ownerId: invitation.ownerId,
+      status: { $in: ['active', 'paused'] },
+      memberId: { $ne: req.user.userId },
+    }).select('memberId');
+    const notifyIds = otherMembers
+      .filter(m => m.memberId)
+      .map(m => m.memberId.toString());
+    // Also notify the warrior (circle owner)
+    notifyIds.push(invitation.ownerId.toString());
+    if (notifyIds.length > 0) {
+      sendPushToUsers(
+        notifyIds,
+        '∞ New Circle Member',
+        `${joinerName} just joined the Care Circle!`,
+        { type: 'circle_joined' }
+      ).catch(err => console.error('[Push] Circle join notification error:', err));
+    }
+
     res.json({
       message: 'Successfully joined Care Circle',
       owner: { name: owner.name, emoji: owner.profileEmoji }
@@ -247,6 +269,26 @@ router.delete('/:id', auth, async (req, res) => {
         `${warriorName} has removed you from their Care Circle. You no longer have access to their glucose data.`,
         { type: 'circle_removed' }
       ).catch(err => console.error('[Push] Circle removal notification error:', err));
+
+      // Notify remaining circle members
+      const removedUser = await User.findById(member.memberId).select('name');
+      const removedName = removedUser?.name || 'A member';
+      const remaining = await CareCircle.find({
+        ownerId: req.user.userId,
+        status: { $in: ['active', 'paused'] },
+        memberId: { $ne: member.memberId },
+      }).select('memberId');
+      const remainingIds = remaining
+        .filter(m => m.memberId)
+        .map(m => m.memberId.toString());
+      if (remainingIds.length > 0) {
+        sendPushToUsers(
+          remainingIds,
+          '∞ Circle Update',
+          `${removedName} has left the Care Circle.`,
+          { type: 'circle_left' }
+        ).catch(err => console.error('[Push] Circle leave notification error:', err));
+      }
     }
 
     res.json({ message: 'Member removed from Care Circle' });

@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, Dimensions, RefreshControl, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import GlassCard from '../components/GlassCard';
 import GlucoseRing from '../components/GlucoseRing';
@@ -94,7 +94,20 @@ export default function HomeScreen({ navigation }) {
     };
   }, [loadData]);
 
-  const onRefresh = () => { setRefreshing(true); loadData(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadData(); };
+
+  const shareGlucoseSnapshot = async () => {
+    if (!latestGlucose) return;
+    haptic.medium();
+    const status = getGlucoseStatus(latestGlucose.value);
+    const trend = getTrendArrow(latestGlucose.trend);
+    const time = new Date(latestGlucose.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const name = isMember ? (warriorName || 'Warrior') : (user?.name || 'My');
+    const msg = `∞ LinkLoop · ${name}'s glucose\n${latestGlucose.value} mg/dL ${trend} · ${status}\n🕐 ${time}${minsOld != null ? ' (' + minsOld + 'm ago)' : ''}`;
+    try {
+      await Share.share({ message: msg });
+    } catch (e) {}
+  };
 
   const getGlucoseColor = (value) => {
     if (!value) return accent;
@@ -141,6 +154,20 @@ export default function HomeScreen({ navigation }) {
     borderColor: glowColor + (isOutOfRange ? '60' : '30'),
   }));
 
+  // Live status dot pulse
+  const livePulse = useSharedValue(0.4);
+  useEffect(() => {
+    livePulse.value = withRepeat(
+      withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+  }, []);
+  const liveDotStyle = useAnimatedStyle(() => ({
+    opacity: livePulse.value,
+    transform: [{ scale: 0.8 + livePulse.value * 0.2 }],
+  }));
+
   /* ── Stat arc helper ── */
   const ARC_SIZE = Math.floor((SCREEN_W - 64) / 4);
 
@@ -183,7 +210,7 @@ export default function HomeScreen({ navigation }) {
         {/* ─── Glucose Ring Hero Card ─── */}
         <FadeIn delay={stagger(0, 100)}>
           <Animated.View style={[styles.glucoseGlow, glowAnimatedStyle]}>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => { haptic.light(); navigation.navigate('CGM'); }}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => { haptic.light(); navigation.navigate('CGM'); }} onLongPress={shareGlucoseSnapshot}>
               <GlassCard accent={glowColor} glow>
                 {latestGlucose ? (
                   <View style={styles.glucoseInner}>
@@ -192,9 +219,14 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.staleWarningText}>{'\u26A0\uFE0F'} Data is {minsOld} min old</Text>
                       </View>
                     )}
-                    <Text style={styles.glucoseLabel}>
-                      {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
-                    </Text>
+                    <View style={styles.glucoseLabelRow}>
+                      <Text style={styles.glucoseLabel}>
+                        {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
+                      </Text>
+                      {isMember && minsOld != null && minsOld <= 30 && (
+                        <Animated.View style={[styles.liveDot, { backgroundColor: minsOld < 5 ? '#4CAF50' : minsOld < 15 ? '#FFA500' : '#FF6B6B' }, liveDotStyle]} />
+                      )}
+                    </View>
                     <View style={styles.ringRow}>
                       <GlucoseRing
                         value={latestGlucose.value}
@@ -213,7 +245,7 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.ringTime}>
                           {new Date(latestGlucose.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
-                        <Text style={styles.ringHint}>Tap for details {'›'}</Text>
+                        <Text style={styles.ringHint}>Tap for details · Hold to share</Text>
                       </View>
                     </View>
                   </View>
@@ -350,7 +382,9 @@ const styles = StyleSheet.create({
   glucoseInner: {},
   staleWarning: { backgroundColor: 'rgba(255,165,0,0.12)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.35)' },
   staleWarningText: { fontSize: TYPE.sm, color: '#FFA500', fontWeight: TYPE.semibold },
-  glucoseLabel: { fontSize: TYPE.xs, color: '#999', fontWeight: TYPE.semibold, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
+  glucoseLabelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  glucoseLabel: { fontSize: TYPE.xs, color: '#999', fontWeight: TYPE.semibold, textTransform: 'uppercase', letterSpacing: 1 },
+  liveDot: { width: 8, height: 8, borderRadius: 4, marginLeft: 8 },
   ringRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   ringMeta: { flex: 1, marginLeft: 16, alignItems: 'flex-start' },
   statusPill: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, marginBottom: 10 },

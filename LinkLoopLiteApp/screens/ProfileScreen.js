@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import GlassCard from '../components/GlassCard';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
@@ -248,7 +249,7 @@ export default function ProfileScreen() {
       <View style={styles.content}>
         <FadeIn delay={stagger(1, 100)}>
         {/* Account Settings */}
-        <View style={styles.settingsCard}>
+        <GlassCard style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
 
           <View style={styles.settingItem}>
@@ -328,10 +329,10 @@ export default function ProfileScreen() {
               </View>
             </View>
           )}
-        </View>
+        </GlassCard>
 
         {/* Alert Thresholds */}
-        <View style={styles.settingsCard}>
+        <GlassCard style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>🎯 Alert Thresholds</Text>
           <Text style={[styles.settingDescription, { marginBottom: 14 }]}>
             {isMember
@@ -402,10 +403,10 @@ export default function ProfileScreen() {
           >
             <Text style={styles.nameSaveBtnText}>{savingThresholds ? 'Saving...' : 'Save Alert Settings'}</Text>
           </TouchableOpacity>
-        </View>
+        </GlassCard>
 
         {/* Push Notification Preferences */}
-        <View style={styles.settingsCard}>
+        <GlassCard style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>{'\uD83D\uDD14'} Notification Preferences</Text>
           <Text style={[styles.settingDescription, { marginBottom: 12 }]}>
             Control which push notifications you receive
@@ -505,11 +506,11 @@ export default function ProfileScreen() {
               thumbColor="#fff"
             />
           </View>
-        </View>
+        </GlassCard>
 
         {/* Pause Alerts — Members only */}
         {isMember && (
-          <View style={styles.settingsCard}>
+          <GlassCard style={styles.settingsCard}>
             <Text style={styles.sectionTitle}>⏸️ Pause Alerts</Text>
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
@@ -531,12 +532,12 @@ export default function ProfileScreen() {
                 thumbColor="#fff"
               />
             </View>
-          </View>
+          </GlassCard>
         )}
 
         {/* Export Data — Warriors only */}
         {!isMember && (
-          <View style={styles.settingsCard}>
+          <GlassCard style={styles.settingsCard}>
             <Text style={styles.sectionTitle}>📤 Export Data</Text>
             <TouchableOpacity
               style={[styles.settingItem, { justifyContent: 'center' }]}
@@ -552,11 +553,11 @@ export default function ProfileScreen() {
               </View>
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
-          </View>
+          </GlassCard>
         )}
 
         {/* Theme Picker */}
-        <View style={styles.settingsCard}>
+        <GlassCard style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>🎨 App Theme</Text>
           <Text style={[styles.settingDescription, { marginBottom: 16 }]}>
             Choose a color palette for your LinkLoop experience
@@ -606,10 +607,10 @@ export default function ProfileScreen() {
               <View style={[styles.themePreviewDot, { backgroundColor: accent }]} />
             </View>
           </View>
-        </View>
+        </GlassCard>
 
         {/* App Info */}
-        <View style={styles.settingsCard}>
+        <GlassCard style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>App Information</Text>
 
           <View style={styles.settingItem}>
@@ -654,7 +655,7 @@ export default function ProfileScreen() {
             </View>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
-        </View>
+        </GlassCard>
 
         {/* Sign Out */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -669,12 +670,12 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* Disclaimer */}
-        <View style={styles.disclaimerCard}>
+        <GlassCard style={styles.disclaimerCard}>
           <Text style={styles.disclaimerIcon}>💚</Text>
           <Text style={styles.disclaimerText}>
             LinkLoop is a personal wellness journal for logging your T1D data. It is not a medical device and does not provide medical advice.
           </Text>
-        </View>
+        </GlassCard>
         </FadeIn>
       </View>
     </ScrollView>
@@ -682,7 +683,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111111' },
+  container: { flex: 1, backgroundColor: '#0A0A0F' },
   content: { padding: 20 },
 
   // ── Hero Banner ──
@@ -759,9 +760,9 @@ const styles = StyleSheet.create({
   heroStatLabel: { fontSize: TYPE.xs, color: 'rgba(255,255,255,0.6)', fontWeight: TYPE.medium, marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
   heroStatValue: { fontSize: TYPE.md, color: '#fff', fontWeight: TYPE.bold },
 
-  settingsCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  settingsCard: { borderRadius: 12, padding: 20, marginBottom: 20 },
   sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
-  settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  settingItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   settingInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   settingIcon: { fontSize: TYPE.h3, marginRight: 14 },
   settingTitle: { fontSize: 15, fontWeight: TYPE.semibold, color: '#fff', marginBottom: 2 },
@@ -772,31 +773,31 @@ const styles = StyleSheet.create({
   dexcomDisconnectText: { fontSize: 13, color: '#FF6B6B', fontWeight: TYPE.semibold },
   dexcomConnectButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#1A2235', borderWidth: 1, borderColor: '#4A90D9' },
   dexcomConnectText: { fontSize: 13, color: '#4A90D9', fontWeight: TYPE.semibold },
-  logoutButton: { backgroundColor: '#2A1A1A', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#3A2020' },
+  logoutButton: { backgroundColor: 'rgba(255,60,60,0.08)', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,60,60,0.15)' },
   logoutIcon: { fontSize: 20, marginRight: 10 },
   logoutText: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#FF6B6B' },
-  deleteAccountButton: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  deleteAccountButton: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   deleteAccountIcon: { fontSize: TYPE.xl, marginRight: 10 },
   deleteAccountText: { fontSize: TYPE.md, fontWeight: TYPE.semibold, color: '#888' },
-  disclaimerCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 30, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  disclaimerCard: { borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 30 },
   disclaimerIcon: { fontSize: 20, marginRight: 10, marginTop: 2 },
   disclaimerText: { fontSize: TYPE.sm, color: '#888', flex: 1, lineHeight: 18 },
-  nameInput: { flex: 1, backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: TYPE.md, color: '#fff', borderWidth: 1, borderColor: '#4A90D9' },
+  nameInput: { flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: TYPE.md, color: '#fff', borderWidth: 1, borderColor: '#4A90D9' },
   nameSaveBtn: { backgroundColor: '#4A90D9', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, marginLeft: 8 },
   nameSaveBtnText: { color: '#fff', fontSize: 13, fontWeight: TYPE.semibold },
   nameCancelBtn: { paddingHorizontal: 10, paddingVertical: 6, marginLeft: 4 },
   nameCancelBtnText: { color: '#888', fontSize: 13 },
-  thresholdInput: { backgroundColor: '#2C2C2E', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', textAlign: 'center', width: 70, borderWidth: 1, borderColor: '#4A90D9' },
+  thresholdInput: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', textAlign: 'center', width: 70, borderWidth: 1, borderColor: '#4A90D9' },
 
   // Theme Picker
   themeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 },
   themeOption: {
     width: '47%',
-    backgroundColor: '#2C2C2E',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: 'rgba(255,255,255,0.08)',
     position: 'relative',
   },
   themeColorRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
@@ -804,7 +805,7 @@ const styles = StyleSheet.create({
   themeOptionLabel: { fontSize: 13, color: '#A0A0A0', fontWeight: TYPE.medium },
   themeActiveCheck: { position: 'absolute', top: 10, right: 12, fontSize: TYPE.lg, fontWeight: TYPE.bold },
   themePreview: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,

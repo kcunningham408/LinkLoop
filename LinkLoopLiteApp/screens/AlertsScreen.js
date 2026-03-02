@@ -77,7 +77,7 @@ export default function AlertsScreen({ navigation }) {
     return () => clearInterval(interval);
   }, [loadAlerts]);
 
-  const onRefresh = () => { setRefreshing(true); loadAlerts(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadAlerts(); };
 
   const handleTriggerCheck = async () => {
     try {

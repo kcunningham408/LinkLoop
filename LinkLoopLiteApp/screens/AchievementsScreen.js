@@ -53,7 +53,7 @@ export default function AchievementsScreen() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const onRefresh = () => { setRefreshing(true); loadData(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadData(); };
 
   const handleCheckAchievements = async () => {
     haptic.medium();

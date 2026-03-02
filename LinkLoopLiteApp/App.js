@@ -174,6 +174,17 @@ function LoopMemberTabs() {
         }}
       />
       <Tab.Screen
+        name="Circle"
+        component={CareCircleScreen}
+        options={{
+          title: 'Care Circle',
+          tabBarLabel: 'Circle',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'people' : 'people-outline'} size={22} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{

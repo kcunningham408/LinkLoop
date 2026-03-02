@@ -65,7 +65,7 @@ export default function MoodScreen() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const onRefresh = () => { setRefreshing(true); loadData(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadData(); };
 
   const handleLogMood = async () => {
     if (!selectedMood) {

@@ -53,7 +53,7 @@ export default function SuppliesScreen() {
   }, []);
 
   useEffect(() => { loadSupplies(); }, [loadSupplies]);
-  const onRefresh = () => { setRefreshing(true); loadSupplies(); };
+  const onRefresh = () => { haptic.light(); setRefreshing(true); loadSupplies(); };
 
   const handleAddSupply = async () => {
     if (!newSupply.name.trim()) { Alert.alert('Error', 'Please enter a supply name'); return; }

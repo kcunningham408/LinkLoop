@@ -402,47 +402,107 @@ export default function CareCircleScreen() {
 
         {/* Quick Actions — Join is only for members who are NOT yet linked */}
         {isMember && !user?.linkedOwnerId && (
-          <View style={styles.quickActions}>
+          <View style={{ marginBottom: 20 }}>
+            {/* Hero for unlinked members */}
+            <GlassCard accent={accent} style={{ marginBottom: 20 }}>
+              <View style={styles.memberHero}>
+                <Text style={styles.memberHeroEmoji}>🔗</Text>
+                <Text style={styles.memberHeroTitle}>Join a Care Circle</Text>
+                <Text style={styles.memberHeroSub}>Enter an invite code from a T1D warrior to join their circle and stay in the loop.</Text>
+              </View>
+            </GlassCard>
+
             <GlassCard accent={accent} glow noPadding>
-            <TouchableOpacity style={[styles.actionButtonPrimary, { borderColor: 'transparent' }]} onPress={() => setShowJoinModal(true)}>
-              <Text style={styles.actionButtonIcon}>🔗</Text>
-              <Text style={[styles.actionButtonPrimaryText, { color: accent }]}>Join a Circle</Text>
+            <TouchableOpacity style={styles.actionButtonPrimary} onPress={() => setShowJoinModal(true)}>
+              <Text style={styles.actionButtonIcon}>�</Text>
+              <Text style={[styles.actionButtonPrimaryText, { color: accent }]}>Enter Invite Code</Text>
             </TouchableOpacity>
             </GlassCard>
           </View>
         )}
 
-        {/* Circle Roster — Members see who else is in the circle */}
+        {/* ─── MEMBER VIEW: Linked to a circle ─── */}
         {isMember && user?.linkedOwnerId && (
-          <View style={styles.membersSection}>
-            <Text style={styles.sectionTitle}>Circle Members ({roster.length})</Text>
-            {loading ? (
-              <ActivityIndicator size="large" color={accent} style={{ paddingVertical: 40 }} />
-            ) : roster.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>👥</Text>
-                <Text style={styles.emptyTitle}>No other members</Text>
-                <Text style={styles.emptyText}>You're the only member in this Care Circle right now.</Text>
-              </View>
-            ) : (
-              roster.map((member, idx) => (
-                <GlassCard key={idx} accent={member.isYou ? accent : accent} glow={member.isYou} style={{ marginBottom: 12 }} noPadding>
-                <View style={styles.memberCard}>
-                  <View style={styles.memberCardTop}>
-                    <Text style={styles.memberEmoji}>{member.emoji || '👤'}</Text>
-                    <View style={styles.memberInfo}>
-                      <Text style={styles.memberName}>
-                        {member.name}{member.isYou ? ' (You)' : ''}
-                      </Text>
-                      <Text style={styles.memberRelationship}>
+          <View style={{ marginBottom: 0 }}>
+
+            {/* Warrior Hero Card */}
+            {(() => {
+              const warrior = roster.find(m => m.isWarrior);
+              return warrior ? (
+                <GlassCard accent={accent} glow style={{ marginBottom: 20 }}>
+                  <View style={styles.warriorHero}>
+                    <Text style={styles.warriorHeroEmoji}>{warrior.emoji || '💪'}</Text>
+                    <Text style={styles.warriorHeroName}>{warrior.name}'s Circle</Text>
+                    <Text style={styles.warriorHeroSub}>You're supporting {warrior.name} as part of their T1D care team</Text>
+                    <View style={[styles.warriorBadge, { backgroundColor: accent + '20', borderColor: accent + '40' }]}>
+                      <Text style={[styles.warriorBadgeText, { color: accent }]}>💪 T1D Warrior</Text>
+                    </View>
+                  </View>
+                </GlassCard>
+              ) : null;
+            })()}
+
+            {/* Circle Roster */}
+            <View style={styles.membersSection}>
+              <Text style={styles.sectionTitle}>
+                Circle Team ({roster.filter(m => !m.isWarrior).length})
+              </Text>
+              {loading ? (
+                <ActivityIndicator size="large" color={accent} style={{ paddingVertical: 40 }} />
+              ) : roster.filter(m => !m.isWarrior).length === 0 ? (
+                <GlassCard accent={accent} style={{ marginBottom: 12 }}>
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyEmoji}>👥</Text>
+                    <Text style={styles.emptyTitle}>Just you for now</Text>
+                    <Text style={styles.emptyText}>You're the only member in this Care Circle right now. Others can join with an invite code.</Text>
+                  </View>
+                </GlassCard>
+              ) : (
+                roster.filter(m => !m.isWarrior).map((member, idx) => (
+                  <GlassCard key={idx} accent={member.isYou ? accent : accent} glow={member.isYou} style={{ marginBottom: 12 }} noPadding>
+                  <View style={styles.rosterCard}>
+                    <Text style={styles.rosterEmoji}>{member.emoji || '👤'}</Text>
+                    <View style={styles.rosterInfo}>
+                      <View style={styles.rosterNameRow}>
+                        <Text style={styles.rosterName}>
+                          {member.name}
+                        </Text>
+                        {member.isYou && (
+                          <View style={[styles.youBadge, { backgroundColor: accent + '25', borderColor: accent + '50' }]}>
+                            <Text style={[styles.youBadgeText, { color: accent }]}>You</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.rosterRelationship}>
+                        {RELATIONSHIPS.find(r => r.value === member.relationship)?.emoji || '👤'}{' '}
                         {RELATIONSHIPS.find(r => r.value === member.relationship)?.label || 'Circle Member'}
                       </Text>
                     </View>
                   </View>
+                  </GlassCard>
+                ))
+              )}
+            </View>
+
+            {/* Group Chat Button */}
+            <GlassCard accent={accent} style={{ marginBottom: 20 }} noPadding>
+              <TouchableOpacity
+                style={styles.groupChatButton}
+                onPress={() => navigation.navigate('Chat', {
+                  circleId: 'group',
+                  memberName: 'Group Chat',
+                  memberEmoji: '💬',
+                  relationship: 'group',
+                })}
+              >
+                <Text style={styles.groupChatEmoji}>💬</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.groupChatTitle}>Circle Group Chat</Text>
+                  <Text style={styles.groupChatSub}>Message everyone in the circle</Text>
                 </View>
-                </GlassCard>
-              ))
-            )}
+                <Text style={[styles.groupChatArrow, { color: accent }]}>›</Text>
+              </TouchableOpacity>
+            </GlassCard>
           </View>
         )}
 
@@ -631,4 +691,37 @@ const styles = StyleSheet.create({
   shareButtonText: { color: '#A0A0A0', fontSize: TYPE.lg, fontWeight: TYPE.semibold },
   doneButton: { paddingVertical: 14, alignItems: 'center' },
   doneButtonText: { fontSize: TYPE.lg, color: '#A0A0A0' },
+
+  /* ─── Member View ─── */
+
+  /* Unlinked hero */
+  memberHero: { alignItems: 'center', paddingVertical: 10 },
+  memberHeroEmoji: { fontSize: 56, marginBottom: 12 },
+  memberHeroTitle: { fontSize: TYPE.h3, fontWeight: TYPE.bold, color: '#fff', marginBottom: 8 },
+  memberHeroSub: { fontSize: TYPE.md, color: '#A0A0A0', textAlign: 'center', lineHeight: 20 },
+
+  /* Warrior hero card */
+  warriorHero: { alignItems: 'center', paddingVertical: 8 },
+  warriorHeroEmoji: { fontSize: 60, marginBottom: 10 },
+  warriorHeroName: { fontSize: TYPE.h3, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
+  warriorHeroSub: { fontSize: TYPE.md, color: '#A0A0A0', textAlign: 'center', lineHeight: 20, marginBottom: 12 },
+  warriorBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
+  warriorBadgeText: { fontSize: TYPE.sm, fontWeight: TYPE.semibold },
+
+  /* Roster cards */
+  rosterCard: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+  rosterEmoji: { fontSize: 36, marginRight: 14 },
+  rosterInfo: { flex: 1 },
+  rosterNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 3 },
+  rosterName: { fontSize: 17, fontWeight: TYPE.semibold, color: '#fff' },
+  rosterRelationship: { fontSize: 13, color: '#A0A0A0' },
+  youBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, borderWidth: 1 },
+  youBadgeText: { fontSize: 11, fontWeight: TYPE.bold },
+
+  /* Group chat button */
+  groupChatButton: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+  groupChatEmoji: { fontSize: 32, marginRight: 14 },
+  groupChatTitle: { fontSize: 16, fontWeight: TYPE.semibold, color: '#fff' },
+  groupChatSub: { fontSize: TYPE.sm, color: '#A0A0A0', marginTop: 2 },
+  groupChatArrow: { fontSize: TYPE.h2, fontWeight: '300' },
 });

@@ -184,17 +184,36 @@ router.get('/roster', auth, async (req, res) => {
       return res.status(403).json({ message: 'Only circle members can view the roster' });
     }
 
+    // Fetch the warrior (circle owner) so they appear in the roster
+    const owner = await User.findById(user.linkedOwnerId).select('name profileEmoji');
+
     const members = await CareCircle.find({
       ownerId: user.linkedOwnerId,
       status: { $in: ['active', 'paused'] },
     }).populate('memberId', 'name profileEmoji');
 
-    const roster = members.map(m => ({
-      name: m.memberId?.name || m.memberName,
-      emoji: m.memberId?.profileEmoji || m.memberEmoji,
-      relationship: m.relationship,
-      isYou: m.memberId?._id.toString() === req.user.userId,
-    }));
+    // Build roster: warrior first, then all circle members
+    const roster = [];
+
+    if (owner) {
+      roster.push({
+        name: owner.name || 'Warrior',
+        emoji: owner.profileEmoji || '💪',
+        relationship: 'warrior',
+        isYou: false,
+        isWarrior: true,
+      });
+    }
+
+    for (const m of members) {
+      roster.push({
+        name: m.memberId?.name || m.memberName,
+        emoji: m.memberId?.profileEmoji || m.memberEmoji,
+        relationship: m.relationship,
+        isYou: m.memberId?._id.toString() === req.user.userId,
+        isWarrior: false,
+      });
+    }
 
     res.json(roster);
   } catch (err) {

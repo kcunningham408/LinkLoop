@@ -7,7 +7,6 @@ import {
     StyleSheet, Text,
     TextInput,
     TouchableOpacity,
-    Vibration,
     View
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
@@ -91,7 +90,7 @@ export default function AlertsScreen({ navigation }) {
       }
       const data = await alertsAPI.triggerCheck(reading.value);
       if (data.alert) {
-        Vibration.vibrate([0, 200, 100, 200]);
+        haptic.warning();
         RNAlert.alert('🔔 Notification Created', data.alert.message || `Reading: ${reading.value} mg/dL`);
         loadAlerts();
       } else {
@@ -115,7 +114,6 @@ export default function AlertsScreen({ navigation }) {
     try {
       await alertsAPI.acknowledge(selectedAlert._id, ackMessage.trim());
       haptic.success();
-      Vibration.vibrate(100);
       setShowAckModal(false);
       setSelectedAlert(null);
       setAckMessage('');

@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
 import { haptic } from './config/haptics';
 
 // Import context
@@ -36,17 +37,22 @@ function MainTabs() {
       screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.warrior,
-        tabBarInactiveTintColor: '#888',
+        tabBarInactiveTintColor: '#666',
         tabBarStyle: styles.tabBar,
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
+          ) : (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(16,16,22,0.92)' }]} />
+          )
+        ),
         headerStyle: {
-          backgroundColor: '#1C1C1E',
-          shadowColor: '#000',
+          backgroundColor: '#0A0A0F',
+          shadowColor: 'transparent',
           elevation: 0,
         },
         headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
+        headerTitleStyle: { fontWeight: 'bold' },
       }}
     >
       <Tab.Screen
@@ -116,17 +122,22 @@ function LoopMemberTabs() {
       screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.member,
-        tabBarInactiveTintColor: '#888',
+        tabBarInactiveTintColor: '#666',
         tabBarStyle: styles.tabBar,
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
+          ) : (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(16,16,22,0.92)' }]} />
+          )
+        ),
         headerStyle: {
-          backgroundColor: '#1C1C1E',
-          shadowColor: '#000',
+          backgroundColor: '#0A0A0F',
+          shadowColor: 'transparent',
           elevation: 0,
         },
         headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
+        headerTitleStyle: { fontWeight: 'bold' },
       }}
     >
       <Tab.Screen
@@ -204,7 +215,7 @@ function AppNavigator() {
             options={{
               headerShown: true,
               title: 'Messages',
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -214,7 +225,7 @@ function AppNavigator() {
             component={ChatScreen}
             options={{
               headerShown: true,
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -225,7 +236,7 @@ function AppNavigator() {
             options={{
               headerShown: true,
               title: 'Care Circle Group',
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -236,7 +247,7 @@ function AppNavigator() {
             options={{
               headerShown: true,
               title: 'CGM Alerts',
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -247,7 +258,7 @@ function AppNavigator() {
             options={{
               headerShown: true,
               title: 'AI Insights',
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -258,7 +269,7 @@ function AppNavigator() {
             options={{
               headerShown: true,
               title: 'Mood & Notes',
-              headerStyle: { backgroundColor: '#1C1C1E' },
+              headerStyle: { backgroundColor: '#0A0A0F' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
             }}
@@ -294,18 +305,30 @@ export default function App() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#1C1C1E',
-    borderTopWidth: 1,
-    borderTopColor: '#2C2C2E',
-    paddingBottom: 5,
-    paddingTop: 5,
-    height: 60,
+    position: 'absolute',
+    bottom: 12,
+    left: 16,
+    right: 16,
+    height: 64,
+    borderRadius: 22,
+    borderTopWidth: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'transparent',
+    paddingBottom: 6,
+    paddingTop: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+    overflow: 'hidden',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#111111',
+    backgroundColor: '#0A0A0F',
   },
   loadingLogo: {
     fontSize: 36,

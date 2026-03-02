@@ -9,11 +9,11 @@ import {
     TextInput, TouchableOpacity,
     View,
 } from 'react-native';
+import { FadeIn } from '../config/animations';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
-import { FadeIn } from '../config/animations';
 import { authAPI, circleAPI, pingServer } from '../services/api';
 
 // mode: 'landing' | 'login' | 'register' | 'join' | 'forgot' | 'reset'

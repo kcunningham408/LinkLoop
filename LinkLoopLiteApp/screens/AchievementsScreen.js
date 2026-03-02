@@ -1,14 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  StyleSheet, Text, View, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert
+    ActivityIndicator, Alert,
+    RefreshControl,
+    ScrollView,
+    StyleSheet, Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { achievementsAPI } from '../services/api';
 
 const CATEGORY_INFO = {

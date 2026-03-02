@@ -9,12 +9,12 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { alertsAPI, glucoseAPI } from '../services/api';
 
 const SEVERITY_CONFIG = {
@@ -332,6 +332,7 @@ export default function AlertsScreen({ navigation }) {
   return (
     <ScrollView
       style={styles.container}
+      contentContainerStyle={{ paddingBottom: 90 }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />
       }

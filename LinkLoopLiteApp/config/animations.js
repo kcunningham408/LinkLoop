@@ -11,18 +11,14 @@
  *   useEntrance()  – Low-level hook returning animated style
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-  withSpring,
-  Easing,
-  FadeIn as ReanimatedFadeIn,
-  FadeInDown,
-  FadeInUp,
-  SlideInDown,
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 
 // ── Timing presets ──────────────────────────────────────────────

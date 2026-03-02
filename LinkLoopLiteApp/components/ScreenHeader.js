@@ -1,9 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, Text, View } from 'react-native';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
 
 /**
  * Unified screen header with themed accent gradient bar.

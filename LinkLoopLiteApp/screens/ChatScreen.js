@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity,
-  KeyboardAvoidingView, Platform, ActivityIndicator, SafeAreaView
-} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { chatAPI } from '../services/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    KeyboardAvoidingView, Platform,
+    SafeAreaView,
+    StyleSheet, Text,
+    TextInput, TouchableOpacity,
+    View
+} from 'react-native';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
+import { chatAPI } from '../services/api';
 
 export default function ChatScreen({ route, navigation }) {
   const { circleId, memberName, memberEmoji, relationship } = route.params;

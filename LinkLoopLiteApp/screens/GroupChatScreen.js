@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
@@ -8,11 +9,10 @@ import {
     TextInput, TouchableOpacity,
     View
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
 import { chatAPI } from '../services/api';
 
 export default function GroupChatScreen({ navigation }) {

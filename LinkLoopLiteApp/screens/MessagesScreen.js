@@ -10,11 +10,11 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import ScreenHeader from '../components/ScreenHeader';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
-import ScreenHeader from '../components/ScreenHeader';
 import { chatAPI } from '../services/api';
 
 function formatTime(dateStr) {

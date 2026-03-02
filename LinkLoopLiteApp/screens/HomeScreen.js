@@ -1,14 +1,19 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import TYPE from '../config/typography';
+import { ActivityIndicator, Alert, AppState, Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import GlassCard from '../components/GlassCard';
+import GlucoseRing from '../components/GlucoseRing';
+import StatArc from '../components/StatArc';
+import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
-import { FadeIn, ScalePop, stagger } from '../config/animations';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { alertsAPI, glucoseAPI } from '../services/api';
+
+const { width: SCREEN_W } = Dimensions.get('window');
 
 const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -136,285 +141,249 @@ export default function HomeScreen({ navigation }) {
     borderColor: glowColor + (isOutOfRange ? '60' : '30'),
   }));
 
+  /* ── Stat arc helper ── */
+  const ARC_SIZE = Math.floor((SCREEN_W - 64) / 4);
+
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />}
+      contentContainerStyle={{ paddingBottom: 90 }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} />}
     >
-      {/* Compact Hero */}
+      {/* ─── Hero gradient header ─── */}
       <FadeIn delay={0} slideY={0}>
-      <LinearGradient
-        colors={getGradient(isMember)}
-        style={styles.hero}
-      >
-        <Text style={styles.heroTitle}>{'\u221E'} LinkLoop</Text>
-        <View style={styles.heroBadge}>
-          <Text style={styles.heroBadgeEmoji}>{isMember ? '\uD83D\uDC41\uFE0F' : '\uD83E\uDE7A'}</Text>
-          <Text style={styles.heroBadgeText}>
-            {isMember
-              ? 'Watching ' + (warriorName || 'your warrior') + "'s loop"
-              : (user?.name ? 'Welcome back, ' + user.name : 'Stay Connected, Stay in Range')}
-          </Text>
-        </View>
-        {isMember && lastCGMSync && (
-          <View style={styles.syncBadge}>
-            <Text style={styles.syncBadgeText}>
-              {'🩸 CGM synced ' + (() => {
-                const mins = Math.floor((Date.now() - new Date(lastCGMSync).getTime()) / 60000);
-                if (mins < 1) return 'just now';
-                if (mins < 60) return mins + 'm ago';
-                const hrs = Math.floor(mins / 60);
-                if (hrs < 24) return hrs + 'h ago';
-                return Math.floor(hrs / 24) + 'd ago';
-              })()}
+        <LinearGradient colors={getGradient(isMember)} style={styles.hero}>
+          <Text style={styles.heroTitle}>{'\u221E'} LinkLoop</Text>
+          <View style={styles.heroBadge}>
+            <Text style={styles.heroBadgeEmoji}>{isMember ? '\uD83D\uDC41\uFE0F' : '\uD83E\uDE7A'}</Text>
+            <Text style={styles.heroBadgeText}>
+              {isMember
+                ? 'Watching ' + (warriorName || 'your warrior') + "'s loop"
+                : user?.name ? 'Welcome back, ' + user.name : 'Stay Connected, Stay in Range'}
             </Text>
           </View>
-        )}
-      </LinearGradient>
-      </FadeIn>      <View style={styles.content}>
-        {/* Glucose Card */}
-        <FadeIn delay={stagger(0, 100)}>
-        <Animated.View style={[styles.glucoseGlow, glowAnimatedStyle]}>
-        <TouchableOpacity style={styles.glucoseCard} onPress={() => { haptic.light(); navigation.navigate('CGM'); }} activeOpacity={0.8}>
-          {latestGlucose ? (
-            <View>
-              {minsOld > 30 && (
-                <View style={styles.staleWarning}>
-                  <Text style={styles.staleWarningText}>{'\u26A0\uFE0F'} Data is {minsOld} min old</Text>
-                </View>
-              )}
-              <View style={styles.glucoseRow}>
-                <View style={styles.glucoseLeft}>
-                  <Text style={styles.glucoseLabel}>
-                    {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
-                  </Text>
-                  <View style={styles.glucoseReadingRow}>
-                    <Text style={[styles.glucoseValue, { color: getGlucoseColor(latestGlucose.value) }]}>
-                      {latestGlucose.value}
-                    </Text>
-                    <Text style={styles.glucoseUnit}>mg/dL</Text>
-                    <Text style={[styles.glucoseTrend, { color: getGlucoseColor(latestGlucose.value) }]}>
-                      {getTrendArrow(latestGlucose.trend)}
-                    </Text>
-                  </View>
-                  <View style={[styles.glucoseStatusBadge, { backgroundColor: getGlucoseColor(latestGlucose.value) + '20' }]}>
-                    <Text style={[styles.glucoseStatusText, { color: getGlucoseColor(latestGlucose.value) }]}>
-                      {getGlucoseStatus(latestGlucose.value)}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.glucoseRight}>
-                  <Text style={styles.glucoseTime}>
-                    {new Date(latestGlucose.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                  <Text style={styles.glucoseChevron}>{'\u203A'}</Text>
-                </View>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.glucoseRow}>
-              <View>
-                <Text style={styles.glucoseLabel}>
-                  {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
-                </Text>
-                <Text style={styles.glucoseEmpty}>
-                  {isMember ? 'No readings from your warrior yet' : 'No readings yet \u2014 tap to sync'}
-                </Text>
-              </View>
-              <Text style={styles.glucoseChevron}>{'\u203A'}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-        </Animated.View>
-        </FadeIn>
-
-        {/* Today's Overview */}
-        <FadeIn delay={stagger(1, 100)}>
-        <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Today's Overview</Text>
-          {loading ? (
-            <ActivityIndicator size="small" color={accent} style={{ paddingVertical: 20 }} />
-          ) : stats && stats.count > 0 ? (
-            <View style={styles.statsRow}>
-              <StatBox label="Time in Range" value={stats.timeInRange + '%'} color={accent} />
-              <StatBox label="Avg Glucose" value={'' + stats.average} color="#FFA500" />
-              <StatBox label="Low Events" value={'' + stats.low} color="#FF6B6B" />
-              <StatBox label="High Events" value={'' + (stats.high || 0)} color="#FFA500" />
-            </View>
-          ) : (
-            <View style={styles.emptyStats}>
-              <Text style={styles.emptyStatsText}>
-                {isMember ? 'No readings from your warrior today' : 'No readings today \u2014 connect Dexcom or log manually'}
+          {isMember && lastCGMSync && (
+            <View style={styles.syncBadge}>
+              <Text style={styles.syncBadgeText}>
+                {'🩸 CGM synced ' + (() => {
+                  const mins = Math.floor((Date.now() - new Date(lastCGMSync).getTime()) / 60000);
+                  if (mins < 1) return 'just now';
+                  if (mins < 60) return mins + 'm ago';
+                  const hrs = Math.floor(mins / 60);
+                  if (hrs < 24) return hrs + 'h ago';
+                  return Math.floor(hrs / 24) + 'd ago';
+                })()}
               </Text>
             </View>
           )}
-        </View>
+        </LinearGradient>
+      </FadeIn>
+
+      <View style={styles.content}>
+        {/* ─── Glucose Ring Hero Card ─── */}
+        <FadeIn delay={stagger(0, 100)}>
+          <Animated.View style={[styles.glucoseGlow, glowAnimatedStyle]}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => { haptic.light(); navigation.navigate('CGM'); }}>
+              <GlassCard accent={glowColor} glow>
+                {latestGlucose ? (
+                  <View style={styles.glucoseInner}>
+                    {minsOld > 30 && (
+                      <View style={styles.staleWarning}>
+                        <Text style={styles.staleWarningText}>{'\u26A0\uFE0F'} Data is {minsOld} min old</Text>
+                      </View>
+                    )}
+                    <Text style={styles.glucoseLabel}>
+                      {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
+                    </Text>
+                    <View style={styles.ringRow}>
+                      <GlucoseRing
+                        value={latestGlucose.value}
+                        trend={latestGlucose.trend}
+                        accentColor={getGlucoseColor(latestGlucose.value)}
+                        lowThreshold={lowThreshold}
+                        highThreshold={highThreshold}
+                        size={150}
+                      />
+                      <View style={styles.ringMeta}>
+                        <View style={[styles.statusPill, { backgroundColor: getGlucoseColor(latestGlucose.value) + '25' }]}>
+                          <Text style={[styles.statusPillText, { color: getGlucoseColor(latestGlucose.value) }]}>
+                            {getGlucoseStatus(latestGlucose.value)}
+                          </Text>
+                        </View>
+                        <Text style={styles.ringTime}>
+                          {new Date(latestGlucose.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </Text>
+                        <Text style={styles.ringHint}>Tap for details {'›'}</Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.emptyGlucose}>
+                    <Text style={styles.glucoseLabel}>
+                      {isMember ? (warriorName || 'Warrior') + "'s Glucose" : 'Current Glucose'}
+                    </Text>
+                    <Text style={styles.glucoseEmpty}>
+                      {isMember ? 'No readings from your warrior yet' : 'No readings yet — tap to sync'}
+                    </Text>
+                  </View>
+                )}
+              </GlassCard>
+            </TouchableOpacity>
+          </Animated.View>
         </FadeIn>
 
-        {/* Active Alerts Banner */}
+        {/* ─── Today's Overview — arc stats ─── */}
+        <FadeIn delay={stagger(1, 100)}>
+          <GlassCard accent={accent}>
+            <Text style={styles.statsTitle}>Today's Overview</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color={accent} style={{ paddingVertical: 20 }} />
+            ) : stats && stats.count > 0 ? (
+              <View style={styles.arcsRow}>
+                <StatArc value={stats.timeInRange} maxValue={100} label="In Range" suffix="%" color={accent} size={ARC_SIZE} />
+                <StatArc value={stats.average} maxValue={300} label="Avg mg/dL" suffix="" color="#FFA500" size={ARC_SIZE} />
+                <StatArc value={stats.low} maxValue={Math.max(stats.low, 5)} label="Lows" suffix="" color="#FF6B6B" size={ARC_SIZE} />
+                <StatArc value={stats.high || 0} maxValue={Math.max(stats.high || 0, 5)} label="Highs" suffix="" color="#FFA500" size={ARC_SIZE} />
+              </View>
+            ) : (
+              <View style={styles.emptyStats}>
+                <Text style={styles.emptyStatsText}>
+                  {isMember ? 'No readings from your warrior today' : 'No readings today — connect Dexcom or log manually'}
+                </Text>
+              </View>
+            )}
+          </GlassCard>
+        </FadeIn>
+
+        {/* ─── Active Alerts Banner ─── */}
         {activeAlertCount > 0 && (
           <FadeIn delay={stagger(2, 100)}>
-          <TouchableOpacity
-            style={styles.alertBanner}
-            onPress={() => navigation.navigate('Alerts')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.alertBannerIcon}>{'\uD83D\uDD14'}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.alertBannerTitle}>
-                {activeAlertCount} Active Alert{activeAlertCount > 1 ? 's' : ''}
-              </Text>
-              <Text style={styles.alertBannerSub}>Tap to view & acknowledge</Text>
-            </View>
-            <Text style={styles.alertBannerArrow}>{'\u203A'}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Alerts')}>
+              <GlassCard accent="#FF6B6B" glow>
+                <View style={styles.alertRow}>
+                  <Text style={styles.alertIcon}>{'\uD83D\uDD14'}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.alertTitle}>
+                      {activeAlertCount} Active Alert{activeAlertCount > 1 ? 's' : ''}
+                    </Text>
+                    <Text style={styles.alertSub}>Tap to view & acknowledge</Text>
+                  </View>
+                  <Text style={styles.alertArrow}>{'\u203A'}</Text>
+                </View>
+              </GlassCard>
+            </TouchableOpacity>
           </FadeIn>
         )}
 
-        {/* Quick Actions */}
+        {/* ─── Quick Actions ─── */}
         <FadeIn delay={stagger(3, 100)}>
-        <Text style={styles.quickActionsTitle}>Quick Actions</Text>
-        <View style={styles.quickActions}>
-          <QuickAction
-            emoji={'\uD83D\uDCAC'}
-            label="Messages"
-            onPress={() => navigation.navigate('Messages')}
-          />
-          {isMember ? (
-            <>
-              <QuickAction
-                emoji={'\uD83D\uDD14'}
-                label="Alerts"
-                badge={activeAlertCount > 0 ? activeAlertCount : null}
-                onPress={() => navigation.navigate('Alerts')}
-              />
-              <QuickAction
-                emoji={'\u2699\uFE0F'}
-                label="Profile"
-                onPress={() => navigation.navigate('Profile')}
-              />
-            </>
-          ) : (
-            <>
-              <QuickAction
-                emoji={'\u2728'}
-                label="Insights"
-                onPress={() => navigation.navigate('Insights')}
-              />
-              <QuickAction
-                emoji={'\uD83D\uDCDD'}
-                label="Mood"
-                onPress={() => navigation.navigate('Mood')}
-              />
-              <QuickAction
-                emoji={'\uD83D\uDD14'}
-                label="Alerts"
-                badge={activeAlertCount > 0 ? activeAlertCount : null}
-                onPress={() => navigation.navigate('Alerts')}
-              />
-            </>
-          )}
-        </View>
+          <Text style={styles.quickActionsTitle}>Quick Actions</Text>
+          <View style={styles.quickActions}>
+            <QuickAction emoji={'\uD83D\uDCAC'} label="Messages" accent={accent} onPress={() => navigation.navigate('Messages')} />
+            {isMember ? (
+              <>
+                <QuickAction emoji={'\uD83D\uDD14'} label="Alerts" accent={accent} badge={activeAlertCount > 0 ? activeAlertCount : null} onPress={() => navigation.navigate('Alerts')} />
+                <QuickAction emoji={'\u2699\uFE0F'} label="Profile" accent={accent} onPress={() => navigation.navigate('Profile')} />
+              </>
+            ) : (
+              <>
+                <QuickAction emoji={'\u2728'} label="Insights" accent={accent} onPress={() => navigation.navigate('Insights')} />
+                <QuickAction emoji={'\uD83D\uDCDD'} label="Mood" accent={accent} onPress={() => navigation.navigate('Mood')} />
+                <QuickAction emoji={'\uD83D\uDD14'} label="Alerts" accent={accent} badge={activeAlertCount > 0 ? activeAlertCount : null} onPress={() => navigation.navigate('Alerts')} />
+              </>
+            )}
+          </View>
         </FadeIn>
 
-        {/* Disclaimer */}
+        {/* ─── Disclaimer ─── */}
         <FadeIn delay={stagger(4, 100)}>
-        <View style={styles.disclaimer}>
-          <Text style={styles.disclaimerIcon}>{'\uD83D\uDC9A'}</Text>
-          <Text style={styles.disclaimerText}>
-            LinkLoop is a wellness companion — not a medical device. Always consult your care team.
-          </Text>
-        </View>
+          <GlassCard>
+            <View style={styles.disclaimerRow}>
+              <Text style={styles.disclaimerIcon}>{'\uD83D\uDC9A'}</Text>
+              <Text style={styles.disclaimerText}>
+                LinkLoop is a wellness companion — not a medical device. Always consult your care team.
+              </Text>
+            </View>
+          </GlassCard>
         </FadeIn>
       </View>
     </ScrollView>
   );
 }
 
-function QuickAction({ emoji, label, onPress, badge }) {
+/* ─── Quick Action Button ─── */
+function QuickAction({ emoji, label, onPress, badge, accent }) {
   return (
-    <TouchableOpacity style={styles.quickAction} onPress={() => { haptic.light(); onPress(); }} activeOpacity={0.7}>
-      <View style={styles.quickActionInner}>
-        <Text style={styles.quickActionEmoji}>{emoji}</Text>
-        {badge ? (
-          <View style={styles.quickActionBadge}>
-            <Text style={styles.quickActionBadgeText}>{badge}</Text>
-          </View>
-        ) : null}
-      </View>
-      <Text style={styles.quickActionLabel}>{label}</Text>
+    <TouchableOpacity activeOpacity={0.7} onPress={() => { haptic.light(); onPress(); }} style={{ flex: 1, marginHorizontal: 4 }}>
+      <GlassCard accent={accent} style={{ alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4 }}>
+        <View style={styles.quickActionInner}>
+          <Text style={styles.quickActionEmoji}>{emoji}</Text>
+          {badge ? (
+            <View style={styles.quickActionBadge}>
+              <Text style={styles.quickActionBadgeText}>{badge}</Text>
+            </View>
+          ) : null}
+        </View>
+        <Text style={styles.quickActionLabel}>{label}</Text>
+      </GlassCard>
     </TouchableOpacity>
   );
 }
 
-function StatBox({ label, value, color }) {
-  return (
-    <View style={styles.statBox}>
-      <Text style={[styles.statValue, { color }]}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
+/* ─── Styles ─── */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111111' },
+  container: { flex: 1, backgroundColor: '#0A0A0F' },
+
+  /* Hero */
   hero: { padding: 24, alignItems: 'center', paddingTop: 35, paddingBottom: 30 },
   heroTitle: { fontSize: TYPE.h1, fontWeight: TYPE.bold, color: '#fff', marginBottom: 10 },
-  heroBadge: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center' },
+  heroBadge: { backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, flexDirection: 'row', alignItems: 'center' },
   heroBadgeEmoji: { fontSize: TYPE.xl, marginRight: 8 },
   heroBadgeText: { color: '#fff', fontSize: TYPE.md, fontWeight: TYPE.semibold },
-  syncBadge: { marginTop: 8, backgroundColor: 'rgba(255,255,255,0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 },
+  syncBadge: { marginTop: 8, backgroundColor: 'rgba(255,255,255,0.10)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 },
   syncBadgeText: { color: 'rgba(255,255,255,0.85)', fontSize: TYPE.sm, fontWeight: TYPE.medium },
-  content: { padding: 16 },
 
-  // Glucose Card
-  glucoseGlow: { borderRadius: 16, marginBottom: 16, borderWidth: 1.5, borderColor: 'rgba(74,144,217,0.3)' },
-  glucoseCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, overflow: 'hidden' },
-  staleWarning: { backgroundColor: 'rgba(255,165,0,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.4)' },
+  content: { padding: 16, marginTop: -8 },
+
+  /* Glucose Hero */
+  glucoseGlow: { borderRadius: 18, marginBottom: 16 },
+  glucoseInner: {},
+  staleWarning: { backgroundColor: 'rgba(255,165,0,0.12)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,165,0,0.35)' },
   staleWarningText: { fontSize: TYPE.sm, color: '#FFA500', fontWeight: TYPE.semibold },
-  glucoseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  glucoseLeft: {},
-  glucoseLabel: { fontSize: TYPE.sm, color: '#888', fontWeight: TYPE.semibold, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
-  glucoseReadingRow: { flexDirection: 'row', alignItems: 'baseline', marginBottom: 6 },
-  glucoseValue: { fontSize: TYPE.hero, fontWeight: TYPE.bold },
-  glucoseUnit: { fontSize: TYPE.lg, color: '#888', marginLeft: 4 },
-  glucoseTrend: { fontSize: TYPE.h2, marginLeft: 10, fontWeight: TYPE.bold },
-  glucoseStatusBadge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10 },
-  glucoseStatusText: { fontSize: TYPE.sm, fontWeight: TYPE.bold },
-  glucoseRight: { alignItems: 'flex-end' },
-  glucoseTime: { fontSize: 13, color: '#888', marginBottom: 4 },
-  glucoseChevron: { fontSize: TYPE.h2, color: '#555', fontWeight: '300' },
+  glucoseLabel: { fontSize: TYPE.xs, color: '#999', fontWeight: TYPE.semibold, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
+  ringRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  ringMeta: { flex: 1, marginLeft: 16, alignItems: 'flex-start' },
+  statusPill: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, marginBottom: 10 },
+  statusPillText: { fontSize: TYPE.sm, fontWeight: TYPE.bold },
+  ringTime: { fontSize: TYPE.md, color: '#888', marginBottom: 4 },
+  ringHint: { fontSize: TYPE.sm, color: '#555' },
+  emptyGlucose: { paddingVertical: 10 },
   glucoseEmpty: { fontSize: TYPE.md, color: '#888', marginTop: 4 },
 
-  // Stats Card
-  statsCard: { backgroundColor: '#1C1C1E', borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  /* Stats */
   statsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 14 },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, marginBottom: 4 },
-  statLabel: { fontSize: TYPE.xs, color: '#A0A0A0', textAlign: 'center' },
+  arcsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   emptyStats: { paddingVertical: 12, alignItems: 'center' },
   emptyStatsText: { fontSize: TYPE.md, color: '#888', textAlign: 'center' },
 
-  // Alert Banner
-  alertBanner: { backgroundColor: '#2A1A1A', borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 16, borderWidth: 2, borderColor: '#FF6B6B' },
-  alertBannerIcon: { fontSize: TYPE.h2, marginRight: 12 },
-  alertBannerTitle: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff' },
-  alertBannerSub: { fontSize: TYPE.sm, color: '#FF6B6B', marginTop: 2 },
-  alertBannerArrow: { fontSize: TYPE.h2, color: '#FF6B6B', fontWeight: '300' },
+  /* Alert Banner */
+  alertRow: { flexDirection: 'row', alignItems: 'center' },
+  alertIcon: { fontSize: TYPE.h2, marginRight: 12 },
+  alertTitle: { fontSize: 15, fontWeight: TYPE.bold, color: '#fff' },
+  alertSub: { fontSize: TYPE.sm, color: '#FF6B6B', marginTop: 2 },
+  alertArrow: { fontSize: TYPE.h2, color: '#FF6B6B', fontWeight: '300' },
 
-  // Quick Actions
-  quickActionsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 12 },
+  /* Quick Actions */
+  quickActionsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 12, marginTop: 4 },
   quickActions: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  quickAction: { flex: 1, alignItems: 'center', backgroundColor: '#1C1C1E', borderRadius: 14, paddingVertical: 16, marginHorizontal: 4, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   quickActionInner: { position: 'relative', marginBottom: 6 },
   quickActionEmoji: { fontSize: TYPE.h2 },
   quickActionBadge: { position: 'absolute', top: -6, right: -10, backgroundColor: '#FF6B6B', borderRadius: 10, minWidth: 18, height: 18, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
   quickActionBadgeText: { fontSize: TYPE.xs, fontWeight: TYPE.bold, color: '#fff' },
-  quickActionLabel: { fontSize: TYPE.sm, color: '#A0A0A0', fontWeight: TYPE.semibold },
+  quickActionLabel: { fontSize: TYPE.sm, color: '#B0B0B0', fontWeight: TYPE.semibold },
 
-  // Disclaimer
-  disclaimer: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 14, flexDirection: 'row', alignItems: 'flex-start', marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  /* Disclaimer */
+  disclaimerRow: { flexDirection: 'row', alignItems: 'flex-start' },
   disclaimerIcon: { fontSize: TYPE.xl, marginRight: 10, marginTop: 1 },
   disclaimerText: { flex: 1, fontSize: TYPE.sm, color: '#888', lineHeight: 18 },
 });

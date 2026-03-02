@@ -12,10 +12,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { dexcomAPI } from '../services/api';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
 import { FadeIn, stagger } from '../config/animations';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
+import { dexcomAPI } from '../services/api';
 
 export default function DexcomConnectScreen({ navigation }) {
   const [username, setUsername] = useState('');

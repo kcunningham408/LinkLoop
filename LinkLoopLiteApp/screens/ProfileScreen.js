@@ -2,11 +2,11 @@ import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FadeIn, stagger } from '../config/animations';
+import { haptic } from '../config/haptics';
+import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import TYPE from '../config/typography';
-import { haptic } from '../config/haptics';
-import { FadeIn, stagger } from '../config/animations';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
 const APP_VERSION = Constants.expoConfig?.version || Constants.manifest?.version || '1.1.0';
@@ -195,7 +195,7 @@ export default function ProfileScreen() {
     : null;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 90 }}>
       {/* ── Hero Banner ── */}
       <FadeIn delay={0} slideY={0}>
       <LinearGradient

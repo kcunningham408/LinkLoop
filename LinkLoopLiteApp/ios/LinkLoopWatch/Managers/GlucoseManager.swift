@@ -61,6 +61,30 @@ class GlucoseManager: ObservableObject {
         self.linkedOwnerId = linkedOwnerId
     }
 
+    /// Apply glucose data pushed from the iPhone via WatchConnectivity.
+    /// This updates the in-app display immediately without a server round-trip.
+    func applyPushedGlucose(value: Int, trend: String, timestamp: String) {
+        currentGlucose = value
+        currentTrend = trend
+
+        // Parse ISO timestamp
+        if !timestamp.isEmpty {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = formatter.date(from: timestamp) {
+                lastReadingDate = date
+            } else {
+                formatter.formatOptions = [.withInternetDateTime]
+                lastReadingDate = formatter.date(from: timestamp)
+            }
+        } else {
+            lastReadingDate = Date()
+        }
+
+        isConnected = true
+        persistForComplication()
+    }
+
     /// Persist latest glucose data to App Group UserDefaults so the Widget Extension
     /// (complication) TimelineProvider can read it, then tell WidgetKit to refresh.
     private func persistForComplication() {
@@ -80,7 +104,9 @@ class GlucoseManager: ObservableObject {
     // MARK: - Auto Refresh
     func startAutoRefresh() {
         stopAutoRefresh()
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+        // Fallback timer: fetch from server every 2 minutes
+        // (primary updates come from iPhone push via WatchConnectivity)
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 await self?.refreshAll()
             }

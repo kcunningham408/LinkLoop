@@ -11,6 +11,9 @@ import WatchConnectivity
 class WatchSessionManager: NSObject, WCSessionDelegate {
     static let shared = WatchSessionManager()
 
+    /// Timer that periodically pushes fresh glucose to the Watch
+    private var glucosePushTimer: Timer?
+
     private override init() {
         super.init()
     }
@@ -92,6 +95,122 @@ class WatchSessionManager: NSObject, WCSessionDelegate {
             print("[WatchSession] Pushed context to Watch: \(context.keys.joined(separator: ", "))")
         } catch {
             print("[WatchSession] Failed to push context: \(error)")
+        }
+    }
+
+    // MARK: - Live Glucose Push to Watch
+
+    /// Start a repeating timer that pushes fresh glucose data to the Watch every ~60 seconds.
+    /// Called when the app becomes active. The Watch receives it instantly via sendMessage
+    /// (if reachable) or via complicationUserInfo (guaranteed delivery for complications).
+    func startGlucosePushTimer() {
+        stopGlucosePushTimer()
+        // Push immediately, then every 60 seconds while the app is in the foreground
+        pushGlucoseToWatch()
+        glucosePushTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.pushGlucoseToWatch()
+        }
+        print("[WatchSession] Glucose push timer started (60s interval)")
+    }
+
+    /// Stop the timer when the app goes to the background.
+    func stopGlucosePushTimer() {
+        glucosePushTimer?.invalidate()
+        glucosePushTimer = nil
+    }
+
+    /// Push the latest glucose reading to the Watch so it can update complications in real time.
+    /// Fetches directly from the LinkLoop server (same API the Watch uses), then sends via:
+    ///   1. sendMessage — instant delivery if Watch is reachable
+    ///   2. transferCurrentComplicationUserInfo — guaranteed delivery, wakes widget extension
+    func pushGlucoseToWatch() {
+        guard WCSession.default.activationState == .activated,
+              WCSession.default.isWatchAppInstalled else { return }
+
+        guard let token = readAsyncStorageValue(forKey: "authToken") else {
+            print("[WatchSession] No auth token for glucose push")
+            return
+        }
+
+        // Determine the correct endpoint based on user role
+        var endpoint = "/glucose/latest"
+        if let cachedUserJSON = readAsyncStorageValue(forKey: "cachedUser"),
+           let data = cachedUserJSON.data(using: .utf8),
+           let user = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            let role = user["role"] as? String ?? "warrior"
+            if role == "member", let ownerId = user["linkedOwnerId"] as? String {
+                endpoint = "/glucose/member-view/\(ownerId)?hours=1"
+            }
+        }
+
+        let urlString = "https://linkloop-9l3x.onrender.com/api\(endpoint)"
+        guard let url = URL(string: urlString) else { return }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 10
+
+        URLSession.shared.dataTask(with: request) { [weak self] responseData, response, error in
+            guard let responseData = responseData, error == nil,
+                  let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                print("[WatchSession] Glucose fetch failed: \(error?.localizedDescription ?? "HTTP error")")
+                return
+            }
+
+            do {
+                let json = try JSONSerialization.jsonObject(with: responseData)
+                var value: Int?
+                var trend: String = "stable"
+                var timestamp: String = ""
+
+                if let reading = json as? [String: Any] {
+                    // /glucose/latest returns a single reading object
+                    value = reading["value"] as? Int
+                    trend = reading["trend"] as? String ?? "stable"
+                    timestamp = reading["readAt"] as? String ?? reading["createdAt"] as? String ?? ""
+                } else if let envelope = json as? [String: Any],
+                          let latest = envelope["latest"] as? [String: Any] {
+                    // /glucose/member-view returns { latest: {...}, stats: {...}, ... }
+                    value = latest["value"] as? Int
+                    trend = latest["trend"] as? String ?? "stable"
+                    timestamp = latest["readAt"] as? String ?? latest["createdAt"] as? String ?? ""
+                }
+
+                guard let glucoseValue = value else {
+                    print("[WatchSession] No glucose value in response")
+                    return
+                }
+
+                self?.deliverGlucoseToWatch(value: glucoseValue, trend: trend, timestamp: timestamp)
+            } catch {
+                print("[WatchSession] JSON parse error: \(error)")
+            }
+        }.resume()
+    }
+
+    private func deliverGlucoseToWatch(value: Int, trend: String, timestamp: String) {
+        let payload: [String: Any] = [
+            "glucoseValue": value,
+            "glucoseTrend": trend,
+            "glucoseTimestamp": timestamp,
+            "pushTime": Date().timeIntervalSince1970
+        ]
+
+        // Channel 1: Real-time message (instant if Watch is reachable)
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(payload, replyHandler: nil) { error in
+                print("[WatchSession] sendMessage glucose error: \(error.localizedDescription)")
+            }
+            print("[WatchSession] Sent glucose via sendMessage: \(value) \(trend)")
+        }
+
+        // Channel 2: Complication user info (guaranteed, wakes widget extension)
+        // Only send if remaining transfers are available (Apple limits to ~50/day)
+        if WCSession.default.remainingComplicationUserInfoTransfers > 0 {
+            WCSession.default.transferCurrentComplicationUserInfo(payload)
+            print("[WatchSession] Transferred complication info: \(value) \(trend) (remaining: \(WCSession.default.remainingComplicationUserInfoTransfers))")
         }
     }
 

@@ -6,6 +6,7 @@ struct LinkLoopWatchApp: App {
     @StateObject private var glucoseManager = GlucoseManager()
     @StateObject private var connectivityManager = ConnectivityManager()
     @StateObject private var healthKitRelay = HealthKitRelayManager()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -30,6 +31,10 @@ struct LinkLoopWatchApp: App {
                             startHealthKitRelayIfReady()
                         }
                     }
+                    connectivityManager.onGlucoseReceived = { value, trend, timestamp in
+                        // iPhone pushed fresh glucose — update the in-app display
+                        glucoseManager.applyPushedGlucose(value: value, trend: trend, timestamp: timestamp)
+                    }
                     connectivityManager.activate()
 
                     // Safety net: re-check context after a short delay
@@ -46,6 +51,16 @@ struct LinkLoopWatchApp: App {
                             UserDefaults.standard.string(forKey: "linkloop_auth_token") ?? ""
                         )
                         startHealthKitRelayIfReady()
+                    }
+                }
+                .onChange(of: scenePhase) { newPhase in
+                    if newPhase == .active {
+                        // Refresh immediately when Watch app comes to foreground (wrist raise, tap)
+                        if glucoseManager.isConnected {
+                            Task { await glucoseManager.refreshAll() }
+                        }
+                        // Also re-check for any pending WCSession context
+                        connectivityManager.recheckContext()
                     }
                 }
         }

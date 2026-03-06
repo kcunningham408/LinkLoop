@@ -1,11 +1,13 @@
 import Foundation
 import WatchConnectivity
+import WidgetKit
 
 class ConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     @Published var isPhoneReachable = false
     var onTokenReceived: ((String) -> Void)?
     var onThresholdsReceived: ((Int, Int) -> Void)?
     var onRoleReceived: ((String, String?) -> Void)?  // (role, linkedOwnerId?)
+    var onGlucoseReceived: ((Int, String, String) -> Void)?  // (value, trend, timestamp)
 
     private var retryCount = 0
     private let maxRetries = 5
@@ -101,6 +103,48 @@ class ConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
 
+    /// Extract and apply glucose data pushed from the iPhone.
+    /// Writes to App Group UserDefaults and reloads complications.
+    private func applyGlucose(from payload: [String: Any]) {
+        guard let value = payload["glucoseValue"] as? Int else { return }
+        let trend = payload["glucoseTrend"] as? String ?? "stable"
+        let timestamp = payload["glucoseTimestamp"] as? String ?? ""
+
+        // Write to App Group shared defaults so the Widget Extension (complication) can read it
+        if let defaults = UserDefaults(suiteName: "group.com.vibecmd.linkloop.watch") {
+            defaults.set(value, forKey: "complication_glucose")
+            defaults.set(trend, forKey: "complication_trend")
+
+            // Parse ISO timestamp to epoch for the complication
+            if !timestamp.isEmpty {
+                let formatter = ISO8601DateFormatter()
+                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                if let date = formatter.date(from: timestamp) {
+                    defaults.set(date.timeIntervalSince1970, forKey: "complication_timestamp")
+                } else {
+                    // Try without fractional seconds
+                    formatter.formatOptions = [.withInternetDateTime]
+                    if let date = formatter.date(from: timestamp) {
+                        defaults.set(date.timeIntervalSince1970, forKey: "complication_timestamp")
+                    }
+                }
+            } else {
+                // No timestamp from server — use current time
+                defaults.set(Date().timeIntervalSince1970, forKey: "complication_timestamp")
+            }
+        }
+
+        // Tell WidgetKit to refresh complications
+        WidgetCenter.shared.reloadAllTimelines()
+
+        // Notify GlucoseManager to update the in-app display too
+        DispatchQueue.main.async {
+            self.onGlucoseReceived?(value, trend, timestamp)
+        }
+
+        print("[Watch] Received glucose push: \(value) \(trend)")
+    }
+
     // MARK: - WCSessionDelegate
     func session(
         _ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState,
@@ -143,6 +187,18 @@ class ConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             DispatchQueue.main.async {
                 self.onTokenReceived?(token)
             }
+        }
+        // Handle glucose pushes from iPhone
+        if message["glucoseValue"] != nil {
+            applyGlucose(from: message)
+        }
+    }
+
+    /// Handle transferCurrentComplicationUserInfo from iPhone (guaranteed delivery for complications)
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        print("[Watch] Received userInfo: \(userInfo.keys.joined(separator: ", "))")
+        if userInfo["glucoseValue"] != nil {
+            applyGlucose(from: userInfo)
         }
     }
 

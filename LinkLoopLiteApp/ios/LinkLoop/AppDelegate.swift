@@ -63,6 +63,12 @@ public class AppDelegate: ExpoAppDelegate {
   public override func applicationDidBecomeActive(_ application: UIApplication) {
     super.applicationDidBecomeActive(application)
     WatchSessionManager.shared.pushContextToWatch()
+    WatchSessionManager.shared.startGlucosePushTimer()
+  }
+
+  public override func applicationWillResignActive(_ application: UIApplication) {
+    super.applicationWillResignActive(application)
+    WatchSessionManager.shared.stopGlucosePushTimer()
   }
 }
 

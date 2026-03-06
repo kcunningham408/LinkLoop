@@ -106,6 +106,15 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  // Apple Watch pairing — 6-digit code the Watch enters to get a JWT
+  watchPairCode: {
+    type: String,
+    default: null
+  },
+  watchPairExpiry: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

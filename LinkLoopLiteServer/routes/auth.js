@@ -240,4 +240,73 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// ─── Apple Watch Pairing ───────────────────────────────────────────
+
+const auth = require('../middleware/auth');
+
+// @route   POST /api/auth/watch-pair
+// @desc    Generate a 6-digit code the Watch can use to authenticate
+// @access  Private (iPhone sends its JWT)
+router.post('/watch-pair', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Generate a 6-digit numeric code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    user.watchPairCode = code;
+    user.watchPairExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+
+    res.json({ code, expiresIn: 600 });
+  } catch (err) {
+    console.error('Watch pair error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/auth/watch-claim
+// @desc    Watch sends a 6-digit code and receives a JWT
+// @access  Public (no auth needed — the code IS the auth)
+router.post('/watch-claim', async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code || code.length !== 6) {
+      return res.status(400).json({ message: 'Invalid code' });
+    }
+
+    const user = await User.findOne({
+      watchPairCode: code,
+      watchPairExpiry: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid or expired code' });
+    }
+
+    // Clear the code so it can't be reused
+    user.watchPairCode = null;
+    user.watchPairExpiry = null;
+    await user.save();
+
+    // Issue a JWT for the Watch (long-lived, same as mobile)
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '90d' });
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        linkedOwnerId: user.linkedOwnerId || null,
+        lowThreshold: user.settings?.lowThreshold || 70,
+        highThreshold: user.settings?.highThreshold || 180,
+      }
+    });
+  } catch (err) {
+    console.error('Watch claim error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

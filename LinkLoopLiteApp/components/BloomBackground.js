@@ -43,10 +43,11 @@ export default function BloomBackground({
   return (
     <View style={[styles.container, style]}>
       {/* Base dark layer */}
-      <View style={styles.base} />
+      <View pointerEvents="none" style={styles.base} />
 
       {/* Primary accent blob — upper-left */}
       <View
+        pointerEvents="none"
         style={[
           styles.blob,
           styles.blobPrimary,
@@ -56,6 +57,7 @@ export default function BloomBackground({
 
       {/* Secondary blob — lower-right */}
       <View
+        pointerEvents="none"
         style={[
           styles.blob,
           styles.blobSecondary,
@@ -65,6 +67,7 @@ export default function BloomBackground({
 
       {/* Tertiary bloom — center-bottom (subtle purple/violet) */}
       <View
+        pointerEvents="none"
         style={[
           styles.blob,
           styles.blobTertiary,
@@ -74,6 +77,7 @@ export default function BloomBackground({
 
       {/* Radial overlay gradient — fades blobs into the dark base at edges */}
       <LinearGradient
+        pointerEvents="none"
         colors={['transparent', 'rgba(10,10,15,0.6)', '#0A0A0F']}
         locations={[0, 0.65, 1]}
         style={styles.fadeOverlay}

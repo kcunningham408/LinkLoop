@@ -16,13 +16,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Svg, {
-  Circle,
-  Defs,
-  G,
-  Line,
-  LinearGradient as SVGGradient,
-  Rect,
-  Stop,
+    Circle,
+    Defs,
+    G,
+    Line,
+    Rect,
+    Stop,
+    LinearGradient as SVGGradient,
 } from 'react-native-svg';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -48,15 +48,16 @@ export default function LinkLoopBanner({
   return (
     <View style={[styles.container, style]}>
       {/* ─── Dark base ─── */}
-      <View style={styles.base} />
+      <View pointerEvents="none" style={styles.base} />
 
       {/* ─── Gradient blobs (View-based, blurred feel via large radius + low opacity) ─── */}
-      <View style={[styles.blob, styles.blobA, { backgroundColor: `rgba(${aRgb},0.22)` }]} />
-      <View style={[styles.blob, styles.blobB, { backgroundColor: `rgba(${sRgb},0.16)` }]} />
-      <View style={[styles.blob, styles.blobC, { backgroundColor: 'rgba(155,89,182,0.07)' }]} />
+      <View pointerEvents="none" style={[styles.blob, styles.blobA, { backgroundColor: `rgba(${aRgb},0.22)` }]} />
+      <View pointerEvents="none" style={[styles.blob, styles.blobB, { backgroundColor: `rgba(${sRgb},0.16)` }]} />
+      <View pointerEvents="none" style={[styles.blob, styles.blobC, { backgroundColor: 'rgba(155,89,182,0.07)' }]} />
 
       {/* ─── SVG artwork layer ─── */}
       <Svg
+        pointerEvents="none"
         width={SCREEN_W}
         height={BANNER_H}
         viewBox={`0 0 ${SCREEN_W} ${BANNER_H}`}
@@ -229,6 +230,7 @@ export default function LinkLoopBanner({
 
       {/* ── Radial fade overlay — blends bottom into #0A0A0F ── */}
       <LinearGradient
+        pointerEvents="none"
         colors={['transparent', 'rgba(10,10,15,0.55)', '#0A0A0F']}
         locations={[0, 0.6, 1]}
         style={styles.fadeOverlay}
@@ -236,6 +238,7 @@ export default function LinkLoopBanner({
 
       {/* ── Bottom edge glow line ── */}
       <LinearGradient
+        pointerEvents="none"
         colors={[
           'transparent',
           `rgba(${aRgb},0.25)`,

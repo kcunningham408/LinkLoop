@@ -12,7 +12,7 @@
 
 import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, LinearGradient as SVGGradient, Path, Rect, Stop, Line as SvgLine, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Defs, Path, Rect, Stop, LinearGradient as SVGGradient, Line as SvgLine, Text as SvgText } from 'react-native-svg';
 
 const PADDING = { top: 20, right: 16, bottom: 32, left: 42 };
 

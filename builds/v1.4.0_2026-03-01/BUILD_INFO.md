@@ -2,12 +2,12 @@
 
 ## Build Files
 
-| File | Platform | Type | Notes |
-|------|----------|------|-------|
-| `LinkLoop-v1.4.0-android.aab` | Android | AAB | **Use this for Google Play** (55.4 MB) |
-| `LinkLoop-v1.4.0-ios.ipa` | iOS | IPA | **Use this for App Store Connect** (13.3 MB) |
-| `build-1772413852404-android-raw.aab` | Android | AAB | Raw EAS build output (same as above, original name) |
-| `build-1772417225019-ios-raw.ipa` | iOS | IPA | Raw EAS build output (same as above, original name) |
+| File                                  | Platform | Type | Notes                                               |
+| ------------------------------------- | -------- | ---- | --------------------------------------------------- |
+| `LinkLoop-v1.4.0-android.aab`         | Android  | AAB  | **Use this for Google Play** (55.4 MB)              |
+| `LinkLoop-v1.4.0-ios.ipa`             | iOS      | IPA  | **Use this for App Store Connect** (13.3 MB)        |
+| `build-1772413852404-android-raw.aab` | Android  | AAB  | Raw EAS build output (same as above, original name) |
+| `build-1772417225019-ios-raw.ipa`     | iOS      | IPA  | Raw EAS build output (same as above, original name) |
 
 ## Build Details
 
@@ -23,6 +23,7 @@
 ## What's in this build
 
 All 10 UI upgrades + QA fixes:
+
 1. Gradient headers on all screens
 2. Animated tab bar with haptic feedback
 3. Glucose card redesign with color-coded ranges

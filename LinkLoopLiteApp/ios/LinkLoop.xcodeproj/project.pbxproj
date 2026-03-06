@@ -10,11 +10,50 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		24AF550C69154884E1BC88DF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1530AD7E1ABC6E707EC517E4 /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		AA000001WATCH000000000030 /* LinkLoopWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000010 /* LinkLoopWatchApp.swift */; };
+		AA000001WATCH000000000031 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000011 /* ContentView.swift */; };
+		AA000001WATCH000000000032 /* GlucoseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000012 /* GlucoseView.swift */; };
+		AA000001WATCH000000000033 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000013 /* GraphView.swift */; };
+		AA000001WATCH000000000034 /* AlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000014 /* AlertsView.swift */; };
+		AA000001WATCH000000000035 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000015 /* SettingsView.swift */; };
+		AA000001WATCH000000000036 /* GlucoseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000016 /* GlucoseManager.swift */; };
+		AA000001WATCH000000000037 /* ConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000017 /* ConnectivityManager.swift */; };
+		AA000001WATCH000000000038 /* GlucoseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000018 /* GlucoseModels.swift */; };
+		AA000001WATCH000000000039 /* Color+LinkLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000019 /* Color+LinkLoop.swift */; };
+		AA000001WATCH000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000020 /* Assets.xcassets */; };
+		AA000001WATCH000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000023 /* PrivacyInfo.xcprivacy */; };
+		AA000001WATCH000000000063 /* LinkLoopWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = AA000001WATCH000000000001 /* LinkLoopWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B75DD7E4CD111A7BACB5C67A /* libPods-LinkLoop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D858C8913A35F39C559DB06 /* libPods-LinkLoop.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		BB68F5CB5E888DA1AB84E40C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55A2329F676635474824BF8 /* ExpoModulesProvider.swift */; };
+		C0710FF9EBFC9A271D8DC366 /* WatchSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BDCFCD90A38455D6007B0 /* WatchSessionManager.swift */; };
+		874E86FA1D6B9818B118C7E4 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6D8E094FF0E0BBA4B94EE7D /* WatchConnectivity.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA000001WATCH000000000061 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000001WATCH000000000002;
+			remoteInfo = LinkLoopWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA000001WATCH000000000062 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				AA000001WATCH000000000063 /* LinkLoopWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* LinkLoop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LinkLoop.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -22,6 +61,21 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LinkLoop/Info.plist; sourceTree = "<group>"; };
 		1530AD7E1ABC6E707EC517E4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = LinkLoop/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1D858C8913A35F39C559DB06 /* libPods-LinkLoop.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LinkLoop.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001WATCH000000000001 /* LinkLoopWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LinkLoopWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001WATCH000000000010 /* LinkLoopWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkLoopWatchApp.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000012 /* GlucoseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseView.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000013 /* GraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000014 /* AlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsView.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000015 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000016 /* GlucoseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseManager.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000017 /* ConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityManager.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000018 /* GlucoseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseModels.swift; sourceTree = "<group>"; };
+		AA000001WATCH000000000019 /* Color+LinkLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+LinkLoop.swift"; sourceTree = "<group>"; };
+		AA000001WATCH000000000020 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA000001WATCH000000000021 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA000001WATCH000000000022 /* LinkLoopWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LinkLoopWatch.entitlements; sourceTree = "<group>"; };
+		AA000001WATCH000000000023 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = LinkLoop/SplashScreen.storyboard; sourceTree = "<group>"; };
 		ACFC081FF2240B454CE3BF56 /* Pods-LinkLoop.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LinkLoop.release.xcconfig"; path = "Target Support Files/Pods-LinkLoop/Pods-LinkLoop.release.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
@@ -30,6 +84,8 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = LinkLoop/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* LinkLoop-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "LinkLoop-Bridging-Header.h"; path = "LinkLoop/LinkLoop-Bridging-Header.h"; sourceTree = "<group>"; };
+		C77BDCFCD90A38455D6007B0 /* WatchSessionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchSessionManager.swift; path = LinkLoop/WatchSessionManager.swift; sourceTree = "<group>"; };
+		F6D8E094FF0E0BBA4B94EE7D /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +94,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				B75DD7E4CD111A7BACB5C67A /* libPods-LinkLoop.a in Frameworks */,
+				874E86FA1D6B9818B118C7E4 /* WatchConnectivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000001WATCH000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +118,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				1530AD7E1ABC6E707EC517E4 /* PrivacyInfo.xcprivacy */,
+				C77BDCFCD90A38455D6007B0 /* WatchSessionManager.swift */,
 			);
 			name = LinkLoop;
 			sourceTree = "<group>";
@@ -63,6 +128,7 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				1D858C8913A35F39C559DB06 /* libPods-LinkLoop.a */,
+				F6D8E094FF0E0BBA4B94EE7D /* WatchConnectivity.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -88,6 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07FAE1A68108700A75B9A /* LinkLoop */,
+				AA000001WATCH000000000050 /* LinkLoopWatch */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -103,8 +170,62 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* LinkLoop.app */,
+				AA000001WATCH000000000001 /* LinkLoopWatch.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA000001WATCH000000000050 /* LinkLoopWatch */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001WATCH000000000010 /* LinkLoopWatchApp.swift */,
+				AA000001WATCH000000000011 /* ContentView.swift */,
+				AA000001WATCH000000000051 /* Views */,
+				AA000001WATCH000000000052 /* Managers */,
+				AA000001WATCH000000000053 /* Models */,
+				AA000001WATCH000000000054 /* Extensions */,
+				AA000001WATCH000000000020 /* Assets.xcassets */,
+				AA000001WATCH000000000021 /* Info.plist */,
+				AA000001WATCH000000000022 /* LinkLoopWatch.entitlements */,
+				AA000001WATCH000000000023 /* PrivacyInfo.xcprivacy */,
+			);
+			path = LinkLoopWatch;
+			sourceTree = "<group>";
+		};
+		AA000001WATCH000000000051 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001WATCH000000000012 /* GlucoseView.swift */,
+				AA000001WATCH000000000013 /* GraphView.swift */,
+				AA000001WATCH000000000014 /* AlertsView.swift */,
+				AA000001WATCH000000000015 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AA000001WATCH000000000052 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001WATCH000000000016 /* GlucoseManager.swift */,
+				AA000001WATCH000000000017 /* ConnectivityManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		AA000001WATCH000000000053 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001WATCH000000000018 /* GlucoseModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA000001WATCH000000000054 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001WATCH000000000019 /* Color+LinkLoop.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -145,16 +266,35 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				AA000001WATCH000000000062 /* Embed Watch Content */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
 				192BF1106DC2AC6AA11FA0DE /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA000001WATCH000000000064 /* PBXTargetDependency */,
 			);
 			name = LinkLoop;
 			productName = LinkLoop;
 			productReference = 13B07F961A680F5B00A75B9A /* LinkLoop.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AA000001WATCH000000000002 /* LinkLoopWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000001WATCH000000000003 /* Build configuration list for PBXNativeTarget "LinkLoopWatch" */;
+			buildPhases = (
+				AA000001WATCH000000000006 /* Sources */,
+				AA000001WATCH000000000008 /* Frameworks */,
+				AA000001WATCH000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LinkLoopWatch;
+			productName = LinkLoopWatch;
+			productReference = AA000001WATCH000000000001 /* LinkLoopWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -184,6 +324,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* LinkLoop */,
+				AA000001WATCH000000000002 /* LinkLoopWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -197,6 +338,15 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				24AF550C69154884E1BC88DF /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000001WATCH000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001WATCH000000000040 /* Assets.xcassets in Resources */,
+				AA000001WATCH000000000041 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,7 +368,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
+			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n. \"$(\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\")\"\n\n";
 		};
 		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -337,10 +487,36 @@
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
 				BB68F5CB5E888DA1AB84E40C /* ExpoModulesProvider.swift in Sources */,
+				C0710FF9EBFC9A271D8DC366 /* WatchSessionManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000001WATCH000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001WATCH000000000030 /* LinkLoopWatchApp.swift in Sources */,
+				AA000001WATCH000000000031 /* ContentView.swift in Sources */,
+				AA000001WATCH000000000032 /* GlucoseView.swift in Sources */,
+				AA000001WATCH000000000033 /* GraphView.swift in Sources */,
+				AA000001WATCH000000000034 /* AlertsView.swift in Sources */,
+				AA000001WATCH000000000035 /* SettingsView.swift in Sources */,
+				AA000001WATCH000000000036 /* GlucoseManager.swift in Sources */,
+				AA000001WATCH000000000037 /* ConnectivityManager.swift in Sources */,
+				AA000001WATCH000000000038 /* GlucoseModels.swift in Sources */,
+				AA000001WATCH000000000039 /* Color+LinkLoop.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA000001WATCH000000000064 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000001WATCH000000000002 /* LinkLoopWatch */;
+			targetProxy = AA000001WATCH000000000061 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -527,6 +703,60 @@
 			};
 			name = Release;
 		};
+		AA000001WATCH000000000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LinkLoopWatch/LinkLoopWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LinkLoopWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vibecmd.linkloop.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AA000001WATCH000000000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LinkLoopWatch/LinkLoopWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LinkLoopWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vibecmd.linkloop.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -544,6 +774,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000001WATCH000000000003 /* Build configuration list for PBXNativeTarget "LinkLoopWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000001WATCH000000000004 /* Debug */,
+				AA000001WATCH000000000005 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

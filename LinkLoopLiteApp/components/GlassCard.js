@@ -41,7 +41,7 @@ export default function GlassCard({
     >
       {/* Bloom glow orb — subtle color wash behind glow cards */}
       {glow && (
-        <View style={[styles.bloomOrb, { backgroundColor: accent, opacity: 0.08 }]} />
+        <View pointerEvents="none" style={[styles.bloomOrb, { backgroundColor: accent, opacity: 0.08 }]} />
       )}
 
       {/* Gradient-ish border via layered borders */}

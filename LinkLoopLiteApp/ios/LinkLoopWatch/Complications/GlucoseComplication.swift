@@ -27,11 +27,14 @@ struct GlucoseTimelineProvider: TimelineProvider {
         )
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (GlucoseComplicationEntry) -> Void) {
+    func getSnapshot(in context: Context, completion: @escaping (GlucoseComplicationEntry) -> Void)
+    {
         completion(currentEntry())
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void) {
+    func getTimeline(
+        in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void
+    ) {
         let entry = currentEntry()
         // Refresh every 5 minutes (aligned with GlucoseManager's auto-refresh)
         let next = Calendar.current.date(byAdding: .minute, value: 5, to: Date()) ?? Date()
@@ -118,11 +121,16 @@ struct GlucoseCircularComplication: View {
                 VStack(spacing: -2) {
                     Text("\(glucose)")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                        .foregroundColor(
+                            glucoseColor(
+                                glucose, low: entry.lowThreshold, high: entry.highThreshold)
+                        )
                         .minimumScaleFactor(0.6)
                     Text(trendArrow(entry.trend))
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                        .foregroundColor(
+                            glucoseColor(
+                                glucose, low: entry.lowThreshold, high: entry.highThreshold))
                 }
             }
         } else {
@@ -147,11 +155,14 @@ struct GlucoseCornerComplication: View {
             VStack(spacing: 0) {
                 Text("\(glucose)")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                    .foregroundColor(
+                        glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold)
+                    )
                     .minimumScaleFactor(0.6)
                 Text(trendArrow(entry.trend))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                    .foregroundColor(
+                        glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
             }
         } else {
             Image(systemName: "drop.circle")
@@ -174,10 +185,14 @@ struct GlucoseRectangularComplication: View {
                     HStack(spacing: 2) {
                         Text("\(glucose)")
                             .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                            .foregroundColor(
+                                glucoseColor(
+                                    glucose, low: entry.lowThreshold, high: entry.highThreshold))
                         Text(trendArrow(entry.trend))
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                            .foregroundColor(
+                                glucoseColor(
+                                    glucose, low: entry.lowThreshold, high: entry.highThreshold))
                     }
 
                     HStack(spacing: 3) {
@@ -195,10 +210,13 @@ struct GlucoseRectangularComplication: View {
                 Spacer()
 
                 // Range label
-                let range = glucose < entry.lowThreshold ? "LOW" : (glucose > entry.highThreshold ? "HIGH" : "OK")
+                let range =
+                    glucose < entry.lowThreshold
+                    ? "LOW" : (glucose > entry.highThreshold ? "HIGH" : "OK")
                 Text(range)
                     .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                    .foregroundColor(
+                        glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
             }
         } else {
             HStack {

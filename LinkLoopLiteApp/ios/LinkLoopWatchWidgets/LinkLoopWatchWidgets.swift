@@ -32,11 +32,14 @@ struct GlucoseTimelineProvider: TimelineProvider {
         )
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (GlucoseComplicationEntry) -> Void) {
+    func getSnapshot(in context: Context, completion: @escaping (GlucoseComplicationEntry) -> Void)
+    {
         completion(currentEntry())
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void) {
+    func getTimeline(
+        in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void
+    ) {
         let entry = currentEntry()
         let next = Calendar.current.date(byAdding: .minute, value: 5, to: Date()) ?? Date()
         let timeline = Timeline(entries: [entry], policy: .after(next))
@@ -82,7 +85,7 @@ private func trendArrow(_ trend: String) -> String {
     case "falling", "fallingfast", "falling_fast": return "↓"
     case "fallingslightly", "falling_slightly": return "↘"
     case "stable", "flat": return "→"
-    default: return "→"
+    default: return ""
     }
 }
 
@@ -92,90 +95,108 @@ private func minutesAgo(_ date: Date?) -> Int {
 }
 
 // MARK: - Circular Complication
+// Shows JUST the glucose number — big, bold, color-coded.
+// Like a battery percentage: the number IS the complication.
 
 struct GlucoseCircularComplication: View {
     let entry: GlucoseComplicationEntry
 
-    private var progress: CGFloat {
-        guard let glucose = entry.glucose else { return 0.5 }
-        let clamped = min(max(Double(glucose), 40), 400)
-        return CGFloat((clamped - 40) / 360)
-    }
-
     var body: some View {
         if let glucose = entry.glucose {
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(
-                        glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                VStack(spacing: -2) {
-                    Text("\(glucose)")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
-                        .minimumScaleFactor(0.6)
-                    Text(trendArrow(entry.trend))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+            let color = glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold)
+            let arrow = trendArrow(entry.trend)
+            VStack(spacing: -1) {
+                Text("\(glucose)")
+                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .foregroundColor(color)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                if !arrow.isEmpty {
+                    Text(arrow)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(color)
                 }
             }
         } else {
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                Image(systemName: "drop.circle")
-                    .font(.system(size: 18))
-                    .foregroundColor(.gray)
-            }
+            Text("--")
+                .font(.system(size: 22, weight: .heavy, design: .rounded))
+                .foregroundColor(.gray)
+        }
+    }
+}
+
+// MARK: - Corner Complication
+// Shows the glucose number for corner slots (e.g. top-left, bottom-right of watch face)
+
+struct GlucoseCornerComplication: View {
+    let entry: GlucoseComplicationEntry
+
+    var body: some View {
+        if let glucose = entry.glucose {
+            let color = glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold)
+            let arrow = trendArrow(entry.trend)
+            Text("\(glucose)\(arrow)")
+                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                .foregroundColor(color)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+        } else {
+            Text("--")
+                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                .foregroundColor(.gray)
         }
     }
 }
 
 // MARK: - Rectangular Complication
+// Shows glucose number prominently with trend arrow and time since last reading.
 
 struct GlucoseRectangularComplication: View {
     let entry: GlucoseComplicationEntry
 
     var body: some View {
         if let glucose = entry.glucose {
-            HStack(spacing: 6) {
+            let color = glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold)
+            let arrow = trendArrow(entry.trend)
+            let mins = minutesAgo(entry.readingDate)
+            HStack(spacing: 4) {
+                // Big glucose number — the main attraction
+                Text("\(glucose)")
+                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .foregroundColor(color)
+                    .minimumScaleFactor(0.6)
+
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(spacing: 2) {
-                        Text("\(glucose)")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
-                        Text(trendArrow(entry.trend))
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+                    if !arrow.isEmpty {
+                        Text(arrow)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(color)
                     }
-                    HStack(spacing: 3) {
-                        Image(systemName: "drop.fill")
-                            .font(.system(size: 8))
-                            .foregroundColor(.blue)
-                        let mins = minutesAgo(entry.readingDate)
-                        Text(mins < 1 ? "Just now" : "\(mins)m ago")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(mins > 10 ? .orange : .gray)
-                    }
+                    Text(mins < 1 ? "now" : "\(mins)m")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(mins > 10 ? .orange : .gray)
                 }
+
                 Spacer()
-                let range = glucose < entry.lowThreshold ? "LOW" : (glucose > entry.highThreshold ? "HIGH" : "OK")
-                Text(range)
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(glucoseColor(glucose, low: entry.lowThreshold, high: entry.highThreshold))
+
+                // Range badge
+                let range =
+                    glucose < entry.lowThreshold
+                    ? "LOW" : (glucose > entry.highThreshold ? "HIGH" : "")
+                if !range.isEmpty {
+                    Text(range)
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(color)
+                }
             }
         } else {
             HStack {
-                Image(systemName: "drop.circle")
-                    .font(.system(size: 16))
-                    .foregroundColor(.blue.opacity(0.5))
-                Text("No glucose data")
-                    .font(.system(size: 12))
+                Text("--")
+                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .foregroundColor(.gray)
+                Spacer()
+                Text("No data")
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.gray)
             }
         }
@@ -183,19 +204,19 @@ struct GlucoseRectangularComplication: View {
 }
 
 // MARK: - Inline Complication
+// Single line of text: "120→ mg/dL · 2m"
 
 struct GlucoseInlineComplication: View {
     let entry: GlucoseComplicationEntry
 
     var body: some View {
         if let glucose = entry.glucose {
+            let arrow = trendArrow(entry.trend)
             let mins = minutesAgo(entry.readingDate)
             let timeStr = mins < 1 ? "now" : "\(mins)m"
-            Text("\(glucose) \(trendArrow(entry.trend)) mg/dL · \(timeStr)")
-                .font(.system(size: 12, weight: .semibold))
+            Text("\(glucose)\(arrow) mg/dL · \(timeStr)")
         } else {
-            Text("LinkLoop — mg/dL")
-                .font(.system(size: 12))
+            Text("-- mg/dL")
         }
     }
 }
@@ -210,7 +231,7 @@ struct GlucoseCircularWidget: Widget {
                 .containerBackground(.black, for: .widget)
         }
         .configurationDisplayName("Glucose")
-        .description("Current blood glucose reading")
+        .description("Live glucose number on your watch face")
         .supportedFamilies([.accessoryCircular, .accessoryCorner])
     }
 }
@@ -223,7 +244,7 @@ struct GlucoseRectangularWidget: Widget {
                 .containerBackground(.black, for: .widget)
         }
         .configurationDisplayName("Glucose Detail")
-        .description("Glucose reading with trend and time")
+        .description("Glucose number with trend and time")
         .supportedFamilies([.accessoryRectangular])
     }
 }
@@ -236,7 +257,7 @@ struct GlucoseInlineWidget: Widget {
                 .containerBackground(.black, for: .widget)
         }
         .configurationDisplayName("Glucose Inline")
-        .description("Glucose value in a single line")
+        .description("Glucose number in a single line")
         .supportedFamilies([.accessoryInline])
     }
 }

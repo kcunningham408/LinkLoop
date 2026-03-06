@@ -23,7 +23,7 @@ class HealthKitRelayManager: ObservableObject {
     }
 
     private var relayTimer: Timer?
-    private let relayInterval: TimeInterval = 300 // 5 minutes
+    private let relayInterval: TimeInterval = 300  // 5 minutes
 
     // Track last uploaded sample date to avoid duplicates
     private var lastUploadedSampleDate: Date {
@@ -113,7 +113,8 @@ class HealthKitRelayManager: ObservableObject {
         Task { await fetchAndUpload() }
 
         // Then fetch on interval
-        relayTimer = Timer.scheduledTimer(withTimeInterval: relayInterval, repeats: true) { [weak self] _ in
+        relayTimer = Timer.scheduledTimer(withTimeInterval: relayInterval, repeats: true) {
+            [weak self] _ in
             Task { @MainActor [weak self] in
                 await self?.fetchAndUpload()
             }
@@ -123,10 +124,12 @@ class HealthKitRelayManager: ObservableObject {
     // MARK: - Fetch & Upload
 
     private func fetchAndUpload() async {
-        guard let glucoseType = HKQuantityType.quantityType(forIdentifier: .bloodGlucose) else { return }
+        guard let glucoseType = HKQuantityType.quantityType(forIdentifier: .bloodGlucose) else {
+            return
+        }
 
         // Query samples newer than our last upload (with a small overlap for safety)
-        let startDate = lastUploadedSampleDate.addingTimeInterval(-60) // 1 min overlap
+        let startDate = lastUploadedSampleDate.addingTimeInterval(-60)  // 1 min overlap
         let predicate = HKQuery.predicateForSamples(
             withStart: startDate,
             end: Date(),
@@ -135,7 +138,8 @@ class HealthKitRelayManager: ObservableObject {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 
         do {
-            let samples = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[HKQuantitySample], Error>) in
+            let samples = try await withCheckedThrowingContinuation {
+                (continuation: CheckedContinuation<[HKQuantitySample], Error>) in
                 let query = HKSampleQuery(
                     sampleType: glucoseType,
                     predicate: predicate,
@@ -188,7 +192,8 @@ class HealthKitRelayManager: ObservableObject {
                     source = "healthkit"
                 }
 
-                let success = await uploadReading(value: value, source: source, timestamp: timestamp)
+                let success = await uploadReading(
+                    value: value, source: source, timestamp: timestamp)
 
                 if success {
                     relayedCount += 1
@@ -212,7 +217,7 @@ class HealthKitRelayManager: ObservableObject {
 
     private func uploadReading(value: Int, source: String, timestamp: Date) async -> Bool {
         guard let token = authToken,
-              let url = URL(string: "\(baseURL)/glucose")
+            let url = URL(string: "\(baseURL)/glucose")
         else { return false }
 
         var request = URLRequest(url: url)
@@ -225,7 +230,7 @@ class HealthKitRelayManager: ObservableObject {
             "value": value,
             "source": source,
             "trend": "stable",  // HealthKit doesn't provide trend, server/app can infer later
-            "notes": "Watch HealthKit relay"
+            "notes": "Watch HealthKit relay",
         ]
 
         do {

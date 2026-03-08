@@ -85,6 +85,11 @@ class ConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         {
             UserDefaults.standard.set(low, forKey: "linkloop_low_threshold")
             UserDefaults.standard.set(high, forKey: "linkloop_high_threshold")
+            // Also write to App Group so the Widget Extension (complication) can read them
+            if let defaults = UserDefaults(suiteName: "group.com.vibecmd.linkloop.watch") {
+                defaults.set(low, forKey: "complication_low")
+                defaults.set(high, forKey: "complication_high")
+            }
             DispatchQueue.main.async {
                 self.onThresholdsReceived?(low, high)
             }

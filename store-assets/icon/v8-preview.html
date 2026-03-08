@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V8 Icon — Full Preview + Device Sizes</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#1a1a2e; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif; color:#fff; padding:30px; }
+
+  h1 { text-align:center; font-size:28px; margin-bottom:8px; }
+  .subtitle { text-align:center; font-size:14px; color:rgba(255,255,255,0.5); margin-bottom:30px; }
+
+  .row { display:flex; gap:40px; justify-content:center; align-items:flex-start; flex-wrap:wrap; }
+
+  .panel { text-align:center; }
+  .panel h2 { font-size:16px; color:rgba(255,255,255,0.7); margin-bottom:12px; font-weight:600; }
+  .panel .size-label { font-size:12px; color:rgba(255,255,255,0.4); margin-top:6px; }
+
+  /* The actual icon rendered inline */
+  .icon-box {
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:
+      radial-gradient(ellipse at 40% 30%, rgba(74,144,217,0.22) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 50%, rgba(52,199,89,0.16) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 65%, rgba(155,89,182,0.06) 0%, transparent 40%),
+      #0A0A0F;
+  }
+  .icon-box.full { width:512px; height:512px; border-radius:100px; }
+  .icon-box.medium { width:180px; height:180px; border-radius:40px; }
+  .icon-box.small { width:120px; height:120px; border-radius:27px; }
+  .icon-box.tiny { width:60px; height:60px; border-radius:13px; }
+
+  /* Blobs */
+  .blob {
+    position:absolute; border-radius:50%; z-index:2;
+    filter: blur(100px);
+  }
+  .icon-box.full .blob { filter: blur(100px); }
+  .icon-box.medium .blob { filter: blur(35px); }
+  .icon-box.small .blob { filter: blur(24px); }
+  .icon-box.tiny .blob { filter: blur(12px); }
+
+  .blob.blue {
+    background: rgba(74,144,217,0.18);
+  }
+  .icon-box.full .blob.blue { width:250px; height:250px; top:60px; left:70px; }
+  .icon-box.medium .blob.blue { width:88px; height:88px; top:21px; left:25px; }
+  .icon-box.small .blob.blue { width:59px; height:59px; top:14px; left:16px; }
+  .icon-box.tiny .blob.blue { width:29px; height:29px; top:7px; left:8px; }
+
+  .blob.green {
+    background: rgba(52,199,89,0.14);
+  }
+  .icon-box.full .blob.green { width:225px; height:225px; top:125px; right:70px; }
+  .icon-box.medium .blob.green { width:79px; height:79px; top:44px; right:25px; }
+  .icon-box.small .blob.green { width:53px; height:53px; top:29px; right:16px; }
+  .icon-box.tiny .blob.green { width:26px; height:26px; top:15px; right:8px; }
+
+  /* Glass card circle */
+  .glass-card {
+    position:absolute; z-index:8;
+    border-radius:50%;
+    background: rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow: inset 0 0 80px rgba(74,144,217,0.04);
+  }
+  .icon-box.full .glass-card { width:360px; height:360px; top:40px; }
+  .icon-box.medium .glass-card { width:127px; height:127px; top:14px; }
+  .icon-box.small .glass-card { width:85px; height:85px; top:9px; }
+  .icon-box.tiny .glass-card { width:42px; height:42px; top:5px; }
+
+  /* SVG loops */
+  .loop-svg {
+    z-index:10; position:relative;
+    filter: drop-shadow(0 0 30px rgba(74,144,217,0.45)) drop-shadow(0 0 60px rgba(52,199,89,0.18));
+  }
+  .icon-box.full .loop-svg { width:330px; height:330px; margin-top:-10px; }
+  .icon-box.medium .loop-svg { width:116px; height:116px; margin-top:-4px; }
+  .icon-box.small .loop-svg { width:78px; height:78px; margin-top:-3px; }
+  .icon-box.tiny .loop-svg { width:39px; height:39px; margin-top:-1px; }
+
+  /* Wordmark */
+  .wordmark {
+    position:relative; z-index:12;
+    font-weight:900; letter-spacing:-2px;
+    background: linear-gradient(135deg, #7BB3FF 0%, #4A90D9 40%, #34C759 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    line-height:1;
+  }
+  .icon-box.full .wordmark { font-size:64px; margin-top:-12px; letter-spacing:-2px; }
+  .icon-box.medium .wordmark { font-size:22px; margin-top:-4px; letter-spacing:-1px; }
+  .icon-box.small .wordmark { font-size:15px; margin-top:-3px; letter-spacing:-0.5px; }
+  .icon-box.tiny .wordmark { font-size:7.5px; margin-top:-1px; letter-spacing:-0.3px; }
+
+  /* Subtitle */
+  .sub {
+    position:relative; z-index:12;
+    font-weight:700; color:rgba(255,255,255,0.22);
+    text-transform:uppercase;
+  }
+  .icon-box.full .sub { font-size:11px; letter-spacing:7px; margin-top:4px; }
+  .icon-box.medium .sub { font-size:4px; letter-spacing:2.5px; margin-top:1px; }
+  .icon-box.small .sub { display:none; }
+  .icon-box.tiny .sub { display:none; }
+
+  /* Home screen simulation */
+  .homescreen-sim {
+    display:flex; gap:24px; justify-content:center; align-items:flex-end;
+    margin-top:40px; padding:30px 40px; border-radius:20px;
+    background: rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .app-slot { text-align:center; }
+  .app-slot .app-name { font-size:11px; color:rgba(255,255,255,0.6); margin-top:5px; }
+  .fake-icon {
+    width:60px; height:60px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+  }
+  .fake-icon.gray { background: linear-gradient(135deg, #3a3a4a, #2a2a3a); }
+  .fake-icon.orange { background: linear-gradient(135deg, #FF9500, #FF6B00); }
+  .fake-icon.red { background: linear-gradient(135deg, #FF3B30, #CC2D25); }
+  .fake-icon.purple { background: linear-gradient(135deg, #AF52DE, #8944B8); }
+
+  .divider { width:100%; border-top:1px solid rgba(255,255,255,0.08); margin:40px 0 30px; }
+</style>
+</head>
+<body>
+
+<h1>🔗 LinkLoop V8 Icon Preview</h1>
+<p class="subtitle">See the icon at every size — from App Store (1024px) down to Home Screen (60px)</p>
+
+<!-- FULL SIZE -->
+<div class="row" style="margin-bottom:30px;">
+  <div class="panel">
+    <h2>📐 Half-Size Render (512px) — Shows Detail</h2>
+    <div class="icon-box full" style="margin:0 auto;">
+      <div class="blob blue"></div>
+      <div class="blob green"></div>
+      <div class="glass-card"></div>
+      <svg class="loop-svg" viewBox="0 0 280 280" fill="none">
+        <defs>
+          <linearGradient id="b1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7BB3FF"/>
+            <stop offset="50%" stop-color="#4A90D9"/>
+            <stop offset="100%" stop-color="#3A7BC8"/>
+          </linearGradient>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5FE89D"/>
+            <stop offset="50%" stop-color="#34C759"/>
+            <stop offset="100%" stop-color="#2A9E47"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#b1)" stroke-width="18" fill="none"/>
+        <rect x="116" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#g1)" stroke-width="18" fill="none"/>
+        <rect x="126" y="72" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <rect x="126" y="180" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <line x1="126" y1="194" x2="150" y2="194" stroke="url(#g1)" stroke-width="18" stroke-linecap="round"/>
+        <line x1="126" y1="86" x2="150" y2="86" stroke="url(#b1)" stroke-width="18" stroke-linecap="round"/>
+      </svg>
+      <div class="wordmark">LinkLoop</div>
+      <div class="sub">T1D Wellness</div>
+    </div>
+    <div class="size-label">512 × 512 px</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SCALED SIZES -->
+<div class="row" style="margin-bottom:20px;">
+  <div class="panel">
+    <h2>🔍 Spotlight / Settings</h2>
+    <div class="icon-box medium" style="margin:0 auto;">
+      <div class="blob blue"></div>
+      <div class="blob green"></div>
+      <div class="glass-card"></div>
+      <svg class="loop-svg" viewBox="0 0 280 280" fill="none">
+        <defs>
+          <linearGradient id="b2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7BB3FF"/>
+            <stop offset="50%" stop-color="#4A90D9"/>
+            <stop offset="100%" stop-color="#3A7BC8"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5FE89D"/>
+            <stop offset="50%" stop-color="#34C759"/>
+            <stop offset="100%" stop-color="#2A9E47"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#b2)" stroke-width="18" fill="none"/>
+        <rect x="116" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#g2)" stroke-width="18" fill="none"/>
+        <rect x="126" y="72" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <rect x="126" y="180" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <line x1="126" y1="194" x2="150" y2="194" stroke="url(#g2)" stroke-width="18" stroke-linecap="round"/>
+        <line x1="126" y1="86" x2="150" y2="86" stroke="url(#b2)" stroke-width="18" stroke-linecap="round"/>
+      </svg>
+      <div class="wordmark">LinkLoop</div>
+      <div class="sub">T1D Wellness</div>
+    </div>
+    <div class="size-label">180 × 180 px (3x retina)</div>
+  </div>
+
+  <div class="panel">
+    <h2>📱 Home Screen (2x)</h2>
+    <div class="icon-box small" style="margin:0 auto;">
+      <div class="blob blue"></div>
+      <div class="blob green"></div>
+      <div class="glass-card"></div>
+      <svg class="loop-svg" viewBox="0 0 280 280" fill="none">
+        <defs>
+          <linearGradient id="b3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7BB3FF"/>
+            <stop offset="50%" stop-color="#4A90D9"/>
+            <stop offset="100%" stop-color="#3A7BC8"/>
+          </linearGradient>
+          <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5FE89D"/>
+            <stop offset="50%" stop-color="#34C759"/>
+            <stop offset="100%" stop-color="#2A9E47"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#b3)" stroke-width="18" fill="none"/>
+        <rect x="116" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#g3)" stroke-width="18" fill="none"/>
+        <rect x="126" y="72" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <rect x="126" y="180" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <line x1="126" y1="194" x2="150" y2="194" stroke="url(#g3)" stroke-width="18" stroke-linecap="round"/>
+        <line x1="126" y1="86" x2="150" y2="86" stroke="url(#b3)" stroke-width="18" stroke-linecap="round"/>
+      </svg>
+      <div class="wordmark">LinkLoop</div>
+    </div>
+    <div class="size-label">120 × 120 px</div>
+  </div>
+
+  <div class="panel">
+    <h2>🏠 Home Screen (actual)</h2>
+    <div class="icon-box tiny" style="margin:0 auto;">
+      <div class="blob blue"></div>
+      <div class="blob green"></div>
+      <div class="glass-card"></div>
+      <svg class="loop-svg" viewBox="0 0 280 280" fill="none">
+        <defs>
+          <linearGradient id="b4" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7BB3FF"/>
+            <stop offset="50%" stop-color="#4A90D9"/>
+            <stop offset="100%" stop-color="#3A7BC8"/>
+          </linearGradient>
+          <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5FE89D"/>
+            <stop offset="50%" stop-color="#34C759"/>
+            <stop offset="100%" stop-color="#2A9E47"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#b4)" stroke-width="18" fill="none"/>
+        <rect x="116" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#g4)" stroke-width="18" fill="none"/>
+        <rect x="126" y="72" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <rect x="126" y="180" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <line x1="126" y1="194" x2="150" y2="194" stroke="url(#g4)" stroke-width="18" stroke-linecap="round"/>
+        <line x1="126" y1="86" x2="150" y2="86" stroke="url(#b4)" stroke-width="18" stroke-linecap="round"/>
+      </svg>
+      <div class="wordmark">LinkLoop</div>
+    </div>
+    <div class="size-label">60 × 60 px (1x point size)</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- HOME SCREEN SIMULATION -->
+<h2 style="text-align:center; margin-bottom:16px; font-size:18px;">📱 Simulated Home Screen — How It Looks Next to Other Apps</h2>
+<div class="homescreen-sim">
+  <div class="app-slot">
+    <div class="fake-icon gray">📷</div>
+    <div class="app-name">Camera</div>
+  </div>
+  <div class="app-slot">
+    <div class="fake-icon orange">🎵</div>
+    <div class="app-name">Music</div>
+  </div>
+  <div class="app-slot">
+    <!-- LINKLOOP V8 at actual home screen size -->
+    <div class="icon-box tiny" style="margin:0 auto;">
+      <div class="blob blue"></div>
+      <div class="blob green"></div>
+      <div class="glass-card"></div>
+      <svg class="loop-svg" viewBox="0 0 280 280" fill="none">
+        <defs>
+          <linearGradient id="b5" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7BB3FF"/>
+            <stop offset="50%" stop-color="#4A90D9"/>
+            <stop offset="100%" stop-color="#3A7BC8"/>
+          </linearGradient>
+          <linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5FE89D"/>
+            <stop offset="50%" stop-color="#34C759"/>
+            <stop offset="100%" stop-color="#2A9E47"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#b5)" stroke-width="18" fill="none"/>
+        <rect x="116" y="82" width="120" height="116" rx="58" ry="58" stroke="url(#g5)" stroke-width="18" fill="none"/>
+        <rect x="126" y="72" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <rect x="126" y="180" width="24" height="28" fill="#0A0A0F" opacity="0.95" rx="2"/>
+        <line x1="126" y1="194" x2="150" y2="194" stroke="url(#g5)" stroke-width="18" stroke-linecap="round"/>
+        <line x1="126" y1="86" x2="150" y2="86" stroke="url(#b5)" stroke-width="18" stroke-linecap="round"/>
+      </svg>
+      <div class="wordmark">LinkLoop</div>
+    </div>
+    <div class="app-name" style="color:#4A90D9; font-weight:600;">LinkLoop</div>
+  </div>
+  <div class="app-slot">
+    <div class="fake-icon red">❤️</div>
+    <div class="app-name">Health</div>
+  </div>
+  <div class="app-slot">
+    <div class="fake-icon purple">💬</div>
+    <div class="app-name">Messages</div>
+  </div>
+</div>
+
+<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.35); font-size:12px;">
+  ↑ This is the actual pixel size you see on your home screen. The loops and "LinkLoop" text should be clearly visible now.
+</div>
+
+</body>
+</html>

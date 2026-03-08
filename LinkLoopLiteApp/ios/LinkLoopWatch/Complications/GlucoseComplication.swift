@@ -36,14 +36,14 @@ struct GlucoseTimelineProvider: TimelineProvider {
         in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void
     ) {
         let entry = currentEntry()
-        // Refresh every 5 minutes (aligned with GlucoseManager's auto-refresh)
-        let next = Calendar.current.date(byAdding: .minute, value: 5, to: Date()) ?? Date()
+        // Refresh every 2 minutes to stay in sync with glucose updates
+        let next = Calendar.current.date(byAdding: .minute, value: 2, to: Date()) ?? Date()
         let timeline = Timeline(entries: [entry], policy: .after(next))
         completion(timeline)
     }
 
     private func currentEntry() -> GlucoseComplicationEntry {
-        let defaults = UserDefaults.standard
+        let defaults = UserDefaults(suiteName: "group.com.vibecmd.linkloop.watch") ?? .standard
         let glucose = defaults.object(forKey: "complication_glucose") as? Int
         let trend = defaults.string(forKey: "complication_trend") ?? "stable"
         let low = defaults.object(forKey: "complication_low") as? Int ?? 70

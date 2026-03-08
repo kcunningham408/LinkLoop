@@ -286,6 +286,17 @@ export const circleAPI = {
   getRoster: async () => {
     return apiRequest('/circle/roster');
   },
+
+  getMyCircles: async () => {
+    return apiRequest('/circle/my-circles');
+  },
+
+  switchContext: async (targetId) => {
+    return apiRequest('/circle/switch-context', {
+      method: 'POST',
+      body: JSON.stringify({ targetId: targetId || null }),
+    });
+  },
 };
 
 // ============ INSIGHTS API ============
@@ -302,6 +313,35 @@ export const insightsAPI = {
   },
   getDailyMotivation: async () => {
     return apiRequest('/insights/daily-motivation');
+  },
+  askLoop: async (question) => {
+    // AI calls can take longer — use a 25s timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    try {
+      const result = await apiRequest('/insights/ask', {
+        method: 'POST',
+        body: JSON.stringify({ question }),
+        signal: controller.signal,
+      });
+      return result;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw new Error('timeout');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  },
+  clearAskHistory: async () => {
+    return apiRequest('/insights/ask/history', { method: 'DELETE' });
+  },
+  getWeeklyReport: async () => {
+    return apiRequest('/insights/weekly-report');
+  },
+  getGlucoseStory: async () => {
+    return apiRequest('/insights/glucose-story');
   },
 };
 
@@ -525,10 +565,10 @@ export const moodAPI = {
 // ============ USERS API ============
 
 export const usersAPI = {
-  savePushToken: async (token) => {
+  savePushToken: async (token, timezone) => {
     return apiRequest('/users/push-token', {
       method: 'PUT',
-      body: JSON.stringify({ pushToken: token }),
+      body: JSON.stringify({ pushToken: token, timezone }),
     });
   },
   updateProfile: async (data) => {
@@ -553,5 +593,34 @@ export const achievementsAPI = {
   },
   check: async () => {
     return apiRequest('/achievements/check', { method: 'POST' });
+  },
+};
+
+// ============ CHALLENGES API ============
+
+export const challengesAPI = {
+  getAll: async () => {
+    return apiRequest('/challenges');
+  },
+  getTemplates: async () => {
+    return apiRequest('/challenges/templates');
+  },
+  create: async (challenge) => {
+    return apiRequest('/challenges', {
+      method: 'POST',
+      body: JSON.stringify(challenge),
+    });
+  },
+  check: async (id) => {
+    return apiRequest(`/challenges/${id}/check`, { method: 'POST' });
+  },
+  cheer: async (id, emoji, message = '') => {
+    return apiRequest(`/challenges/${id}/cheer`, {
+      method: 'POST',
+      body: JSON.stringify({ emoji, message }),
+    });
+  },
+  cancel: async (id) => {
+    return apiRequest(`/challenges/${id}`, { method: 'DELETE' });
   },
 };

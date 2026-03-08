@@ -270,6 +270,9 @@ export default function MoodScreen() {
               <Text style={styles.emptyEmoji}>📝</Text>
               <Text style={styles.emptyTitle}>No mood entries yet</Text>
               <Text style={styles.emptyText}>Tap a mood above to start tracking how you feel</Text>
+              <View style={styles.emptyNudge}>
+                <Text style={styles.emptyNudgeText}>🧠 Mood data helps your AI Insights get smarter — log daily for the best results!</Text>
+              </View>
             </View>
           ) : (
             entries.map((entry) => (
@@ -490,6 +493,8 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 40, marginBottom: 10 },
   emptyTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
   emptyText: { fontSize: 13, color: '#A0A0A0' },
+  emptyNudge: { marginTop: 14, backgroundColor: 'rgba(74,144,217,0.10)', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10, marginHorizontal: 16, borderWidth: 1, borderColor: 'rgba(74,144,217,0.20)' },
+  emptyNudgeText: { fontSize: 13, color: '#7BB3E0', textAlign: 'center', lineHeight: 19 },
 
   // Entry Cards
   entryCard: {

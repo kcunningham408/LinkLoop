@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkLoop HomeScreen Mockup — Warrior vs Member</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; display: flex; justify-content: center; gap: 40px; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif; min-height: 100vh; flex-wrap: wrap; }
+
+  .phone { width: 375px; height: 812px; background: #0A0A0F; border-radius: 44px; overflow: hidden; position: relative; border: 3px solid #333; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .phone-label { text-align: center; color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+
+  .notch { width: 160px; height: 34px; background: #0A0A0F; border-radius: 0 0 20px 20px; position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  .screen { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* Hero */
+  .hero { padding: 55px 24px 28px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .hero-warrior { background: linear-gradient(135deg, rgba(74,144,217,0.25), rgba(58,123,200,0.15), rgba(10,10,15,0.95)); }
+  .hero-member { background: linear-gradient(135deg, rgba(0,212,170,0.25), rgba(0,184,149,0.15), rgba(10,10,15,0.95)); }
+
+  .hero-title { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; }
+  .hero-badge-emoji { font-size: 18px; }
+  .hero-badge-text { color: #fff; font-size: 14px; font-weight: 600; }
+
+  .sync-badge { margin-top: 8px; display: inline-block; background: rgba(255,255,255,0.10); padding: 5px 12px; border-radius: 12px; }
+  .sync-badge-text { color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 500; }
+
+  /* Content */
+  .content { padding: 16px; margin-top: -8px; }
+
+  /* Glass Card */
+  .glass-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; margin-bottom: 16px; backdrop-filter: blur(10px); }
+  .glass-card-glow-warrior { box-shadow: 0 0 15px rgba(74,144,217,0.2); border-color: rgba(74,144,217,0.15); }
+  .glass-card-glow-member { box-shadow: 0 0 15px rgba(0,212,170,0.2); border-color: rgba(0,212,170,0.15); }
+
+  /* Glucose Hero Card */
+  .glucose-label { font-size: 10px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; animation: pulse 1s ease-in-out infinite alternate; }
+  @keyframes pulse { from { opacity: 0.4; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+  .ring-row { display: flex; align-items: center; gap: 16px; }
+  .glucose-ring { width: 130px; height: 130px; position: relative; flex-shrink: 0; }
+  .glucose-ring svg { width: 100%; height: 100%; }
+  .glucose-ring-value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); text-align: center; }
+  .glucose-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; }
+  .glucose-unit { font-size: 10px; color: #888; font-weight: 500; }
+  .glucose-trend { font-size: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, 50%); }
+
+  .ring-meta { flex: 1; }
+  .status-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; margin-bottom: 10px; font-size: 12px; font-weight: 700; }
+  .status-in-range-warrior { background: rgba(74,144,217,0.15); color: #4A90D9; }
+  .status-in-range-member { background: rgba(0,212,170,0.15); color: #00D4AA; }
+  .ring-time { font-size: 14px; color: #888; margin-bottom: 4px; }
+  .ring-hint { font-size: 12px; color: #555; }
+
+  /* Today's Average */
+  .stats-title { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 14px; }
+  .avg-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .avg-value { font-size: 40px; font-weight: 800; }
+  .avg-value-warrior { color: #4A90D9; }
+  .avg-value-member { color: #00D4AA; }
+  .avg-unit { font-size: 14px; color: #888; }
+  .avg-readings { margin-left: auto; background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 10px; }
+  .avg-readings-text { font-size: 12px; color: #999; }
+
+  /* Quick Actions */
+  .section-title { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 12px; margin-top: 4px; }
+  .quick-actions { display: flex; gap: 6px; margin-bottom: 20px; }
+  .quick-action { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 4px; text-align: center; }
+  .quick-action-emoji { font-size: 22px; margin-bottom: 6px; }
+  .quick-action-label { font-size: 11px; color: #B0B0B0; font-weight: 600; }
+
+  /* Disclaimer */
+  .disclaimer-row { display: flex; align-items: flex-start; gap: 10px; }
+  .disclaimer-icon { font-size: 18px; margin-top: 1px; }
+  .disclaimer-text { flex: 1; font-size: 12px; color: #888; line-height: 1.5; }
+
+  /* Column wrapper */
+  .phone-col { display: flex; flex-direction: column; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- ========== WARRIOR VIEW ========== -->
+<div class="phone-col">
+  <div class="phone-label">🩹 Warrior View (Shay)</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- Hero -->
+      <div class="hero hero-warrior">
+        <div class="hero-title">∞ LinkLoop</div>
+        <div class="hero-badge">
+          <span class="hero-badge-emoji">🩹</span>
+          <span class="hero-badge-text">Welcome back, Shay</span>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- Glucose Ring Card -->
+        <div class="glass-card glass-card-glow-warrior">
+          <div class="glucose-label">Current Glucose</div>
+          <div class="ring-row">
+            <div class="glucose-ring">
+              <svg viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="58" stroke="rgba(255,255,255,0.06)" stroke-width="5" fill="none"/>
+                <circle cx="65" cy="65" r="58" stroke="#4A90D9" stroke-width="5" fill="none"
+                  stroke-dasharray="364.42" stroke-dashoffset="109"
+                  stroke-linecap="round" transform="rotate(-90 65 65)" opacity="0.9"/>
+              </svg>
+              <div class="glucose-ring-value">
+                <div class="glucose-number">142</div>
+                <div class="glucose-unit">mg/dL</div>
+              </div>
+              <div class="glucose-trend">→</div>
+            </div>
+            <div class="ring-meta">
+              <div class="status-pill status-in-range-warrior">IN RANGE</div>
+              <div class="ring-time">2:34 PM</div>
+              <div class="ring-hint">Tap for details · Hold to share</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Average -->
+        <div class="glass-card">
+          <div class="stats-title">Today's Average</div>
+          <div class="avg-row">
+            <span class="avg-value avg-value-warrior">148</span>
+            <span class="avg-unit">mg/dL</span>
+            <div class="avg-readings">
+              <span class="avg-readings-text">47 readings today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-actions">
+          <div class="quick-action">
+            <div class="quick-action-emoji">💬</div>
+            <div class="quick-action-label">Messages</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">✨</div>
+            <div class="quick-action-label">Insights</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">😊</div>
+            <div class="quick-action-label">Mood</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">🔔</div>
+            <div class="quick-action-label">Alerts</div>
+          </div>
+        </div>
+
+        <!-- Explore -->
+        <div class="section-title">Explore</div>
+        <div class="quick-actions">
+          <div class="quick-action">
+            <div class="quick-action-emoji">🤖</div>
+            <div class="quick-action-label">Ask Loop</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">📖</div>
+            <div class="quick-action-label">Story</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">📊</div>
+            <div class="quick-action-label">Report</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">🏆</div>
+            <div class="quick-action-label">Challenges</div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="glass-card" style="margin-bottom:30px;">
+          <div class="disclaimer-row">
+            <span class="disclaimer-icon">💚</span>
+            <span class="disclaimer-text">LinkLoop is a wellness companion — not a medical device. Always consult your care team.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MEMBER VIEW ========== -->
+<div class="phone-col">
+  <div class="phone-label">👁️ Member View (Kevin)</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- Hero -->
+      <div class="hero hero-member">
+        <div class="hero-title">∞ LinkLoop</div>
+        <div class="hero-badge">
+          <span class="hero-badge-emoji">👁️</span>
+          <span class="hero-badge-text">Watching Shay's loop</span>
+        </div>
+        <div class="sync-badge">
+          <span class="sync-badge-text">🩸 CGM synced 3m ago</span>
+        </div>
+        <div class="sync-badge" style="margin-top:4px;">
+          <span class="sync-badge-text">🟢 Active 2m ago</span>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- Glucose Ring Card -->
+        <div class="glass-card glass-card-glow-member">
+          <div class="glucose-label">
+            Shay's Glucose
+            <div class="live-dot"></div>
+          </div>
+          <div class="ring-row">
+            <div class="glucose-ring">
+              <svg viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="58" stroke="rgba(255,255,255,0.06)" stroke-width="5" fill="none"/>
+                <circle cx="65" cy="65" r="58" stroke="#00D4AA" stroke-width="5" fill="none"
+                  stroke-dasharray="364.42" stroke-dashoffset="109"
+                  stroke-linecap="round" transform="rotate(-90 65 65)" opacity="0.9"/>
+              </svg>
+              <div class="glucose-ring-value">
+                <div class="glucose-number">142</div>
+                <div class="glucose-unit">mg/dL</div>
+              </div>
+              <div class="glucose-trend">→</div>
+            </div>
+            <div class="ring-meta">
+              <div class="status-pill status-in-range-member">IN RANGE</div>
+              <div class="ring-time">2:34 PM</div>
+              <div class="ring-hint">Tap for details · Hold to share</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Average -->
+        <div class="glass-card">
+          <div class="stats-title">Today's Average</div>
+          <div class="avg-row">
+            <span class="avg-value avg-value-member">148</span>
+            <span class="avg-unit">mg/dL</span>
+            <div class="avg-readings">
+              <span class="avg-readings-text">47 readings today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions (member) -->
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-actions">
+          <div class="quick-action">
+            <div class="quick-action-emoji">💬</div>
+            <div class="quick-action-label">Messages</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">🔔</div>
+            <div class="quick-action-label">Alerts</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">👥</div>
+            <div class="quick-action-label">Circle</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-emoji">⚙️</div>
+            <div class="quick-action-label">Settings</div>
+          </div>
+        </div>
+
+        <!-- NO Explore section for member -->
+
+        <!-- Disclaimer -->
+        <div class="glass-card" style="margin-bottom:30px;">
+          <div class="disclaimer-row">
+            <span class="disclaimer-icon">💚</span>
+            <span class="disclaimer-text">LinkLoop is a wellness companion — not a medical device. Always consult your care team.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

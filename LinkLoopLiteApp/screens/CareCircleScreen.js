@@ -8,6 +8,7 @@ import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useViewing } from '../context/ViewingContext';
 import { alertsAPI, circleAPI } from '../services/api';
 
 // TODO: Replace with actual App Store / Play Store URLs when live
@@ -26,7 +27,9 @@ const RELATIONSHIPS = [
 export default function CareCircleScreen() {
   const { user, updateUser, checkAuth } = useAuth();
   const { getAccent } = useTheme();
-  const isMember = user?.role === 'member';
+  const { isViewingOther, viewingId } = useViewing();
+  const isMember = isViewingOther || user?.role === 'member';
+  const isLinked = !!(viewingId || user?.linkedOwnerId || user?.activeViewingId);
   const accent = getAccent(isMember);
   const navigation = useNavigation();
   const [members, setMembers] = useState([]);
@@ -401,7 +404,7 @@ export default function CareCircleScreen() {
         )}
 
         {/* Quick Actions — Join is only for members who are NOT yet linked */}
-        {isMember && !user?.linkedOwnerId && (
+        {isMember && !isLinked && (
           <View style={{ marginBottom: 20 }}>
             {/* Hero for unlinked members */}
             <GlassCard accent={accent} style={{ marginBottom: 20 }}>
@@ -422,13 +425,14 @@ export default function CareCircleScreen() {
         )}
 
         {/* ─── MEMBER VIEW: Linked to a circle ─── */}
-        {isMember && user?.linkedOwnerId && (
+        {isMember && isLinked && (
           <View style={{ marginBottom: 0 }}>
 
             {/* Warrior Hero Card */}
             {(() => {
               const warrior = roster.find(m => m.isWarrior);
               return warrior ? (
+                <>
                 <GlassCard accent={accent} glow style={{ marginBottom: 20 }}>
                   <View style={styles.warriorHero}>
                     <Text style={styles.warriorHeroEmoji}>{warrior.emoji || '💪'}</Text>
@@ -439,6 +443,30 @@ export default function CareCircleScreen() {
                     </View>
                   </View>
                 </GlassCard>
+
+                {/* Message Warrior shortcut */}
+                <GlassCard accent={accent} noPadding style={{ marginBottom: 20 }}>
+                  <TouchableOpacity
+                    style={styles.messageWarriorBtn}
+                    onPress={() => {
+                      haptic.light();
+                      navigation.navigate('Chat', {
+                        circleId: warrior.userId,
+                        memberName: warrior.name,
+                        memberEmoji: warrior.emoji || '💪',
+                        relationship: 'warrior',
+                      });
+                    }}
+                  >
+                    <Text style={styles.messageWarriorEmoji}>💬</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.messageWarriorTitle}>Message {warrior.name}</Text>
+                      <Text style={styles.messageWarriorSub}>Send a quick check-in or encouragement</Text>
+                    </View>
+                    <Text style={[styles.groupChatArrow, { color: accent }]}>›</Text>
+                  </TouchableOpacity>
+                </GlassCard>
+                </>
               ) : null;
             })()}
 
@@ -724,4 +752,10 @@ const styles = StyleSheet.create({
   groupChatTitle: { fontSize: 16, fontWeight: TYPE.semibold, color: '#fff' },
   groupChatSub: { fontSize: TYPE.sm, color: '#A0A0A0', marginTop: 2 },
   groupChatArrow: { fontSize: TYPE.h2, fontWeight: '300' },
+
+  /* Message Warrior shortcut */
+  messageWarriorBtn: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+  messageWarriorEmoji: { fontSize: 32, marginRight: 14 },
+  messageWarriorTitle: { fontSize: 16, fontWeight: TYPE.semibold, color: '#fff' },
+  messageWarriorSub: { fontSize: TYPE.sm, color: '#A0A0A0', marginTop: 2 },
 });

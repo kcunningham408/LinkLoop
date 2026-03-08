@@ -41,7 +41,8 @@ struct GlucoseTimelineProvider: TimelineProvider {
         in context: Context, completion: @escaping (Timeline<GlucoseComplicationEntry>) -> Void
     ) {
         let entry = currentEntry()
-        let next = Calendar.current.date(byAdding: .minute, value: 5, to: Date()) ?? Date()
+        // Refresh every 2 minutes to stay in sync with glucose updates
+        let next = Calendar.current.date(byAdding: .minute, value: 2, to: Date()) ?? Date()
         let timeline = Timeline(entries: [entry], policy: .after(next))
         completion(timeline)
     }

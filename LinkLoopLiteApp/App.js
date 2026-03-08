@@ -1,23 +1,30 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BlurView } from 'expo-blur';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
 import { haptic } from './config/haptics';
 
 // Import context
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { ViewingProvider, useViewing } from './context/ViewingContext';
 
 // Import screens
 import HealthDisclaimer from './components/HealthDisclaimer';
+import AchievementsScreen from './screens/AchievementsScreen';
 import AlertsScreen from './screens/AlertsScreen';
+import AskLoopScreen from './screens/AskLoopScreen';
 import CGMScreen from './screens/CGMScreen';
 import CareCircleScreen from './screens/CareCircleScreen';
+import ChallengesScreen from './screens/ChallengesScreen';
 import ChatScreen from './screens/ChatScreen';
 import DexcomConnectScreen from './screens/DexcomConnectScreen';
+import GlucoseStoryScreen from './screens/GlucoseStoryScreen';
 import GroupChatScreen from './screens/GroupChatScreen';
 import HomeScreen from './screens/HomeScreen';
 import InsightsScreen from './screens/InsightsScreen';
@@ -25,10 +32,14 @@ import LoginScreen from './screens/LoginScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import MoodScreen from './screens/MoodScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import SettingsScreen from './screens/SettingsScreen';
 import SuppliesScreen from './screens/SuppliesScreen';
+import WatchSyncScreen from './screens/WatchSyncScreen';
+import WeeklyReportScreen from './screens/WeeklyReportScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const navigationRef = createNavigationContainerRef();
 
 function MainTabs() {
   const { palette } = useTheme();
@@ -201,7 +212,7 @@ function LoopMemberTabs() {
 
 function AppNavigator() {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const isMember = user?.role === 'member';
+  const { showMemberTabs } = useViewing();
 
   if (isLoading) {
     return (
@@ -218,7 +229,7 @@ function AppNavigator() {
         <>
           <Stack.Screen
             name="Main"
-            component={isMember ? LoopMemberTabs : MainTabs}
+            component={showMemberTabs ? LoopMemberTabs : MainTabs}
           />
           <Stack.Screen
             name="Messages"
@@ -292,6 +303,83 @@ function AppNavigator() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="WatchSync"
+            component={WatchSyncScreen}
+            options={{
+              headerShown: true,
+              title: 'Apple Watch',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              title: 'Settings',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="Achievements"
+            component={AchievementsScreen}
+            options={{
+              headerShown: true,
+              title: 'Achievements',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="AskLoop"
+            component={AskLoopScreen}
+            options={{
+              headerShown: true,
+              title: 'Ask Loop',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="WeeklyReport"
+            component={WeeklyReportScreen}
+            options={{
+              headerShown: true,
+              title: 'Weekly Report',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="GlucoseStory"
+            component={GlucoseStoryScreen}
+            options={{
+              headerShown: true,
+              title: 'Glucose Story',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="Challenges"
+            component={ChallengesScreen}
+            options={{
+              headerShown: true,
+              title: 'Challenges',
+              headerStyle: { backgroundColor: '#0A0A0F' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
         </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -301,14 +389,34 @@ function AppNavigator() {
 }
 
 export default function App() {
+  // Navigate to the right screen when user taps a push notification
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request?.content?.data;
+      if (!navigationRef.isReady()) return;
+      if (data?.type === 'daily_insight') {
+        navigationRef.navigate('Insights');
+      } else if (data?.type === 'new_message' || data?.type === 'group_message') {
+        navigationRef.navigate('Messages');
+      } else if (data?.type === 'glucose_alert' || data?.type === 'alert_acknowledged' || data?.type === 'alert_resolved') {
+        navigationRef.navigate('Alerts');
+      } else if (data?.type === 'supply_low') {
+        navigationRef.navigate('Main', { screen: 'Supplies' });
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>
-        <NavigationContainer>
-          <StatusBar style="light" backgroundColor="#4A90D9" />
-          <AppNavigator />
-          <HealthDisclaimer />
-        </NavigationContainer>
+        <ViewingProvider>
+          <NavigationContainer ref={navigationRef}>
+            <StatusBar style="light" backgroundColor="#4A90D9" />
+            <AppNavigator />
+            <HealthDisclaimer />
+          </NavigationContainer>
+        </ViewingProvider>
       </AuthProvider>
     </ThemeProvider>
   );

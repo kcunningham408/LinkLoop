@@ -1,26 +1,25 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, Dimensions, RefreshControl, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import BloomBackground from '../components/BloomBackground';
 import GlassCard from '../components/GlassCard';
 import GlucoseRing from '../components/GlucoseRing';
-import StatArc from '../components/StatArc';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useViewing } from '../context/ViewingContext';
 import { alertsAPI, glucoseAPI } from '../services/api';
 
-const { width: SCREEN_W } = Dimensions.get('window');
-
-const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 minutes
+const AUTO_REFRESH_MS = 2 * 60 * 1000; // 2 minutes — matches Dexcom ~5min reading cadence
 
 export default function HomeScreen({ navigation }) {
   const { user, circleRemoved, clearCircleRemoved, checkAuth } = useAuth();
   const { getAccent, getGradient } = useTheme();
-  const isMember = user?.role === 'member';
+  const { isViewingOther, viewingId } = useViewing();
+  const isMember = isViewingOther || user?.role === 'member';
   const accent = getAccent(isMember);
   const lowThreshold = user?.settings?.lowThreshold ?? 70;
   const highThreshold = user?.settings?.highThreshold ?? 180;
@@ -32,19 +31,22 @@ export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [activeAlertCount, setActiveAlertCount] = useState(0);
   const [lastCGMSync, setLastCGMSync] = useState(null);
+  const [warriorLastActive, setWarriorLastActive] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
-      if (isMember && user?.linkedOwnerId) {
+      // Cross-Circle: use viewingId (from ViewingContext) to determine which warrior to fetch
+      const targetId = viewingId || user?.linkedOwnerId;
+      if (isMember && targetId) {
         try {
-          const data = await glucoseAPI.getMemberView(user.linkedOwnerId, 24);
+          const data = await glucoseAPI.getMemberView(targetId, 24);
           setLatestGlucose(data.latest || null);
           setStats(data.stats || null);
           if (data.ownerName) setWarriorName(user?.warriorDisplayName || data.ownerName);
           if (data.lastCGMSync) setLastCGMSync(data.lastCGMSync);
+          if (data.lastActive) setWarriorLastActive(data.lastActive);
         } catch (memberErr) {
           // If the member-view call fails (e.g. removed from circle), refresh profile
-          // The server will return updated role/linkedOwnerId
           console.log('Member view failed, refreshing auth:', memberErr.message);
           await checkAuth();
         }
@@ -66,7 +68,7 @@ export default function HomeScreen({ navigation }) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [isMember, user?.linkedOwnerId]);
+  }, [isMember, viewingId, user?.linkedOwnerId]);
 
   useFocusEffect(
     useCallback(() => { loadData(); }, [loadData])
@@ -168,9 +170,6 @@ export default function HomeScreen({ navigation }) {
     transform: [{ scale: 0.8 + livePulse.value * 0.2 }],
   }));
 
-  /* ── Stat arc helper ── */
-  const ARC_SIZE = Math.floor((SCREEN_W - 64) / 4);
-
   return (
     <ScrollView
       style={styles.container}
@@ -199,6 +198,21 @@ export default function HomeScreen({ navigation }) {
                   const hrs = Math.floor(mins / 60);
                   if (hrs < 24) return hrs + 'h ago';
                   return Math.floor(hrs / 24) + 'd ago';
+                })()}
+              </Text>
+            </View>
+          )}
+          {isMember && warriorLastActive && (
+            <View style={[styles.syncBadge, { marginTop: lastCGMSync ? 4 : 8 }]}>
+              <Text style={styles.syncBadgeText}>
+                {(() => {
+                  const mins = Math.floor((Date.now() - new Date(warriorLastActive).getTime()) / 60000);
+                  const dot = mins < 15 ? '🟢' : mins < 60 ? '🟡' : '🔴';
+                  if (mins < 1) return dot + ' Active just now';
+                  if (mins < 60) return dot + ' Active ' + mins + 'm ago';
+                  const hrs = Math.floor(mins / 60);
+                  if (hrs < 24) return dot + ' Last seen ' + hrs + 'h ago';
+                  return dot + ' Last seen ' + Math.floor(hrs / 24) + 'd ago';
                 })()}
               </Text>
             </View>
@@ -264,18 +278,19 @@ export default function HomeScreen({ navigation }) {
           </Animated.View>
         </FadeIn>
 
-        {/* ─── Today's Overview — arc stats ─── */}
+        {/* ─── Today's Average ─── */}
         <FadeIn delay={stagger(1, 100)}>
           <GlassCard accent={accent}>
-            <Text style={styles.statsTitle}>Today's Overview</Text>
+            <Text style={styles.statsTitle}>Today's Average</Text>
             {loading ? (
               <ActivityIndicator size="small" color={accent} style={{ paddingVertical: 20 }} />
             ) : stats && stats.count > 0 ? (
-              <View style={styles.arcsRow}>
-                <StatArc value={stats.timeInRange} maxValue={100} label="In Range" suffix="%" color={accent} size={ARC_SIZE} />
-                <StatArc value={stats.average} maxValue={300} label="Avg mg/dL" suffix="" color="#FFA500" size={ARC_SIZE} />
-                <StatArc value={stats.low} maxValue={Math.max(stats.low, 5)} label="Lows" suffix="" color="#FF6B6B" size={ARC_SIZE} />
-                <StatArc value={stats.high || 0} maxValue={Math.max(stats.high || 0, 5)} label="Highs" suffix="" color="#FFA500" size={ARC_SIZE} />
+              <View style={styles.avgRow}>
+                <Text style={[styles.avgValue, { color: accent }]}>{stats.average}</Text>
+                <Text style={styles.avgUnit}>mg/dL</Text>
+                <View style={styles.avgReadings}>
+                  <Text style={styles.avgReadingsText}>{stats.count} reading{stats.count !== 1 ? 's' : ''} today</Text>
+                </View>
               </View>
             ) : (
               <View style={styles.emptyStats}>
@@ -315,20 +330,34 @@ export default function HomeScreen({ navigation }) {
             {isMember ? (
               <>
                 <QuickAction emoji={'\uD83D\uDD14'} label="Alerts" accent={accent} badge={activeAlertCount > 0 ? activeAlertCount : null} onPress={() => navigation.navigate('Alerts')} />
-                <QuickAction emoji={'\u2699\uFE0F'} label="Profile" accent={accent} onPress={() => navigation.navigate('Profile')} />
+                <QuickAction emoji={'\uD83D\uDC65'} label="Circle" accent={accent} onPress={() => navigation.navigate('Circle')} />
+                <QuickAction emoji={'\u2699\uFE0F'} label="Settings" accent={accent} onPress={() => navigation.navigate('Settings')} />
               </>
             ) : (
               <>
                 <QuickAction emoji={'\u2728'} label="Insights" accent={accent} onPress={() => navigation.navigate('Insights')} />
-                <QuickAction emoji={'\uD83D\uDCDD'} label="Mood" accent={accent} onPress={() => navigation.navigate('Mood')} />
+                <QuickAction emoji={'\uD83D\uDE0A'} label="Mood" accent={accent} onPress={() => navigation.navigate('Mood')} />
                 <QuickAction emoji={'\uD83D\uDD14'} label="Alerts" accent={accent} badge={activeAlertCount > 0 ? activeAlertCount : null} onPress={() => navigation.navigate('Alerts')} />
               </>
             )}
           </View>
         </FadeIn>
 
-        {/* ─── Disclaimer ─── */}
+        {/* ─── Explore Features (warriors only) ─── */}
+        {!isMember && (
         <FadeIn delay={stagger(4, 100)}>
+          <Text style={styles.quickActionsTitle}>Explore</Text>
+          <View style={styles.quickActions}>
+                <QuickAction emoji={'\uD83E\uDD16'} label="Ask Loop" accent={accent} onPress={() => navigation.navigate('AskLoop')} />
+                <QuickAction emoji={'\uD83D\uDCD6'} label="Story" accent={accent} onPress={() => navigation.navigate('GlucoseStory')} />
+                <QuickAction emoji={'\uD83D\uDCCA'} label="Report" accent={accent} onPress={() => navigation.navigate('WeeklyReport')} />
+                <QuickAction emoji={'\uD83C\uDFC6'} label="Challenges" accent={accent} onPress={() => navigation.navigate('Challenges')} />
+          </View>
+        </FadeIn>
+        )}
+
+        {/* ─── Disclaimer ─── */}
+        <FadeIn delay={stagger(5, 100)}>
           <GlassCard>
             <View style={styles.disclaimerRow}>
               <Text style={styles.disclaimerIcon}>{'\uD83D\uDC9A'}</Text>
@@ -396,7 +425,11 @@ const styles = StyleSheet.create({
 
   /* Stats */
   statsTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 14 },
-  arcsRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  avgRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 },
+  avgValue: { fontSize: 32, fontWeight: TYPE.bold },
+  avgUnit: { fontSize: TYPE.md, color: '#888', marginBottom: 2 },
+  avgReadings: { marginLeft: 'auto', backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  avgReadingsText: { fontSize: TYPE.sm, color: '#999' },
   emptyStats: { paddingVertical: 12, alignItems: 'center' },
   emptyStatsText: { fontSize: TYPE.md, color: '#888', textAlign: 'center' },
 

@@ -10,7 +10,8 @@ import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { alertsAPI, dexcomAPI, glucoseAPI, nightscoutAPI, notesAPI } from '../services/api';
+import { useViewing } from '../context/ViewingContext';
+import { alertsAPI, dexcomAPI, glucoseAPI, nightscoutAPI } from '../services/api';
 
 const AUTO_REFRESH_MS = 5 * 60 * 1000;
 
@@ -27,7 +28,8 @@ const TREND_OPTIONS = [
 export default function CGMScreen({ navigation }) {
   const { user } = useAuth();
   const { getAccent } = useTheme();
-  const isMember = user?.role === 'member';
+  const { isViewingOther, viewingId } = useViewing();
+  const isMember = isViewingOther || user?.role === 'member';
   const accent = getAccent(isMember);
 
   // Use the warrior's personal thresholds if set, otherwise standard defaults
@@ -56,17 +58,13 @@ export default function CGMScreen({ navigation }) {
   const [nsSecret, setNsSecret] = useState('');
   const [nsConnecting, setNsConnecting] = useState(false);
 
-  // Notes
-  const [notes, setNotes] = useState([]);
-  const [showNoteModal, setShowNoteModal] = useState(false);
-  const [newNoteText, setNewNoteText] = useState('');
-  const [noteSaving, setNoteSaving] = useState(false);
-
   const loadData = useCallback(async () => {
     try {
-      if (isMember && user?.linkedOwnerId) {
+      // Cross-Circle: use viewingId (from ViewingContext) to determine which warrior to fetch
+      const targetId = viewingId || user?.linkedOwnerId;
+      if (isMember && targetId) {
         // Loop Member: fetch the linked warrior's data in one call
-        const data = await glucoseAPI.getMemberView(user.linkedOwnerId, 24);
+        const data = await glucoseAPI.getMemberView(targetId, 24);
         setReadings(data.readings || []);
         setCurrentGlucose(data.latest || null);
         setStats(data.stats || null);
@@ -88,18 +86,13 @@ export default function CGMScreen({ navigation }) {
         if (shareStatusData.status === 'fulfilled') setShareStatus(shareStatusData.value);
         if (nsStatusData.status === 'fulfilled') setNsStatus(nsStatusData.value);
       }
-      // Load notes for the timeline
-      try {
-        const notesData = await notesAPI.getAll(24);
-        setNotes(Array.isArray(notesData) ? notesData : []);
-      } catch (e) { /* notes are optional */ }
     } catch (err) {
       console.log('CGM load error:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [isMember, user?.linkedOwnerId]);
+  }, [isMember, viewingId, user?.linkedOwnerId]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -237,33 +230,6 @@ export default function CGMScreen({ navigation }) {
     );
   };
 
-  const handleAddNote = async () => {
-    if (!newNoteText.trim()) return;
-    haptic.medium();
-    setNoteSaving(true);
-    try {
-      await notesAPI.add(newNoteText.trim());
-      setNewNoteText('');
-      setShowNoteModal(false);
-      loadData();
-    } catch (err) {
-      Alert.alert('Error', err.message || 'Could not save note');
-    } finally {
-      setNoteSaving(false);
-    }
-  };
-
-  const handleDeleteNote = (id) => {
-    haptic.warning();
-    Alert.alert('Delete Note', 'Remove this note?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try { await notesAPI.remove(id); loadData(); }
-        catch (err) { Alert.alert('Error', 'Could not delete note'); }
-      }},
-    ]);
-  };
-
   const getGlucoseColor = (value) => {
     if (!value) return accent;
     if (value < lowThreshold) return '#FF6B6B';
@@ -314,6 +280,13 @@ export default function CGMScreen({ navigation }) {
           <View style={styles.staleBanner}>
             <Text style={styles.staleBannerText} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>
               ⚠️ Data is {minsOld} min old — {isMember ? 'warrior may be offline' : 'app may be in background'}
+            </Text>
+          </View>
+        )}
+        {!isStale && isMember && minsOld !== null && minsOld > 15 && (
+          <View style={[styles.staleBanner, { backgroundColor: 'rgba(255,165,0,0.12)', borderColor: 'rgba(255,165,0,0.30)' }]}>
+            <Text style={[styles.staleBannerText, { color: '#FFA500' }]} numberOfLines={1}>
+              🕐 Last reading {minsOld}m ago — waiting for next sync
             </Text>
           </View>
         )}
@@ -403,36 +376,9 @@ export default function CGMScreen({ navigation }) {
           </GlassCard>
         </FadeIn>
 
-        {/* ─── Notes Timeline ─── */}
-        <FadeIn delay={stagger(3, 100)}>
-          <GlassCard>
-            <View style={styles.notesHeader}>
-              <Text style={styles.sectionTitle}>📝 Notes</Text>
-              <TouchableOpacity style={[styles.addNoteBtn, { borderColor: accent }]} onPress={() => setShowNoteModal(true)}>
-                <Text style={[styles.addNoteBtnText, { color: accent }]}>+ Add Note</Text>
-              </TouchableOpacity>
-            </View>
-            {notes.length > 0 ? (
-              notes.slice(0, 5).map((n) => (
-                <TouchableOpacity key={n._id} style={styles.noteCard} onLongPress={() => handleDeleteNote(n._id)}>
-                  <View style={styles.noteRow}>
-                    <Text style={[styles.noteAuthor, { color: accent }]} numberOfLines={1}>{n.authorEmoji || '📝'} {n.authorName}</Text>
-                    <Text style={styles.noteTime}>
-                      {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </Text>
-                  </View>
-                  <Text style={styles.noteText}>{n.text}</Text>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text style={styles.noNotesText}>No notes today — add one to share with your circle</Text>
-            )}
-          </GlassCard>
-        </FadeIn>
-
         {/* ─── Warriors only: Connected Devices ─── */}
         {!isMember && (
-          <FadeIn delay={stagger(4, 100)}>
+          <FadeIn delay={stagger(3, 100)}>
             <GlassCard accent={accent}>
               <Text style={styles.sectionTitle}>🔗 Connected Devices</Text>
 
@@ -583,35 +529,6 @@ export default function CGMScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-
-      {/* ═══ Add Note Modal ═══ */}
-      <Modal visible={showNoteModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>📝 Add a Note</Text>
-            <Text style={styles.modalHint}>Notes appear on the timeline and are visible to your Care Circle.</Text>
-            <TextInput
-              style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
-              placeholder="e.g. Had pizza for dinner, feeling tired..."
-              placeholderTextColor="#555"
-              value={newNoteText}
-              onChangeText={setNewNoteText}
-              multiline
-              maxLength={500}
-              autoFocus
-            />
-            <Text style={styles.charCount}>{newNoteText.length}/500</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowNoteModal(false); setNewNoteText(''); }}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.saveButton, { backgroundColor: accent }]} onPress={handleAddNote} disabled={noteSaving || !newNoteText.trim()}>
-                {noteSaving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Save Note</Text>}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </ScrollView>
   );
 }
@@ -648,17 +565,6 @@ const styles = StyleSheet.create({
   arcsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   noDataText: { fontSize: TYPE.md, color: '#888', textAlign: 'center', paddingVertical: 15 },
 
-  /* Notes */
-  notesHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  addNoteBtn: { backgroundColor: 'rgba(74,144,217,0.12)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
-  addNoteBtnText: { fontSize: 13, fontWeight: TYPE.semibold },
-  noteCard: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  noteRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  noteAuthor: { fontSize: 13, fontWeight: TYPE.semibold, flex: 1, marginRight: 8 },
-  noteTime: { fontSize: 11, color: '#666', flexShrink: 0 },
-  noteText: { fontSize: TYPE.md, color: '#D0D0D0', lineHeight: 20 },
-  noNotesText: { fontSize: 13, color: '#666', textAlign: 'center', paddingVertical: 15 },
-
   /* Devices */
   deviceItem: { flexDirection: 'row', alignItems: 'center' },
   deviceEmoji: { fontSize: 28, marginRight: 14 },
@@ -684,7 +590,6 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 16, textAlign: 'center' },
   modalHint: { fontSize: 13, color: '#A0A0A0', textAlign: 'center', marginBottom: 16, lineHeight: 19 },
   modalFine: { fontSize: 11, color: '#666', marginTop: 6 },
-  charCount: { fontSize: 11, color: '#555', textAlign: 'right', marginTop: 4, marginBottom: 12 },
   inputLabel: { fontSize: TYPE.md, fontWeight: TYPE.semibold, color: '#E0E0E0', marginBottom: 8, marginTop: 10 },
   input: { backgroundColor: '#2A2A32', borderRadius: 12, padding: 14, fontSize: TYPE.lg, borderWidth: 1, borderColor: '#3A3A42', color: '#fff' },
   trendRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
 import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
@@ -42,6 +43,7 @@ export default function InsightsScreen() {
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
   const accent = getAccent(isMember);
+  const navigation = useNavigation();
 
   const [insights, setInsights] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -190,6 +192,24 @@ export default function InsightsScreen() {
               <Text style={styles.motivationText}>{"T1D doesn\u2019t define you \u2014 but how you handle it sure says a lot about who you are. \uD83D\uDCAA"}</Text>
             </>
           )}
+        </View>
+        </FadeIn>
+
+        {/* Quick nav to new features */}
+        <FadeIn delay={40}>
+        <View style={styles.featureRow}>
+          <TouchableOpacity style={styles.featureBtn} onPress={() => { haptic.light(); navigation.navigate('AskLoop'); }}>
+            <Text style={styles.featureBtnEmoji}>🤖</Text>
+            <Text style={styles.featureBtnText}>Ask Loop</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.featureBtn} onPress={() => { haptic.light(); navigation.navigate('GlucoseStory'); }}>
+            <Text style={styles.featureBtnEmoji}>📖</Text>
+            <Text style={styles.featureBtnText}>Your Story</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.featureBtn} onPress={() => { haptic.light(); navigation.navigate('WeeklyReport'); }}>
+            <Text style={styles.featureBtnEmoji}>📊</Text>
+            <Text style={styles.featureBtnText}>Report</Text>
+          </TouchableOpacity>
         </View>
         </FadeIn>
 
@@ -525,6 +545,12 @@ const styles = StyleSheet.create({
   categoryBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 },
   categoryBadgeText: { fontSize: TYPE.xs, fontWeight: TYPE.bold, textTransform: 'capitalize' },
   trendMessage: { fontSize: TYPE.md, color: '#C0C0C0', lineHeight: 21 },
+
+  // Feature row
+  featureRow: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 4, marginBottom: 14 },
+  featureBtn: { flex: 1, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingVertical: 14, marginHorizontal: 4 },
+  featureBtnEmoji: { fontSize: 24, marginBottom: 4 },
+  featureBtnText: { fontSize: TYPE.xs, color: '#ccc', fontWeight: TYPE.semibold },
 
   // Disclaimer
   disclaimerBox: { borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, marginBottom: 30 },

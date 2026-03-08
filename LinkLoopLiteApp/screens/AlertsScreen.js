@@ -352,11 +352,11 @@ export default function AlertsScreen({ navigation }) {
       />
 
       <View style={styles.content}>
-        {/* Alert Settings shortcut — jumps to Profile tab */}
+        {/* Alert Settings shortcut — jumps to Settings screen */}
         <FadeIn delay={stagger(0, 100)}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => { haptic.light(); navigation.navigate('Profile'); }}
+          onPress={() => { haptic.light(); navigation.navigate('Settings'); }}
           activeOpacity={0.7}
         >
           <Text style={styles.settingsButtonIcon}>⚙️</Text>

@@ -52,7 +52,11 @@ async function registerPushToken() {
     });
     const token = tokenData.data;
     console.log('[Push] Token:', token);
-    await usersAPI.savePushToken(token);
+
+    // Send timezone alongside push token so the server can schedule
+    // time-sensitive notifications (e.g. 7 PM daily insights) in the user's local time
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York';
+    await usersAPI.savePushToken(token, timezone);
   } catch (err) {
     console.error('[Push] Token registration error:', err);
   }
@@ -101,10 +105,15 @@ export function AuthProvider({ children }) {
         const profile = await userAPI.getProfile();
 
         // Detect if this user was removed from a Care Circle:
-        // They were a member before but the server now says they're a warrior
-        const wasMember = (cached?.role === 'member' && cached?.linkedOwnerId);
-        const noLongerMember = (profile.role !== 'member' || !profile.linkedOwnerId);
-        if (wasMember && noLongerMember) {
+        // They were a member/hybrid before but the server now says they're a warrior with no circle
+        const wasInCircle = (
+          (cached?.role === 'member' || cached?.role === 'hybrid') &&
+          (cached?.linkedOwnerId || cached?.activeViewingId)
+        );
+        const noLongerInCircle = (
+          profile.role === 'warrior' && !profile.linkedOwnerId && !profile.activeViewingId
+        );
+        if (wasInCircle && noLongerInCircle) {
           setCircleRemoved(true);
         }
 

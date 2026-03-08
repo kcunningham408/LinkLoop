@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.vibecmd.linkloop",
-      "buildNumber": "37",
+      "buildNumber": "64",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,7 +31,7 @@
         "backgroundColor": "#4A90D9"
       },
       "package": "com.vibecmd.linkloop",
-      "versionCode": 1,
+      "versionCode": 10,
       "permissions": []
     },
     "web": {
@@ -55,6 +55,7 @@
       }
     },
     "updates": {
+      "enabled": false,
       "url": "https://u.expo.dev/fe571b30-5832-4068-b4cd-327399d778c6"
     }
   }

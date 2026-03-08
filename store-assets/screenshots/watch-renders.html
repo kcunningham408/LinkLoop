@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkLoop Watch Screenshots</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    h1 { text-align: center; color: #00D4FF; font-size: 28px; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 40px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .screenshot-card {
+      text-align: center;
+    }
+    .screenshot-card .label {
+      color: #aaa;
+      font-size: 13px;
+      margin-top: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Watch Frame ── */
+    .watch-frame {
+      width: 230px;
+      height: 280px;
+      background: #2a2a2a;
+      border-radius: 58px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 
+        0 0 0 3px #444,
+        0 0 0 5px #222,
+        0 20px 60px rgba(0,0,0,0.5);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Crown */
+    .watch-frame::after {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: 80px;
+      width: 6px;
+      height: 30px;
+      background: linear-gradient(180deg, #555, #333);
+      border-radius: 3px;
+    }
+    /* Side button */
+    .watch-frame::before {
+      content: '';
+      position: absolute;
+      right: -7px;
+      top: 125px;
+      width: 5px;
+      height: 16px;
+      background: linear-gradient(180deg, #444, #333);
+      border-radius: 2px;
+    }
+    .watch-screen {
+      width: 198px;
+      height: 242px;
+      background: #000;
+      border-radius: 42px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Screenshot 1: Watch Face with Complications ── */
+    .watch-face {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 45%, #111 0%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .watch-time {
+      font-size: 56px;
+      font-weight: 200;
+      letter-spacing: -2px;
+      color: #fff;
+      margin-top: -10px;
+    }
+    .watch-date {
+      font-size: 13px;
+      color: #FF9F0A;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    /* Complications positioned around the face */
+    .complication {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Top-left: LinkLoop circular complication */
+    .comp-top-left {
+      top: 20px;
+      left: 20px;
+      width: 52px;
+      height: 52px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+      flex-direction: column;
+    }
+    .comp-top-left .glucose-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #34C759;
+      line-height: 1;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .comp-top-left .glucose-arrow {
+      font-size: 10px;
+      font-weight: 700;
+      color: #34C759;
+      margin-top: -1px;
+    }
+    /* Top-right: Activity rings */
+    .comp-top-right {
+      top: 20px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+    }
+    .activity-rings {
+      width: 42px;
+      height: 42px;
+      position: relative;
+    }
+    .activity-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 4px solid transparent;
+    }
+    .ring-move { width: 42px; height: 42px; top: 0; left: 0; border-color: #FF2D55; border-top-color: transparent; transform: rotate(45deg); }
+    .ring-exercise { width: 32px; height: 32px; top: 5px; left: 5px; border-color: #AAFF00; border-top-color: transparent; border-right-color: transparent; transform: rotate(30deg); }
+    .ring-stand { width: 22px; height: 22px; top: 10px; left: 10px; border-color: #00D4FF; border-top-color: transparent; transform: rotate(60deg); }
+    
+    /* Bottom-left: Weather */
+    .comp-bottom-left {
+      bottom: 20px;
+      left: 20px;
+      width: 52px;
+      height: 52px;
+      flex-direction: column;
+    }
+    .comp-bottom-left .weather-temp {
+      font-size: 16px;
+      font-weight: 600;
+      color: #00BFFF;
+    }
+    .comp-bottom-left .weather-icon {
+      font-size: 14px;
+      margin-bottom: 1px;
+    }
+    /* Bottom-right: Heart rate */
+    .comp-bottom-right {
+      bottom: 20px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      flex-direction: column;
+    }
+    .comp-bottom-right .hr-icon { font-size: 14px; color: #FF3B30; }
+    .comp-bottom-right .hr-num { font-size: 14px; font-weight: 600; color: #FF3B30; }
+
+    /* Bottom center: LinkLoop rectangular complication */
+    .comp-bottom-center {
+      bottom: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 26px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 0 10px;
+    }
+    .comp-bottom-center .rect-glucose {
+      font-size: 16px;
+      font-weight: 800;
+      color: #34C759;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .comp-bottom-center .rect-arrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: #34C759;
+      margin-left: 2px;
+    }
+    .comp-bottom-center .rect-time {
+      font-size: 10px;
+      color: #888;
+      margin-left: auto;
+    }
+
+    /* ── Screenshot 2: Glucose Main View ── */
+    .glucose-view {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .glucose-ring-container {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glucose-ring-bg {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 7px solid rgba(255,255,255,0.08);
+    }
+    .glucose-ring-fill {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 7px solid #34C759;
+      border-top-color: transparent;
+      transform: rotate(200deg);
+    }
+    .glucose-ring-fill.high {
+      border-color: #FF9500;
+      border-top-color: transparent;
+      transform: rotate(260deg);
+    }
+    .glucose-ring-fill.low {
+      border-color: #FF3B30;
+      border-top-color: transparent;
+      transform: rotate(120deg);
+    }
+    .glucose-center {
+      text-align: center;
+      z-index: 1;
+    }
+    .glucose-center .value {
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .glucose-center .value.green { color: #34C759; }
+    .glucose-center .value.orange { color: #FF9500; }
+    .glucose-center .value.red { color: #FF3B30; }
+    .glucose-center .arrow {
+      font-size: 24px;
+      font-weight: 700;
+      display: inline;
+    }
+    .glucose-center .unit {
+      font-size: 10px;
+      color: #888;
+      margin-top: 1px;
+    }
+    .range-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .range-label.green { color: #34C759; }
+    .range-label.orange { color: #FF9500; }
+    .range-label.red { color: #FF3B30; }
+    .time-ago {
+      font-size: 10px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* ── Screenshot 3: Alert View ── */
+    .alert-view {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 14px 14px;
+    }
+    .alert-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FF9500;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .alert-card {
+      background: rgba(255,140,0,0.12);
+      border: 1px solid rgba(255,140,0,0.2);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .alert-card .alert-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FF9500;
+    }
+    .alert-card .alert-detail {
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+    .alert-card.low {
+      background: rgba(255,59,48,0.12);
+      border-color: rgba(255,59,48,0.2);
+    }
+    .alert-card.low .alert-title { color: #FF3B30; }
+
+    /* ── Screenshot 4: Graph View ── */
+    .graph-view {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 10px 10px;
+    }
+    .graph-title {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .graph-container {
+      flex: 1;
+      position: relative;
+      margin: 0 4px;
+    }
+    .graph-svg {
+      width: 100%;
+      height: 100%;
+    }
+    .graph-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 8px;
+    }
+    .graph-stat {
+      text-align: center;
+    }
+    .graph-stat .stat-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: #34C759;
+    }
+    .graph-stat .stat-label {
+      font-size: 8px;
+      color: #666;
+      margin-top: 1px;
+    }
+
+    /* ── Screenshot 5: Watch Face Close-up (Corner Complication) ── */
+    .watch-face-2 {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, #0a1628 0%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .modular-time {
+      font-size: 62px;
+      font-weight: 100;
+      color: #fff;
+      letter-spacing: -3px;
+    }
+    .modular-date-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: -2px;
+    }
+    .modular-date {
+      font-size: 13px;
+      color: #FF9F0A;
+      font-weight: 600;
+    }
+    /* Corner complication showing glucose */
+    .corner-comp {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+    }
+    .corner-glucose {
+      font-size: 18px;
+      font-weight: 800;
+      color: #34C759;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    /* Inline complication */
+    .inline-comp {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+    .inline-glucose {
+      font-size: 13px;
+      font-weight: 800;
+      color: #34C759;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .inline-detail {
+      font-size: 10px;
+      color: #888;
+    }
+
+    /* ── Screenshot 6: Pairing Screen ── */
+    .pair-view {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .pair-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .pair-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00D4FF;
+      margin-bottom: 4px;
+    }
+    .pair-subtitle {
+      font-size: 10px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .pair-code {
+      display: flex;
+      gap: 6px;
+    }
+    .pair-digit {
+      width: 28px;
+      height: 34px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #00D4FF;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+
+    /* ── Instructions ── */
+    .instructions {
+      max-width: 800px;
+      margin: 60px auto 0;
+      padding: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+    }
+    .instructions h2 { color: #00D4FF; font-size: 18px; margin-bottom: 12px; }
+    .instructions p { color: #999; font-size: 13px; line-height: 1.7; }
+    .instructions ol { color: #999; font-size: 13px; line-height: 2; padding-left: 20px; }
+
+    /* High contrast large complication showcase */
+    .showcase-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .complication-showcase {
+      text-align: center;
+    }
+    .complication-showcase .comp-label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .showcase-circular {
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .showcase-circular .s-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #34C759;
+      line-height: 1;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .showcase-circular .s-arrow {
+      font-size: 11px;
+      font-weight: 700;
+      color: #34C759;
+    }
+    .showcase-rect {
+      width: 180px;
+      height: 40px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 6px;
+    }
+    .showcase-rect .s-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #34C759;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .showcase-rect .s-arrow {
+      font-size: 16px;
+      font-weight: 700;
+      color: #34C759;
+    }
+    .showcase-rect .s-time {
+      font-size: 11px;
+      color: #888;
+      margin-left: auto;
+    }
+    .showcase-inline {
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 4px 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .showcase-inline .s-num {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FF9500;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .showcase-inline .s-detail {
+      font-size: 11px;
+      color: #888;
+    }
+
+    /* Color variants row */
+    .color-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .color-variant {
+      text-align: center;
+    }
+    .color-variant .cv-circle {
+      width: 58px;
+      height: 58px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .color-variant .cv-num {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      font-family: 'SF Pro Rounded', -apple-system, sans-serif;
+    }
+    .color-variant .cv-arrow {
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .color-variant .cv-label {
+      font-size: 9px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚡ LinkLoop — Apple Watch</h1>
+  <p class="subtitle">Screenshot renders for website & marketing</p>
+
+  <div class="grid">
+
+    <!-- 1. Watch Face with Circular + Rectangular Complications -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="watch-face">
+            <!-- LinkLoop circular complication (top-left) -->
+            <div class="complication comp-top-left">
+              <span class="glucose-num">124</span>
+              <span class="glucose-arrow">↗</span>
+            </div>
+            <!-- Activity rings (top-right) -->
+            <div class="complication comp-top-right">
+              <div class="activity-rings">
+                <div class="activity-ring ring-move"></div>
+                <div class="activity-ring ring-exercise"></div>
+                <div class="activity-ring ring-stand"></div>
+              </div>
+            </div>
+            <!-- Time -->
+            <div class="watch-time">10:08</div>
+            <div class="watch-date">THU MAR 6</div>
+            <!-- LinkLoop rectangular complication (bottom center) -->
+            <div class="complication comp-bottom-center">
+              <span class="rect-glucose">124</span>
+              <span class="rect-arrow">↗</span>
+              <span class="rect-time">2m ago</span>
+            </div>
+            <!-- Weather (bottom-left) -->
+            <div class="complication comp-bottom-left">
+              <span class="weather-icon">☀️</span>
+              <span class="weather-temp">72°</span>
+            </div>
+            <!-- Heart rate (bottom-right) -->
+            <div class="complication comp-bottom-right">
+              <span class="hr-icon">♥</span>
+              <span class="hr-num">68</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Watch Face — Circular & Rectangular Complications</p>
+    </div>
+
+    <!-- 2. Watch Face with Corner + Inline Complications -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="watch-face-2">
+            <!-- Corner complication -->
+            <div class="corner-comp">
+              <span class="corner-glucose">124↗</span>
+            </div>
+            <div class="modular-time">10:08</div>
+            <div class="modular-date-row">
+              <span class="modular-date">THURSDAY 6</span>
+            </div>
+            <!-- Inline complication at bottom -->
+            <div class="inline-comp">
+              <span class="inline-glucose">124↗</span>
+              <span class="inline-detail">mg/dL · 2m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Watch Face — Corner & Inline Complications</p>
+    </div>
+
+    <!-- 3. Glucose Main View (In Range) -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="glucose-view">
+            <div class="glucose-ring-container">
+              <div class="glucose-ring-bg"></div>
+              <div class="glucose-ring-fill"></div>
+              <div class="glucose-center">
+                <span class="value green">124</span><span class="arrow" style="color:#34C759">↗</span>
+                <div class="unit">mg/dL</div>
+              </div>
+            </div>
+            <div class="range-label green">In Range</div>
+            <div class="time-ago">2m ago</div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Glucose View — In Range</p>
+    </div>
+
+    <!-- 4. Glucose Main View (High) -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="glucose-view">
+            <div class="glucose-ring-container">
+              <div class="glucose-ring-bg"></div>
+              <div class="glucose-ring-fill high"></div>
+              <div class="glucose-center">
+                <span class="value orange">243</span><span class="arrow" style="color:#FF9500">↑</span>
+                <div class="unit">mg/dL</div>
+              </div>
+            </div>
+            <div class="range-label orange">HIGH</div>
+            <div class="time-ago">1m ago</div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Glucose View — High Alert</p>
+    </div>
+
+    <!-- 5. Glucose Main View (Low) -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="glucose-view">
+            <div class="glucose-ring-container">
+              <div class="glucose-ring-bg"></div>
+              <div class="glucose-ring-fill low"></div>
+              <div class="glucose-center">
+                <span class="value red">62</span><span class="arrow" style="color:#FF3B30">↓</span>
+                <div class="unit">mg/dL</div>
+              </div>
+            </div>
+            <div class="range-label red">LOW</div>
+            <div class="time-ago">Just now</div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Glucose View — Low Alert</p>
+    </div>
+
+    <!-- 6. Graph View -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="graph-view">
+            <div class="graph-title">Last 3 Hours</div>
+            <div class="graph-container">
+              <svg class="graph-svg" viewBox="0 0 180 120" preserveAspectRatio="none">
+                <!-- High threshold line -->
+                <line x1="0" y1="20" x2="180" y2="20" stroke="rgba(255,149,0,0.2)" stroke-width="0.5" stroke-dasharray="3,3"/>
+                <!-- Low threshold line -->
+                <line x1="0" y1="90" x2="180" y2="90" stroke="rgba(255,59,48,0.2)" stroke-width="0.5" stroke-dasharray="3,3"/>
+                <!-- In-range zone -->
+                <rect x="0" y="20" width="180" height="70" fill="rgba(52,199,89,0.04)"/>
+                <!-- Glucose curve -->
+                <path d="M 0,65 C 15,68 25,72 35,70 C 45,68 55,55 70,48 C 85,41 95,38 105,42 C 115,46 125,52 135,48 C 145,44 155,40 165,38 C 170,37 175,36 180,35"
+                  fill="none" stroke="#34C759" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Current dot -->
+                <circle cx="180" cy="35" r="4" fill="#34C759"/>
+                <!-- Threshold labels -->
+                <text x="2" y="18" fill="rgba(255,149,0,0.4)" font-size="7">180</text>
+                <text x="2" y="98" fill="rgba(255,59,48,0.4)" font-size="7">70</text>
+              </svg>
+            </div>
+            <div class="graph-stats">
+              <div class="graph-stat">
+                <div class="stat-val">87%</div>
+                <div class="stat-label">IN RANGE</div>
+              </div>
+              <div class="graph-stat">
+                <div class="stat-val">128</div>
+                <div class="stat-label">AVERAGE</div>
+              </div>
+              <div class="graph-stat">
+                <div class="stat-val" style="color:#FF9500">1</div>
+                <div class="stat-label">HIGHS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="label">3-Hour Glucose Graph</p>
+    </div>
+
+    <!-- 7. Alerts View -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="alert-view">
+            <div class="alert-header">
+              ⚠️ 2 Active Alerts
+            </div>
+            <div class="alert-card">
+              <div class="alert-title">⬆ High Glucose: 243 mg/dL</div>
+              <div class="alert-detail">Above 180 threshold · 4m ago</div>
+            </div>
+            <div class="alert-card low">
+              <div class="alert-title">⬇ Low Earlier: 62 mg/dL</div>
+              <div class="alert-detail">Below 70 threshold · 47m ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Active Alerts</p>
+    </div>
+
+    <!-- 8. Pairing Screen -->
+    <div class="screenshot-card">
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="pair-view">
+            <div class="pair-icon">🔗</div>
+            <div class="pair-title">LinkLoop</div>
+            <div class="pair-subtitle">Enter this code on your<br>iPhone to pair</div>
+            <div class="pair-code">
+              <div class="pair-digit">4</div>
+              <div class="pair-digit">7</div>
+              <div class="pair-digit">2</div>
+              <div class="pair-digit">8</div>
+              <div class="pair-digit">1</div>
+              <div class="pair-digit">9</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="label">Watch Pairing Screen</p>
+    </div>
+
+  </div>
+
+  <!-- Complication Showcase -->
+  <div style="text-align:center; margin-top:60px;">
+    <h2 style="color:#00D4FF; font-size:20px; margin-bottom:4px;">Complication Styles</h2>
+    <p style="color:#666; font-size:12px; margin-bottom:20px;">See your glucose number on any Watch face</p>
+  </div>
+
+  <div class="showcase-row">
+    <div class="complication-showcase">
+      <div class="showcase-circular">
+        <span class="s-num">124</span>
+        <span class="s-arrow">↗</span>
+      </div>
+      <div class="comp-label">Circular</div>
+    </div>
+    <div class="complication-showcase">
+      <div class="showcase-rect">
+        <span class="s-num">124</span>
+        <span class="s-arrow">↗</span>
+        <span class="s-time">2m</span>
+      </div>
+      <div class="comp-label">Rectangular</div>
+    </div>
+    <div class="complication-showcase">
+      <div class="showcase-inline">
+        <span class="s-num">124↗</span>
+        <span class="s-detail">mg/dL · 2m</span>
+      </div>
+      <div class="comp-label">Inline</div>
+    </div>
+  </div>
+
+  <!-- Color states -->
+  <div class="color-row">
+    <div class="color-variant">
+      <div class="cv-circle">
+        <span class="cv-num" style="color:#FF3B30">62</span>
+        <span class="cv-arrow" style="color:#FF3B30">↓</span>
+      </div>
+      <div class="cv-label">LOW</div>
+    </div>
+    <div class="color-variant">
+      <div class="cv-circle">
+        <span class="cv-num" style="color:#34C759">118</span>
+        <span class="cv-arrow" style="color:#34C759">→</span>
+      </div>
+      <div class="cv-label">IN RANGE</div>
+    </div>
+    <div class="color-variant">
+      <div class="cv-circle">
+        <span class="cv-num" style="color:#34C759">124</span>
+        <span class="cv-arrow" style="color:#34C759">↗</span>
+      </div>
+      <div class="cv-label">RISING</div>
+    </div>
+    <div class="color-variant">
+      <div class="cv-circle">
+        <span class="cv-num" style="color:#FF9500">195</span>
+        <span class="cv-arrow" style="color:#FF9500">↑</span>
+      </div>
+      <div class="cv-label">HIGH</div>
+    </div>
+    <div class="color-variant">
+      <div class="cv-circle">
+        <span class="cv-num" style="color:#FF3B30">243</span>
+        <span class="cv-arrow" style="color:#FF3B30">↑</span>
+      </div>
+      <div class="cv-label">VERY HIGH</div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h2>📸 How to capture these</h2>
+    <ol>
+      <li>Open this file in a browser (Chrome recommended)</li>
+      <li>Right-click any watch → Inspect → Device toolbar → set to a fixed size</li>
+      <li>Or just screenshot each watch frame individually</li>
+      <li>Use ⌘+Shift+4 on Mac to select just the watch area</li>
+      <li>The dark background will crop cleanly for your website</li>
+    </ol>
+    <p style="margin-top:12px;">💡 <strong>Tip:</strong> For App Store screenshots, Apple requires 410×502 px for Series 10 (46mm). You can resize these captures to match.</p>
+  </div>
+
+</body>
+</html>

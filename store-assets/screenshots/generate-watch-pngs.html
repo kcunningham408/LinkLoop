@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkLoop Watch PNG Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #111;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      color: #fff;
+      padding: 30px;
+    }
+    h1 { text-align: center; color: #00D4FF; margin-bottom: 6px; font-size: 22px; }
+    .sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 30px; }
+    .controls { text-align: center; margin-bottom: 30px; }
+    .controls button {
+      background: #00D4FF; color: #000; border: none;
+      padding: 12px 28px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .status { text-align: center; color: #34C759; font-size: 13px; margin-top: 10px; min-height: 20px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+    .card { text-align: center; }
+    .card .label { color: #888; font-size: 11px; margin-top: 10px; }
+
+    /* ── Watch Shell ── */
+    .watch-capture { width: 230px; height: 280px; position: relative; display: inline-block; }
+    .watch-body {
+      width: 230px; height: 280px;
+      background: linear-gradient(145deg, #3a3a3a 0%, #222 50%, #1a1a1a 100%);
+      border-radius: 58px; position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px #111, 0 0 0 3px #444, 0 0 0 4px #222;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .watch-body::after {
+      content: ''; position: absolute; right: -9px; top: 78px;
+      width: 7px; height: 32px;
+      background: linear-gradient(180deg, #555, #3a3a3a, #333);
+      border-radius: 3px; box-shadow: 0 0 0 1px #222;
+    }
+    .watch-body::before {
+      content: ''; position: absolute; right: -8px; top: 124px;
+      width: 5px; height: 18px;
+      background: linear-gradient(180deg, #4a4a4a, #333);
+      border-radius: 2px; box-shadow: 0 0 0 1px #222;
+    }
+    .screen {
+      width: 198px; height: 242px;
+      background: #000; border-radius: 42px;
+      overflow: hidden; position: relative;
+    }
+
+    /* ════════════════════════════════════════════
+       FACE 1: Modular Compact
+       Layout: top row comps → time → rect comp → bottom row comps
+       Uses flexbox column, NO absolute positioning = no overlaps
+       ════════════════════════════════════════════ */
+    .face-modular {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 20px 14px 16px;
+    }
+    .fm-top-row {
+      display: flex; width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .fm-center {
+      display: flex; flex-direction: column;
+      align-items: center; flex: 1;
+      justify-content: center;
+    }
+    .fm-time {
+      font-size: 52px; font-weight: 200;
+      color: #fff; letter-spacing: -2px; line-height: 1;
+    }
+    .fm-date {
+      font-size: 11px; font-weight: 600;
+      color: #FF9F0A; margin-top: 2px;
+    }
+    .fm-bottom { width: 100%; margin-top: auto; }
+    .fm-bottom-row {
+      display: flex; width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      padding: 0 4px;
+    }
+
+    /* Circular complication */
+    .circ-comp {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .circ-comp .cc-val {
+      font-size: 16px; font-weight: 800; line-height: 1;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .circ-comp .cc-arrow { font-size: 8px; font-weight: 700; margin-top: -1px; }
+
+    /* Activity rings */
+    .activity-svg { width: 42px; height: 42px; flex-shrink: 0; }
+
+    /* Small bottom comps (weather, heart rate) */
+    .sm-comp {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .sm-comp .sm-icon { font-size: 12px; line-height: 1; }
+    .sm-comp .sm-val { font-size: 10px; font-weight: 600; margin-top: 1px; }
+
+    /* Rectangular complication */
+    .rect-comp {
+      width: 100%; height: 28px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      display: flex; align-items: center;
+      padding: 0 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .rect-comp .rc-val {
+      font-size: 14px; font-weight: 800;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .rect-comp .rc-arrow { font-size: 10px; font-weight: 700; margin-left: 2px; }
+    .rect-comp .rc-unit { font-size: 9px; color: #888; margin-left: 4px; }
+    .rect-comp .rc-time { font-size: 9px; color: #888; margin-left: auto; }
+
+    /* ════════════════════════════════════════════
+       FACE 2: Infograph — proper flow layout
+       ════════════════════════════════════════════ */
+    .face-infograph {
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 42%, #0c1829, #000);
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 22px 16px 20px;
+    }
+    .fi-top-row {
+      display: flex; width: 100%;
+      justify-content: space-between; align-items: flex-start;
+    }
+    .fi-corner { display: flex; flex-direction: column; align-items: center; }
+    .fi-corner .fc-val {
+      font-size: 15px; font-weight: 800;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .fi-corner .fc-sub { font-size: 7px; color: #888; font-weight: 600; }
+    .fi-center {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .fi-time {
+      font-size: 56px; font-weight: 100;
+      color: #fff; letter-spacing: -3px; line-height: 1;
+      margin-top: 12px;
+    }
+    .fi-date {
+      font-size: 11px; font-weight: 600;
+      color: #FF9F0A; margin-top: 2px;
+    }
+    .fi-bottom { margin-top: auto; width: 100%; }
+    .inline-comp {
+      background: rgba(255,255,255,0.05);
+      border-radius: 7px; padding: 4px 12px;
+      display: flex; align-items: center;
+      justify-content: center; gap: 5px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .inline-comp .il-val {
+      font-size: 13px; font-weight: 800;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .inline-comp .il-detail { font-size: 10px; color: #888; }
+
+    /* ════════════════════════════════════════════
+       FACE 10: California — analog dial with glucose sub-dial
+       Completely different style from modular/infograph
+       ════════════════════════════════════════════ */
+    .face-california {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 12px;
+    }
+    .cal-dial {
+      width: 174px; height: 174px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cal-marker {
+      position: absolute;
+      font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.7);
+      font-family: -apple-system, 'SF Pro Display', sans-serif;
+    }
+    .cal-m12 { top: 6px; left: 50%; transform: translateX(-50%); }
+    .cal-m3  { right: 8px; top: 50%; transform: translateY(-50%); }
+    .cal-m6  { bottom: 6px; left: 50%; transform: translateX(-50%); }
+    .cal-m9  { left: 8px; top: 50%; transform: translateY(-50%); }
+    .cal-hands { position: absolute; width: 100%; height: 100%; }
+    .cal-hands svg { width: 100%; height: 100%; }
+    .cal-sub-dial {
+      position: absolute;
+      bottom: 28px; left: 50%; transform: translateX(-50%);
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .cal-sub-dial .csd-val {
+      font-size: 16px; font-weight: 800; line-height: 1;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .cal-sub-dial .csd-arrow { font-size: 8px; font-weight: 700; }
+    .cal-date-window {
+      position: absolute;
+      right: 28px; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px; padding: 2px 6px;
+      font-size: 10px; font-weight: 700; color: #FF9F0A;
+    }
+
+    /* ════════════════════════════════════════════
+       Glucose App Screens
+       ════════════════════════════════════════════ */
+    .glucose-app {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 14px;
+    }
+    .ga-ring {
+      width: 120px; height: 120px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ga-ring svg { position: absolute; width: 120px; height: 120px; }
+    .ga-center { z-index: 1; text-align: center; }
+    .ga-center .ga-val {
+      font-size: 40px; font-weight: 700; line-height: 1;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+    .ga-center .ga-arrow { font-size: 20px; font-weight: 700; }
+    .ga-center .ga-unit { font-size: 10px; color: #888; display: block; margin-top: 1px; }
+    .ga-range { font-size: 12px; font-weight: 600; margin-top: 6px; }
+    .ga-time { font-size: 10px; color: #888; margin-top: 2px; }
+
+    /* ════════════════════════════════════════════
+       Graph View
+       ════════════════════════════════════════════ */
+    .graph-app {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      padding: 20px 12px 14px;
+    }
+    .gph-title { font-size: 11px; color: #888; text-align: center; margin-bottom: 6px; }
+    .gph-chart { flex: 1; position: relative; }
+    .gph-chart svg { width: 100%; height: 100%; }
+    .gph-stats { display: flex; justify-content: space-around; margin-top: 8px; }
+    .gph-stat { text-align: center; }
+    .gph-stat .gs-val { font-size: 14px; font-weight: 700; }
+    .gph-stat .gs-lbl { font-size: 8px; color: #666; margin-top: 1px; }
+
+    /* ════════════════════════════════════════════
+       Alerts
+       ════════════════════════════════════════════ */
+    .alert-app {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      padding: 24px 14px 14px;
+    }
+    .al-header {
+      font-size: 12px; font-weight: 700; color: #FF9500;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .al-card { border-radius: 10px; padding: 9px 10px; margin-bottom: 6px; }
+    .al-card.high-alert { background: rgba(255,149,0,0.1); border: 1px solid rgba(255,149,0,0.2); }
+    .al-card.low-alert  { background: rgba(255,59,48,0.1);  border: 1px solid rgba(255,59,48,0.2); }
+    .al-card .al-title { font-size: 11px; font-weight: 700; }
+    .al-card.high-alert .al-title { color: #FF9500; }
+    .al-card.low-alert  .al-title { color: #FF3B30; }
+    .al-card .al-sub { font-size: 9px; color: #888; margin-top: 2px; }
+
+    /* ════════════════════════════════════════════
+       Pairing
+       ════════════════════════════════════════════ */
+    .pair-app {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .pa-icon { font-size: 30px; margin-bottom: 6px; }
+    .pa-title { font-size: 14px; font-weight: 700; color: #00D4FF; margin-bottom: 3px; }
+    .pa-sub { font-size: 10px; color: #888; text-align: center; margin-bottom: 12px; line-height: 1.4; }
+    .pa-code { display: flex; gap: 5px; }
+    .pa-digit {
+      width: 27px; height: 33px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 700; color: #00D4FF;
+      font-family: -apple-system, 'SF Pro Rounded', sans-serif;
+    }
+
+    /* ════════════════════════════════════════════
+       Complication Showcase
+       ════════════════════════════════════════════ */
+    .showcase-app {
+      width: 100%; height: 100%;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; padding: 16px;
+    }
+    .sc-title { font-size: 11px; color: #888; font-weight: 600; letter-spacing: 0.5px; }
+    .sc-circ {
+      width: 60px; height: 60px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .sc-circ .sc-val { font-size: 24px; font-weight: 800; line-height: 1; font-family: -apple-system, 'SF Pro Rounded', sans-serif; }
+    .sc-circ .sc-arr { font-size: 11px; font-weight: 700; }
+    .sc-rect {
+      width: 160px; height: 36px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 9px;
+      display: flex; align-items: center;
+      padding: 0 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .sc-rect .sc-val { font-size: 24px; font-weight: 800; font-family: -apple-system, 'SF Pro Rounded', sans-serif; }
+    .sc-rect .sc-arr { font-size: 14px; font-weight: 700; margin-left: 2px; }
+    .sc-rect .sc-tm { font-size: 10px; color: #888; margin-left: auto; }
+    .sc-inline {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px; padding: 4px 12px;
+      display: flex; align-items: center; gap: 4px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .sc-inline .sc-val { font-size: 13px; font-weight: 800; font-family: -apple-system, 'SF Pro Rounded', sans-serif; }
+    .sc-inline .sc-det { font-size: 10px; color: #888; }
+
+    /* Colors */
+    .c-green  { color: #34C759; }
+    .c-orange { color: #FF9500; }
+    .c-red    { color: #FF3B30; }
+  </style>
+</head>
+<body>
+
+<h1>⚡ LinkLoop Watch PNGs</h1>
+<p class="sub">Click "Download All PNGs" to save each screenshot individually</p>
+<div class="controls">
+  <button onclick="downloadAll()">⬇ Download All PNGs</button>
+</div>
+<div class="status" id="status"></div>
+
+<div class="grid">
+
+  <!-- ─── 1. Watch Face: Modular Compact (In Range) ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-1">
+      <div class="watch-body"><div class="screen">
+        <div class="face-modular">
+          <div class="fm-top-row">
+            <div class="circ-comp">
+              <span class="cc-val c-green">124</span>
+              <span class="cc-arrow c-green">↗</span>
+            </div>
+            <svg class="activity-svg" viewBox="0 0 46 46">
+              <circle cx="23" cy="23" r="20" fill="none" stroke="rgba(255,45,85,0.25)" stroke-width="4"/>
+              <circle cx="23" cy="23" r="20" fill="none" stroke="#FF2D55" stroke-width="4"
+                stroke-dasharray="105 126" stroke-linecap="round" transform="rotate(-90 23 23)"/>
+              <circle cx="23" cy="23" r="14.5" fill="none" stroke="rgba(170,255,0,0.25)" stroke-width="4"/>
+              <circle cx="23" cy="23" r="14.5" fill="none" stroke="#AAFF00" stroke-width="4"
+                stroke-dasharray="68 91" stroke-linecap="round" transform="rotate(-90 23 23)"/>
+              <circle cx="23" cy="23" r="9" fill="none" stroke="rgba(0,212,255,0.25)" stroke-width="4"/>
+              <circle cx="23" cy="23" r="9" fill="none" stroke="#00D4FF" stroke-width="4"
+                stroke-dasharray="42 57" stroke-linecap="round" transform="rotate(-90 23 23)"/>
+            </svg>
+          </div>
+          <div class="fm-center">
+            <span class="fm-time">10:08</span>
+            <span class="fm-date">THU MAR 6</span>
+          </div>
+          <div class="fm-bottom">
+            <div class="rect-comp">
+              <span class="rc-val c-green">124</span>
+              <span class="rc-arrow c-green">↗</span>
+              <span class="rc-unit">mg/dL</span>
+              <span class="rc-time">2m ago</span>
+            </div>
+            <div class="fm-bottom-row">
+              <div class="sm-comp">
+                <span class="sm-icon">☀️</span>
+                <span class="sm-val" style="color:#5AC8FA">72°</span>
+              </div>
+              <div class="sm-comp">
+                <span class="sm-icon" style="color:#FF3B30">♥︎</span>
+                <span class="sm-val" style="color:#FF3B30">68</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">1 · Modular Compact</div>
+  </div>
+
+  <!-- ─── 2. Watch Face: Infograph ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-2">
+      <div class="watch-body"><div class="screen">
+        <div class="face-infograph">
+          <div class="fi-top-row">
+            <div class="fi-corner">
+              <span class="fc-val" style="color:#5AC8FA">72°</span>
+              <span class="fc-sub">SAN JOSE</span>
+            </div>
+            <div class="fi-corner">
+              <span class="fc-val c-green">124↗</span>
+              <span class="fc-sub">GLUCOSE</span>
+            </div>
+          </div>
+          <div class="fi-center">
+            <span class="fi-time">10:08</span>
+            <span class="fi-date">THURSDAY MAR 6</span>
+          </div>
+          <div class="fi-bottom">
+            <div class="inline-comp">
+              <span class="il-val c-green">124↗</span>
+              <span class="il-detail">mg/dL · 2m ago</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">2 · Infograph</div>
+  </div>
+
+  <!-- ─── 3. Glucose: In Range ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-3">
+      <div class="watch-body"><div class="screen">
+        <div class="glucose-app">
+          <div class="ga-ring">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#34C759" stroke-width="8"
+                stroke-dasharray="245 327" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="ga-center">
+              <span class="ga-val c-green">124</span><span class="ga-arrow c-green">↗</span>
+              <span class="ga-unit">mg/dL</span>
+            </div>
+          </div>
+          <div class="ga-range c-green">In Range</div>
+          <div class="ga-time">2m ago</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">3 · Glucose — In Range</div>
+  </div>
+
+  <!-- ─── 4. Glucose: High ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-4">
+      <div class="watch-body"><div class="screen">
+        <div class="glucose-app">
+          <div class="ga-ring">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#FF9500" stroke-width="8"
+                stroke-dasharray="290 327" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="ga-center">
+              <span class="ga-val c-orange">243</span><span class="ga-arrow c-orange">↑</span>
+              <span class="ga-unit">mg/dL</span>
+            </div>
+          </div>
+          <div class="ga-range c-orange">HIGH</div>
+          <div class="ga-time">1m ago</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">4 · Glucose — High</div>
+  </div>
+
+  <!-- ─── 5. Glucose: Low ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-5">
+      <div class="watch-body"><div class="screen">
+        <div class="glucose-app">
+          <div class="ga-ring">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#FF3B30" stroke-width="8"
+                stroke-dasharray="130 327" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="ga-center">
+              <span class="ga-val c-red">62</span><span class="ga-arrow c-red">↓</span>
+              <span class="ga-unit">mg/dL</span>
+            </div>
+          </div>
+          <div class="ga-range c-red">LOW</div>
+          <div class="ga-time">Just now</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">5 · Glucose — Low</div>
+  </div>
+
+  <!-- ─── 6. Graph ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-6">
+      <div class="watch-body"><div class="screen">
+        <div class="graph-app">
+          <div class="gph-title">Last 3 Hours</div>
+          <div class="gph-chart">
+            <svg viewBox="0 0 178 100" preserveAspectRatio="none">
+              <rect x="0" y="18" width="178" height="58" fill="rgba(52,199,89,0.04)"/>
+              <line x1="0" y1="18" x2="178" y2="18" stroke="rgba(255,149,0,0.15)" stroke-width="0.5" stroke-dasharray="3,3"/>
+              <text x="2" y="15" fill="rgba(255,149,0,0.3)" font-size="7" font-family="sans-serif">180</text>
+              <line x1="0" y1="76" x2="178" y2="76" stroke="rgba(255,59,48,0.15)" stroke-width="0.5" stroke-dasharray="3,3"/>
+              <text x="2" y="84" fill="rgba(255,59,48,0.3)" font-size="7" font-family="sans-serif">70</text>
+              <path d="M 0,55 C 12,58 22,62 32,60 C 44,57 54,45 68,38 C 82,31 92,28 104,32 C 114,36 124,44 134,40 C 144,36 154,30 164,28 C 170,27 174,26 178,25"
+                fill="none" stroke="#34C759" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="178" cy="25" r="3.5" fill="#34C759"/>
+            </svg>
+          </div>
+          <div class="gph-stats">
+            <div class="gph-stat"><div class="gs-val c-green">87%</div><div class="gs-lbl">IN RANGE</div></div>
+            <div class="gph-stat"><div class="gs-val c-green">128</div><div class="gs-lbl">AVERAGE</div></div>
+            <div class="gph-stat"><div class="gs-val c-orange">1</div><div class="gs-lbl">HIGHS</div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">6 · 3-Hour Graph</div>
+  </div>
+
+  <!-- ─── 7. Alerts ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-7">
+      <div class="watch-body"><div class="screen">
+        <div class="alert-app">
+          <div class="al-header">⚠️ 2 Active Alerts</div>
+          <div class="al-card high-alert">
+            <div class="al-title">⬆ High: 243 mg/dL</div>
+            <div class="al-sub">Above 180 · 4m ago</div>
+          </div>
+          <div class="al-card low-alert">
+            <div class="al-title">⬇ Low: 62 mg/dL</div>
+            <div class="al-sub">Below 70 · 47m ago</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">7 · Active Alerts</div>
+  </div>
+
+  <!-- ─── 8. Pairing ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-8">
+      <div class="watch-body"><div class="screen">
+        <div class="pair-app">
+          <div class="pa-icon">🔗</div>
+          <div class="pa-title">LinkLoop</div>
+          <div class="pa-sub">Enter this code on your<br>iPhone to pair</div>
+          <div class="pa-code">
+            <div class="pa-digit">4</div>
+            <div class="pa-digit">7</div>
+            <div class="pa-digit">2</div>
+            <div class="pa-digit">8</div>
+            <div class="pa-digit">1</div>
+            <div class="pa-digit">9</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">8 · Watch Pairing</div>
+  </div>
+
+  <!-- ─── 9. Complication Showcase ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-9">
+      <div class="watch-body"><div class="screen">
+        <div class="showcase-app">
+          <div class="sc-title">COMPLICATIONS</div>
+          <div class="sc-circ">
+            <span class="sc-val c-green">124</span>
+            <span class="sc-arr c-green">↗</span>
+          </div>
+          <div class="sc-rect">
+            <span class="sc-val c-green">124</span>
+            <span class="sc-arr c-green">↗</span>
+            <span class="sc-tm">2m</span>
+          </div>
+          <div class="sc-inline">
+            <span class="sc-val c-green">124↗</span>
+            <span class="sc-det">mg/dL · 2m</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">9 · Complication Styles</div>
+  </div>
+
+  <!-- ─── 10. California Face — High Glucose (distinct from 1 & 2) ─── -->
+  <div class="card">
+    <div class="watch-capture" id="shot-10">
+      <div class="watch-body"><div class="screen">
+        <div class="face-california">
+          <div class="cal-dial">
+            <span class="cal-marker cal-m12">12</span>
+            <span class="cal-marker cal-m3">3</span>
+            <span class="cal-marker cal-m6">6</span>
+            <span class="cal-marker cal-m9">9</span>
+            <div class="cal-hands">
+              <svg viewBox="0 0 174 174">
+                <g stroke="rgba(255,255,255,0.15)" stroke-width="1">
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(30 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(60 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(120 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(150 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(210 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(240 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(300 87 87)"/>
+                  <line x1="87" y1="4" x2="87" y2="14" transform="rotate(330 87 87)"/>
+                </g>
+                <!-- Hour hand (~10:08 = 304°) -->
+                <line x1="87" y1="87" x2="60" y2="42" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+                <!-- Minute hand (~48° for :08) -->
+                <line x1="87" y1="87" x2="95" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="87" cy="87" r="3.5" fill="#fff"/>
+              </svg>
+            </div>
+            <div class="cal-sub-dial">
+              <span class="csd-val c-orange">243</span>
+              <span class="csd-arrow c-orange">↑</span>
+            </div>
+            <div class="cal-date-window">6</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="label">10 · California — High Glucose</div>
+  </div>
+
+</div>
+
+<script>
+const NAMES = [
+  'watchface-modular-compact',
+  'watchface-infograph',
+  'glucose-in-range',
+  'glucose-high',
+  'glucose-low',
+  'graph-3hour',
+  'alerts-active',
+  'pairing-screen',
+  'complication-styles',
+  'watchface-california-high'
+];
+
+async function captureOne(id, filename) {
+  const el = document.getElementById(id);
+  const canvas = await html2canvas(el, {
+    backgroundColor: null, scale: 3,
+    useCORS: true, logging: false
+  });
+  return { canvas, filename };
+}
+
+async function downloadAll() {
+  const status = document.getElementById('status');
+  status.textContent = 'Loading html2canvas...';
+  if (!window.html2canvas) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  status.textContent = 'Generating PNGs...';
+  await new Promise(r => setTimeout(r, 100));
+  for (let i = 0; i < NAMES.length; i++) {
+    const id = `shot-${i + 1}`;
+    const name = NAMES[i];
+    status.textContent = `Capturing ${i + 1}/${NAMES.length}: ${name}...`;
+    await new Promise(r => setTimeout(r, 50));
+    try {
+      const { canvas } = await captureOne(id, name);
+      const link = document.createElement('a');
+      link.download = `linkloop-watch-${name}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      await new Promise(r => setTimeout(r, 300));
+    } catch (err) { console.error(`Failed ${name}:`, err); }
+  }
+  status.textContent = `✅ Done! ${NAMES.length} PNGs downloaded.`;
+}
+</script>
+
+</body>
+</html>

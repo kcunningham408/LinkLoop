@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -108,14 +109,14 @@ export default function SuppliesScreen() {
       <View style={styles.content}>
         {/* Supply Summary */}
         <FadeIn delay={stagger(0, 100)}>
-        <View style={styles.summaryCard}>
+        <GlassCard accent={accent} style={{ marginBottom: 20 }}>
           <Text style={styles.summaryTitle}>Supply Summary</Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryNumber}>{supplies.length}</Text>
               <Text style={styles.summaryLabel}>Items Tracked</Text>
             </View>
-            <View style={[styles.summaryItem, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: '#2C2C2E' }]}>
+            <View style={[styles.summaryItem, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }]}>
               <Text style={[styles.summaryNumber, { color: needsRefill > 0 ? '#FF6B6B' : accent }]}>{needsRefill}</Text>
               <Text style={styles.summaryLabel}>Needs Refill</Text>
             </View>
@@ -124,7 +125,7 @@ export default function SuppliesScreen() {
               <Text style={styles.summaryLabel}>Well Stocked</Text>
             </View>
           </View>
-        </View>
+        </GlassCard>
         </FadeIn>
 
         <FadeIn delay={stagger(1, 100)}>
@@ -146,7 +147,8 @@ export default function SuppliesScreen() {
             const actualDaysLeft = Math.max(0, (supply.daysLeft || 30) - daysSinceCreated);
             const status = getStatusInfo(actualDaysLeft);
             return (
-              <TouchableOpacity key={supply._id} style={styles.supplyCard} onLongPress={() => handleDeleteSupply(supply._id, supply.name)}>
+              <GlassCard key={supply._id} accent={accent} noPadding style={{ marginBottom: 12 }}>
+              <TouchableOpacity style={styles.supplyCard} onLongPress={() => handleDeleteSupply(supply._id, supply.name)}>
                 <Text style={styles.supplyEmoji}>{supply.emoji}</Text>
                 <View style={styles.supplyInfo}>
                   <Text style={styles.supplyName} numberOfLines={1}>{supply.name}</Text>
@@ -159,18 +161,21 @@ export default function SuppliesScreen() {
                   <Text style={styles.daysLeft}>{actualDaysLeft} days left</Text>
                 </View>
               </TouchableOpacity>
+              </GlassCard>
             );
           })
         )}
 
         {/* Add Supply Button */}
+        <GlassCard accent={accent} noPadding style={{ marginBottom: 20 }}>
         <TouchableOpacity style={[styles.addButton, { borderColor: accent }]} onPress={() => { haptic.light(); setShowAddModal(true); }}>
           <Text style={styles.addButtonIcon}>➕</Text>
           <Text style={[styles.addButtonText, { color: accent }]}>Add Supply</Text>
         </TouchableOpacity>
+        </GlassCard>
 
         {/* Usage Insights */}
-        <View style={styles.insightsCard}>
+        <GlassCard accent={accent} style={{ marginBottom: 20 }}>
           <Text style={styles.sectionTitle}>Usage Insights</Text>
           <View style={styles.insightItem}>
             <Text style={styles.insightEmoji}>📊</Text>
@@ -197,10 +202,10 @@ export default function SuppliesScreen() {
               </Text>
             </View>
           </View>
-        </View>
+        </GlassCard>
 
         {/* Smart Reminders */}
-        <View style={styles.remindersCard}>
+        <GlassCard accent={accent} style={{ marginBottom: 20 }}>
           <Text style={styles.sectionTitle}>Smart Reminders</Text>
           {supplies.filter(s => getActualDaysLeft(s) <= 7).length > 0 ? (
             supplies.filter(s => getActualDaysLeft(s) <= 7).map((s) => (
@@ -217,24 +222,7 @@ export default function SuppliesScreen() {
               <Text style={styles.reminderText}>All supplies are well stocked! No action needed.</Text>
             </View>
           )}
-        </View>
-
-        {/* Pro Tips */}
-        <View style={styles.tipsCard}>
-          <Text style={styles.sectionTitle}>Pro Tips</Text>
-          <View style={styles.tipItem}>
-            <Text style={styles.tipEmoji}>💡</Text>
-            <Text style={styles.tipText}>Keep at least a 2-week backup supply of insulin and test strips</Text>
-          </View>
-          <View style={styles.tipItem}>
-            <Text style={styles.tipEmoji}>📋</Text>
-            <Text style={styles.tipText}>Set a monthly reminder to audit your supplies and check expiration dates</Text>
-          </View>
-          <View style={styles.tipItem}>
-            <Text style={styles.tipEmoji}>🏥</Text>
-            <Text style={styles.tipText}>Reorder supplies early so you never run out of what you need</Text>
-          </View>
-        </View>
+        </GlassCard>
         </FadeIn>
       </View>
 
@@ -286,7 +274,6 @@ export default function SuppliesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111111' },
   content: { padding: 20 },
-  summaryCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   summaryTitle: { fontSize: TYPE.lg, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15, textAlign: 'center' },
   summaryRow: { flexDirection: 'row' },
   summaryItem: { flex: 1, alignItems: 'center' },
@@ -296,7 +283,7 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 50, marginBottom: 10 },
   emptyTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 6 },
   emptyText: { fontSize: TYPE.md, color: '#888', textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
-  supplyCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 15, marginBottom: 12, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  supplyCard: { padding: 15, flexDirection: 'row', alignItems: 'center' },
   supplyEmoji: { fontSize: 36, marginRight: 15 },
   supplyInfo: { flex: 1 },
   supplyName: { fontSize: TYPE.lg, fontWeight: TYPE.semibold, color: '#fff', marginBottom: 4 },
@@ -305,24 +292,18 @@ const styles = StyleSheet.create({
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginBottom: 4 },
   statusText: { fontSize: TYPE.sm, fontWeight: TYPE.semibold },
   daysLeft: { fontSize: 11, color: '#888' },
-  addButton: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20, borderWidth: 2, borderColor: '#4A90D9', borderStyle: 'dashed', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  addButton: { padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#4A90D9', borderStyle: 'dashed', borderRadius: 12 },
   addButtonIcon: { fontSize: TYPE.h3, marginRight: 10 },
   addButtonText: { fontSize: TYPE.lg, fontWeight: TYPE.semibold, color: '#4A90D9' },
-  insightsCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   sectionTitle: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 15 },
-  insightItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2C2C2E' },
+  insightItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   insightEmoji: { fontSize: TYPE.h3, marginRight: 12 },
   insightInfo: { flex: 1 },
   insightTitle: { fontSize: TYPE.md, color: '#A0A0A0', marginBottom: 2 },
   insightValue: { fontSize: TYPE.xl, fontWeight: TYPE.bold, color: '#fff' },
-  remindersCard: { backgroundColor: '#1C1C1E', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2C2C2E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   reminderItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
   reminderEmoji: { fontSize: 20, marginRight: 10 },
   reminderText: { fontSize: TYPE.md, color: '#E0E0E0', flex: 1, lineHeight: 20 },
-  tipsCard: { backgroundColor: '#1A2235', borderRadius: 12, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#2A3A50' },
-  tipItem: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8 },
-  tipEmoji: { fontSize: TYPE.xl, marginRight: 10, marginTop: 2 },
-  tipText: { fontSize: TYPE.md, color: '#C0C0C0', flex: 1, lineHeight: 20 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 25, paddingBottom: 40 },
   modalTitle: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff', marginBottom: 20, textAlign: 'center' },

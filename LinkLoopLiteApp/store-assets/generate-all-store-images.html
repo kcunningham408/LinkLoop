@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkLoop — Store Asset Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #111; color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      padding: 30px;
+    }
+    h1 { text-align: center; color: #4A90D9; margin-bottom: 4px; font-size: 28px; }
+    .sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 10px; }
+    .controls { text-align: center; margin: 20px 0; }
+    .controls button {
+      background: #4A90D9; color: #fff; border: none;
+      padding: 14px 32px; border-radius: 10px;
+      font-size: 16px; font-weight: 700; cursor: pointer; margin: 0 8px;
+    }
+    .controls button:hover { background: #3A7BC8; }
+    .controls button.secondary { background: #333; }
+    .controls button.secondary:hover { background: #444; }
+    .status { text-align: center; color: #34C759; font-size: 13px; margin-top: 10px; min-height: 20px; }
+
+    .section { margin: 40px 0 20px; border-top: 1px solid #333; padding-top: 20px; }
+    .section h2 { color: #4A90D9; font-size: 20px; margin-bottom: 4px; }
+    .section .dims { color: #666; font-size: 12px; margin-bottom: 16px; }
+
+    .grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+    .card { text-align: center; }
+    .card .label { color: #888; font-size: 11px; margin-top: 8px; }
+    .card .size { color: #555; font-size: 10px; }
+
+    /* Scale containers for preview */
+    .scale-phone { transform: scale(0.25); transform-origin: top left; }
+    .scale-tablet { transform: scale(0.15); transform-origin: top left; }
+    .scale-feature { transform: scale(0.3); transform-origin: top left; }
+    .scale-watch { transform: scale(0.5); transform-origin: top left; }
+
+    .preview-wrap { overflow: hidden; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<h1>LinkLoop T1D — Store Asset Generator</h1>
+<p class="sub">All required images for Apple App Store, Google Play, and Apple Watch</p>
+
+<div class="controls">
+  <button onclick="exportAll()">Export All PNGs</button>
+  <button class="secondary" onclick="exportSection('iphone67')">iPhone 6.7" Only</button>
+  <button class="secondary" onclick="exportSection('iphone65')">iPhone 6.5" Only</button>
+  <button class="secondary" onclick="exportSection('ipad')">iPad Only</button>
+  <button class="secondary" onclick="exportSection('watch')">Watch Only</button>
+  <button class="secondary" onclick="exportSection('google')">Google Play Only</button>
+</div>
+<div class="status" id="status"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: iPhone 6.7" (iPhone 15 Pro Max) — 1290 x 2796
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>iPhone 6.7" Screenshots (1290 x 2796)</h2>
+  <div class="dims">Required for iPhone 15 Pro Max, 14 Pro Max — App Store Connect</div>
+  <div class="grid" id="grid-iphone67"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: iPhone 6.5" (iPhone 11 Pro Max) — 1284 x 2778
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>iPhone 6.5" Screenshots (1284 x 2778)</h2>
+  <div class="dims">Required for iPhone 11 Pro Max, XS Max — App Store Connect</div>
+  <div class="grid" id="grid-iphone65"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: iPad 12.9" — 2048 x 2732
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>iPad 12.9" Screenshots (2048 x 2732)</h2>
+  <div class="dims">Required for iPad Pro 12.9" — App Store Connect</div>
+  <div class="grid" id="grid-ipad"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: Apple Watch — 410 x 502 (Series 9/Ultra)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>Apple Watch Screenshots (410 x 502)</h2>
+  <div class="dims">Required for Apple Watch Series 9 / Ultra — App Store Connect</div>
+  <div class="grid" id="grid-watch"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: Google Play Feature Graphic — 1024 x 500
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>Google Play Feature Graphic (1024 x 500)</h2>
+  <div class="dims">Required for Google Play Store listing</div>
+  <div class="grid" id="grid-google-feature"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: Google Play Phone Screenshots — 1080 x 1920
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>Google Play Phone Screenshots (1080 x 1920)</h2>
+  <div class="dims">Recommended for Google Play Store listing</div>
+  <div class="grid" id="grid-google-phone"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION: Google Play Tablet — 1200 x 1600
+     ══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>Google Play 7" Tablet Screenshots (1200 x 1600)</h2>
+  <div class="dims">Optional but recommended for Google Play</div>
+  <div class="grid" id="grid-google-tablet"></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     OFF-SCREEN CANVASES — Full-resolution renders
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div id="render-area" style="position:absolute; left:-99999px; top:0;"></div>
+
+<script>
+// ── Brand Colors ──
+const C = {
+  bg:       '#0A0A0F',
+  accent:   '#4A90D9',
+  accent2:  '#3A7BC8',
+  green:    '#34C759',
+  red:      '#FF3B30',
+  orange:   '#FF9500',
+  yellow:   '#FFD60A',
+  cyan:     '#00D4FF',
+  white:    '#FFFFFF',
+  gray:     '#888888',
+  card:     '#1A1A24',
+  cardBdr:  'rgba(255,255,255,0.06)',
+};
+
+// ── Screen data for each screenshot ──
+const SCREENS = [
+  {
+    id: 'home',
+    caption: 'Everything in one place',
+    sub: 'Your glucose dashboard at a glance',
+    render: drawHomeScreen,
+  },
+  {
+    id: 'glucose',
+    caption: 'Real-time glucose tracking',
+    sub: 'Dexcom CGM integration with 2-min refresh',
+    render: drawGlucoseScreen,
+  },
+  {
+    id: 'insights',
+    caption: 'AI-powered insights',
+    sub: 'Concise summaries that learn your patterns',
+    render: drawInsightsScreen,
+  },
+  {
+    id: 'care-circle',
+    caption: 'Keep your Care Circle informed',
+    sub: 'Share glucose data with family in real time',
+    render: drawCareCircleScreen,
+  },
+  {
+    id: 'challenges',
+    caption: 'Stay motivated with challenges',
+    sub: 'Earn streaks and hit glucose goals',
+    render: drawChallengesScreen,
+  },
+  {
+    id: 'watch',
+    caption: 'Apple Watch companion',
+    sub: 'Glucose on your wrist, always updated',
+    render: drawWatchPromoScreen,
+  },
+];
+
+const WATCH_SCREENS = [
+  { id: 'watch-glucose', caption: 'Glucose at a glance', render: drawWatchGlucose },
+  { id: 'watch-complication', caption: 'Watch face complication', render: drawWatchComplication },
+  { id: 'watch-high-alert', caption: 'High glucose alert', render: drawWatchHighAlert },
+];
+
+// ════════════════════════════════════════════
+// Drawing helpers
+// ════════════════════════════════════════════
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function fillRoundRect(ctx, x, y, w, h, r, color) {
+  roundRect(ctx, x, y, w, h, r);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function strokeRoundRect(ctx, x, y, w, h, r, color, lw) {
+  roundRect(ctx, x, y, w, h, r);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw || 1;
+  ctx.stroke();
+}
+
+function drawGradientBg(ctx, w, h) {
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, '#0A0A0F');
+  g.addColorStop(0.5, '#0D0D18');
+  g.addColorStop(1, '#0A0A0F');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function drawStatusBar(ctx, w, scale) {
+  const s = scale || 1;
+  ctx.fillStyle = '#fff';
+  ctx.font = `600 ${28*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText('9:41', 50*s, 56*s);
+  ctx.textAlign = 'right';
+  // Battery icon
+  fillRoundRect(ctx, w - 70*s, 38*s, 50*s, 22*s, 4*s, 'rgba(255,255,255,0.3)');
+  fillRoundRect(ctx, w - 68*s, 40*s, 38*s, 18*s, 3*s, '#fff');
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillRect(w - 18*s, 44*s, 4*s, 10*s);
+  // Signal dots
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.arc(w - 160*s + i*18*s, 49*s, 5*s, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+  }
+  ctx.textAlign = 'left';
+}
+
+function drawNavBar(ctx, w, y, title, scale) {
+  const s = scale || 1;
+  ctx.fillStyle = '#fff';
+  ctx.font = `700 ${40*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText(title, 40*s, y);
+}
+
+function drawCaptionOverlay(ctx, w, h, caption, sub) {
+  // Gradient overlay at top
+  const g = ctx.createLinearGradient(0, 0, 0, h * 0.25);
+  g.addColorStop(0, 'rgba(10,10,15,0.95)');
+  g.addColorStop(1, 'rgba(10,10,15,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h * 0.25);
+
+  // Caption text
+  ctx.fillStyle = '#fff';
+  ctx.font = `800 ${Math.round(w * 0.055)}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(caption, w/2, h * 0.1);
+
+  // Sub text
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = `500 ${Math.round(w * 0.03)}px -apple-system, sans-serif`;
+  ctx.fillText(sub, w/2, h * 0.1 + Math.round(w * 0.055));
+}
+
+// ════════════════════════════════════════════
+// Phone screen renderers
+// ════════════════════════════════════════════
+
+function drawHomeScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+  drawStatusBar(ctx, w, s);
+  drawNavBar(ctx, w, 150*s, 'LinkLoop', s);
+
+  // Today's Average card
+  const cardY = 200*s;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 280*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, cardY, w - 80*s, 280*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText("Today's Average", 80*s, cardY + 50*s);
+
+  ctx.fillStyle = C.green;
+  ctx.font = `800 ${96*s}px -apple-system, sans-serif`;
+  ctx.fillText('118', 80*s, cardY + 170*s);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${28*s}px -apple-system, sans-serif`;
+  ctx.fillText('mg/dL', 280*s, cardY + 170*s);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = `500 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('12 readings today', 80*s, cardY + 220*s);
+
+  // Trend arrow
+  ctx.fillStyle = C.green;
+  ctx.font = `600 ${36*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('Stable', w - 80*s, cardY + 120*s);
+  ctx.textAlign = 'left';
+
+  // 6-card grid
+  const gridY = cardY + 320*s;
+  const gridCards = [
+    { icon: '📊', label: 'CGM Data', color: C.accent },
+    { icon: '👥', label: 'Care Circle', color: '#FF6B6B' },
+    { icon: '💊', label: 'Supplies', color: C.orange },
+    { icon: '🧠', label: 'AI Insights', color: C.cyan },
+    { icon: '😊', label: 'Mood & Notes', color: '#FF9FF3' },
+    { icon: '🏆', label: 'Achievements', color: C.yellow },
+  ];
+
+  const cardW = (w - 120*s) / 2;
+  const cardH = 200*s;
+  const gap = 20*s;
+
+  gridCards.forEach((c, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const cx = 40*s + col * (cardW + gap);
+    const cy = gridY + row * (cardH + gap);
+
+    fillRoundRect(ctx, cx, cy, cardW, cardH, 20*s, C.card);
+    strokeRoundRect(ctx, cx, cy, cardW, cardH, 20*s, C.cardBdr, 1);
+
+    ctx.font = `${48*s}px -apple-system, sans-serif`;
+    ctx.fillText(c.icon, cx + 30*s, cy + 60*s);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${28*s}px -apple-system, sans-serif`;
+    ctx.fillText(c.label, cx + 30*s, cy + 110*s);
+
+    // Fake stat
+    ctx.fillStyle = c.color;
+    ctx.font = `800 ${36*s}px -apple-system, sans-serif`;
+    ctx.fillText(c === gridCards[0] ? '118' : c === gridCards[1] ? '3' : c === gridCards[5] ? '12' : '--', cx + 30*s, cy + 165*s);
+  });
+
+  // Tab bar
+  const tabY = h - 120*s;
+  ctx.fillStyle = 'rgba(20,20,30,0.95)';
+  ctx.fillRect(0, tabY, w, 120*s);
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, tabY); ctx.lineTo(w, tabY); ctx.stroke();
+
+  const tabs = ['Home', 'CGM', 'Log', 'Circle', 'Profile'];
+  const tabIcons = ['🏠', '📈', '➕', '👥', '👤'];
+  tabs.forEach((t, i) => {
+    const tx = (w / 5) * i + (w / 10);
+    ctx.font = `${30*s}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(tabIcons[i], tx, tabY + 45*s);
+    ctx.fillStyle = i === 0 ? C.accent : '#666';
+    ctx.font = `600 ${20*s}px -apple-system, sans-serif`;
+    ctx.fillText(t, tx, tabY + 80*s);
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+  });
+
+  drawCaptionOverlay(ctx, w, h, 'Everything in one place', 'Your glucose dashboard at a glance');
+}
+
+function drawGlucoseScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+  drawStatusBar(ctx, w, s);
+  drawNavBar(ctx, w, 150*s, 'Glucose', s);
+
+  // Current reading card
+  const cardY = 200*s;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 320*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, cardY, w - 80*s, 320*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Current Glucose', 80*s, cardY + 50*s);
+
+  ctx.fillStyle = C.green;
+  ctx.font = `900 ${120*s}px -apple-system, sans-serif`;
+  ctx.fillText('112', 80*s, cardY + 200*s);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `500 ${32*s}px -apple-system, sans-serif`;
+  ctx.fillText('mg/dL', 340*s, cardY + 200*s);
+
+  // Trend arrow
+  ctx.fillStyle = C.green;
+  ctx.font = `700 ${48*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('→ Flat', w - 80*s, cardY + 130*s);
+  ctx.textAlign = 'left';
+
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('2 min ago via Dexcom', 80*s, cardY + 260*s);
+
+  // Chart area
+  const chartY = cardY + 360*s;
+  fillRoundRect(ctx, 40*s, chartY, w - 80*s, 500*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, chartY, w - 80*s, 500*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('24-Hour Trend', 80*s, chartY + 50*s);
+
+  // Range bands
+  const chartLeft = 80*s;
+  const chartRight = w - 80*s;
+  const chartTop = chartY + 80*s;
+  const chartBot = chartY + 440*s;
+  const chartW = chartRight - chartLeft;
+  const chartH = chartBot - chartTop;
+
+  // High zone
+  ctx.fillStyle = 'rgba(255,59,48,0.08)';
+  ctx.fillRect(chartLeft, chartTop, chartW, chartH * 0.25);
+  // In range zone
+  ctx.fillStyle = 'rgba(52,199,89,0.08)';
+  ctx.fillRect(chartLeft, chartTop + chartH * 0.25, chartW, chartH * 0.5);
+  // Low zone
+  ctx.fillStyle = 'rgba(255,149,0,0.08)';
+  ctx.fillRect(chartLeft, chartTop + chartH * 0.75, chartW, chartH * 0.25);
+
+  // Range labels
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = `500 ${18*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('250', chartLeft - 10*s, chartTop + 20*s);
+  ctx.fillText('180', chartLeft - 10*s, chartTop + chartH * 0.25 + 10*s);
+  ctx.fillText('70', chartLeft - 10*s, chartTop + chartH * 0.75 + 10*s);
+  ctx.fillText('40', chartLeft - 10*s, chartBot);
+  ctx.textAlign = 'left';
+
+  // Threshold lines
+  ctx.setLineDash([6*s, 4*s]);
+  ctx.strokeStyle = 'rgba(255,59,48,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(chartLeft, chartTop + chartH * 0.25); ctx.lineTo(chartRight, chartTop + chartH * 0.25); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,149,0,0.3)';
+  ctx.beginPath(); ctx.moveTo(chartLeft, chartTop + chartH * 0.75); ctx.lineTo(chartRight, chartTop + chartH * 0.75); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Fake glucose line
+  const points = [135, 142, 138, 150, 165, 158, 140, 128, 118, 122, 130, 125, 115, 112, 108, 110, 115, 118, 122, 112];
+  ctx.beginPath();
+  ctx.strokeStyle = C.green;
+  ctx.lineWidth = 4*s;
+  ctx.lineJoin = 'round';
+  points.forEach((val, i) => {
+    const x = chartLeft + (chartW / (points.length - 1)) * i;
+    const y = chartTop + chartH * (1 - (val - 40) / 210);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Current dot
+  const lastX = chartRight;
+  const lastY = chartTop + chartH * (1 - (112 - 40) / 210);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 8*s, 0, Math.PI*2);
+  ctx.fillStyle = C.green;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3*s;
+  ctx.stroke();
+
+  // Time in Range card
+  const tirY = chartY + 540*s;
+  fillRoundRect(ctx, 40*s, tirY, w - 80*s, 200*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, tirY, w - 80*s, 200*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Time in Range', 80*s, tirY + 50*s);
+
+  // Bar
+  const barY = tirY + 80*s;
+  const barH = 30*s;
+  const barW = w - 160*s;
+  fillRoundRect(ctx, 80*s, barY, barW, barH, 8*s, 'rgba(255,255,255,0.08)');
+  fillRoundRect(ctx, 80*s, barY, barW * 0.78, barH, 8*s, C.green);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `800 ${36*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('78%', w - 80*s, tirY + 50*s);
+  ctx.textAlign = 'left';
+
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${20*s}px -apple-system, sans-serif`;
+  ctx.fillText('70-180 mg/dL target range', 80*s, tirY + 160*s);
+
+  drawCaptionOverlay(ctx, w, h, 'Real-time glucose tracking', 'Dexcom CGM integration with 2-min refresh');
+}
+
+function drawInsightsScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+  drawStatusBar(ctx, w, s);
+  drawNavBar(ctx, w, 150*s, 'AI Insights', s);
+
+  // Summary card
+  const cardY = 200*s;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 380*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, cardY, w - 80*s, 380*s, 24*s, C.cardBdr, 1);
+
+  // Gradient accent line at top
+  const g = ctx.createLinearGradient(40*s, cardY, w - 40*s, cardY);
+  g.addColorStop(0, C.cyan);
+  g.addColorStop(1, C.accent);
+  ctx.fillStyle = g;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 6*s, 3*s, '');
+  ctx.fill();
+
+  ctx.fillStyle = C.cyan;
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Daily Summary', 80*s, cardY + 50*s);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `500 ${28*s}px -apple-system, sans-serif`;
+  wrapText(ctx, "Your glucose stayed mostly in range today with an average of 118 mg/dL. The brief spike after lunch settled quickly, and your overnight readings were excellent.", 80*s, cardY + 100*s, w - 200*s, 40*s);
+
+  // Ask Loop card
+  const askY = cardY + 420*s;
+  fillRoundRect(ctx, 40*s, askY, w - 80*s, 250*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, askY, w - 80*s, 250*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = C.accent;
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Ask Loop', 80*s, askY + 50*s);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = `500 ${26*s}px -apple-system, sans-serif`;
+  ctx.fillText('"Why did my glucose spike after dinner?"', 80*s, askY + 100*s);
+
+  // Fake response
+  fillRoundRect(ctx, 80*s, askY + 130*s, w - 200*s, 80*s, 16*s, 'rgba(74,144,217,0.1)');
+  ctx.fillStyle = '#fff';
+  ctx.font = `500 ${22*s}px -apple-system, sans-serif`;
+  wrapText(ctx, "Your post-dinner spike was likely from the high-carb meal. Consider a pre-bolus next time.", 100*s, askY + 160*s, w - 260*s, 32*s);
+
+  // Motivation card
+  const motY = askY + 290*s;
+  fillRoundRect(ctx, 40*s, motY, w - 80*s, 200*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, motY, w - 80*s, 200*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = C.yellow;
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Daily Motivation', 80*s, motY + 50*s);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `500 ${28*s}px -apple-system, sans-serif`;
+  wrapText(ctx, "You logged 12 readings today and kept 78% in range. That consistency is building real momentum.", 80*s, motY + 100*s, w - 200*s, 40*s);
+
+  // Pattern card
+  const patY = motY + 240*s;
+  fillRoundRect(ctx, 40*s, patY, w - 80*s, 300*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, patY, w - 80*s, 300*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#FF6B6B';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Patterns Detected', 80*s, patY + 50*s);
+
+  const patterns = [
+    { label: 'Post-lunch highs on weekdays', val: '3 occurrences' },
+    { label: 'Excellent overnight control', val: '5 nights in a row' },
+    { label: 'Morning readings trending lower', val: '-8 mg/dL avg' },
+  ];
+  patterns.forEach((p, i) => {
+    const py = patY + 90*s + i * 65*s;
+    ctx.fillStyle = '#fff';
+    ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+    ctx.fillText(p.label, 80*s, py);
+    ctx.fillStyle = '#888';
+    ctx.font = `500 ${20*s}px -apple-system, sans-serif`;
+    ctx.fillText(p.val, 80*s, py + 30*s);
+  });
+
+  drawCaptionOverlay(ctx, w, h, 'AI-powered insights', 'Concise summaries that learn your patterns');
+}
+
+function drawCareCircleScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+  drawStatusBar(ctx, w, s);
+  drawNavBar(ctx, w, 150*s, 'Care Circle', s);
+
+  // Members
+  const members = [
+    { name: 'Kevin (You)', role: 'Warrior', glucose: '112', trend: 'Flat', color: C.green, initials: 'KC' },
+    { name: 'Sarah', role: 'Supporter', glucose: '--', trend: '', color: C.accent, initials: 'SC' },
+    { name: 'Mom', role: 'Supporter', glucose: '--', trend: '', color: '#FF6B6B', initials: 'MC' },
+  ];
+
+  let y = 200*s;
+  members.forEach((m) => {
+    fillRoundRect(ctx, 40*s, y, w - 80*s, 160*s, 24*s, C.card);
+    strokeRoundRect(ctx, 40*s, y, w - 80*s, 160*s, 24*s, C.cardBdr, 1);
+
+    // Avatar circle
+    ctx.beginPath();
+    ctx.arc(120*s, y + 80*s, 40*s, 0, Math.PI*2);
+    ctx.fillStyle = m.color;
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${28*s}px -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(m.initials, 120*s, y + 90*s);
+    ctx.textAlign = 'left';
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${30*s}px -apple-system, sans-serif`;
+    ctx.fillText(m.name, 190*s, y + 60*s);
+
+    ctx.fillStyle = m.color;
+    ctx.font = `600 ${22*s}px -apple-system, sans-serif`;
+    ctx.fillText(m.role, 190*s, y + 95*s);
+
+    if (m.glucose !== '--') {
+      ctx.fillStyle = m.color;
+      ctx.font = `800 ${44*s}px -apple-system, sans-serif`;
+      ctx.textAlign = 'right';
+      ctx.fillText(m.glucose, w - 100*s, y + 75*s);
+      ctx.fillStyle = '#888';
+      ctx.font = `500 ${20*s}px -apple-system, sans-serif`;
+      ctx.fillText(m.trend + ' mg/dL', w - 100*s, y + 110*s);
+      ctx.textAlign = 'left';
+    }
+
+    y += 190*s;
+  });
+
+  // Chat card
+  y += 20*s;
+  fillRoundRect(ctx, 40*s, y, w - 80*s, 400*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, y, w - 80*s, 400*s, 24*s, C.cardBdr, 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Group Chat', 80*s, y + 50*s);
+
+  const messages = [
+    { from: 'Sarah', msg: 'Looking good today! Keep it up!', time: '2:15 PM', color: C.accent },
+    { from: 'Mom', msg: 'Did you eat lunch yet?', time: '1:30 PM', color: '#FF6B6B' },
+    { from: 'Kevin', msg: 'Just checked - 112 and stable', time: '1:28 PM', color: C.green },
+  ];
+
+  let chatY = y + 80*s;
+  messages.forEach((msg) => {
+    fillRoundRect(ctx, 80*s, chatY, w - 200*s, 80*s, 16*s, 'rgba(255,255,255,0.04)');
+    ctx.fillStyle = msg.color;
+    ctx.font = `700 ${22*s}px -apple-system, sans-serif`;
+    ctx.fillText(msg.from, 100*s, chatY + 30*s);
+    ctx.fillStyle = '#888';
+    ctx.font = `500 ${18*s}px -apple-system, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.fillText(msg.time, w - 120*s, chatY + 30*s);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ccc';
+    ctx.font = `500 ${22*s}px -apple-system, sans-serif`;
+    ctx.fillText(msg.msg, 100*s, chatY + 60*s);
+    chatY += 100*s;
+  });
+
+  // Invite button
+  y += 430*s;
+  fillRoundRect(ctx, 40*s, y, w - 80*s, 80*s, 20*s, C.accent);
+  ctx.fillStyle = '#fff';
+  ctx.font = `700 ${28*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Invite to Care Circle', w/2, y + 50*s);
+  ctx.textAlign = 'left';
+
+  drawCaptionOverlay(ctx, w, h, 'Keep your Care Circle informed', 'Share glucose data with family in real time');
+}
+
+function drawChallengesScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+  drawStatusBar(ctx, w, s);
+  drawNavBar(ctx, w, 150*s, 'Challenges', s);
+
+  // Active challenge
+  const cardY = 200*s;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 300*s, 24*s, C.card);
+  strokeRoundRect(ctx, 40*s, cardY, w - 80*s, 300*s, 24*s, C.cardBdr, 1);
+
+  const acg = ctx.createLinearGradient(40*s, cardY, w - 40*s, cardY);
+  acg.addColorStop(0, C.yellow);
+  acg.addColorStop(1, C.orange);
+  ctx.fillStyle = acg;
+  fillRoundRect(ctx, 40*s, cardY, w - 80*s, 6*s, 3*s, '');
+  ctx.fill();
+
+  ctx.fillStyle = C.yellow;
+  ctx.font = `600 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Active Challenge', 80*s, cardY + 50*s);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `700 ${36*s}px -apple-system, sans-serif`;
+  ctx.fillText('7-Day Streak Challenge', 80*s, cardY + 110*s);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('Log at least 3 readings every day for 7 days', 80*s, cardY + 155*s);
+
+  // Progress bar
+  const progY = cardY + 190*s;
+  fillRoundRect(ctx, 80*s, progY, w - 200*s, 24*s, 12*s, 'rgba(255,255,255,0.08)');
+  const progG = ctx.createLinearGradient(80*s, progY, 80*s + (w - 200*s) * 0.71, progY);
+  progG.addColorStop(0, C.yellow);
+  progG.addColorStop(1, C.orange);
+  ctx.fillStyle = progG;
+  fillRoundRect(ctx, 80*s, progY, (w - 200*s) * 0.71, 24*s, 12*s, '');
+  ctx.fill();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = `800 ${28*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('5/7 days', w - 80*s, cardY + 110*s);
+  ctx.textAlign = 'left';
+
+  // Day dots
+  const dotY = cardY + 245*s;
+  for (let i = 0; i < 7; i++) {
+    const dx = 80*s + i * ((w - 200*s) / 7) + 30*s;
+    ctx.beginPath();
+    ctx.arc(dx, dotY, 16*s, 0, Math.PI*2);
+    ctx.fillStyle = i < 5 ? C.green : 'rgba(255,255,255,0.1)';
+    ctx.fill();
+    if (i < 5) {
+      ctx.fillStyle = '#fff';
+      ctx.font = `700 ${18*s}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('✓', dx, dotY + 6*s);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // Available challenges
+  const avY = cardY + 340*s;
+  ctx.fillStyle = '#fff';
+  ctx.font = `700 ${32*s}px -apple-system, sans-serif`;
+  ctx.fillText('Available Challenges', 40*s, avY);
+
+  const challenges = [
+    { title: 'Time in Range Pro', desc: 'Keep 80%+ in range for 3 days', reward: '50 pts', icon: '🎯' },
+    { title: 'Mood Master', desc: 'Log mood 5 days in a row', reward: '30 pts', icon: '😊' },
+    { title: 'Night Owl', desc: 'Perfect overnight readings for a week', reward: '75 pts', icon: '🌙' },
+    { title: 'Community Champion', desc: 'Send 10 messages in Care Circle', reward: '25 pts', icon: '💬' },
+  ];
+
+  let cy = avY + 40*s;
+  challenges.forEach((ch) => {
+    fillRoundRect(ctx, 40*s, cy, w - 80*s, 150*s, 20*s, C.card);
+    strokeRoundRect(ctx, 40*s, cy, w - 80*s, 150*s, 20*s, C.cardBdr, 1);
+
+    ctx.font = `${44*s}px sans-serif`;
+    ctx.fillText(ch.icon, 80*s, cy + 55*s);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${28*s}px -apple-system, sans-serif`;
+    ctx.fillText(ch.title, 150*s, cy + 50*s);
+
+    ctx.fillStyle = '#888';
+    ctx.font = `500 ${22*s}px -apple-system, sans-serif`;
+    ctx.fillText(ch.desc, 150*s, cy + 85*s);
+
+    ctx.fillStyle = C.yellow;
+    ctx.font = `700 ${22*s}px -apple-system, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.fillText(ch.reward, w - 80*s, cy + 50*s);
+    ctx.textAlign = 'left';
+
+    // Start button
+    fillRoundRect(ctx, w - 240*s, cy + 90*s, 140*s, 40*s, 10*s, C.accent);
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${20*s}px -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Start', w - 170*s, cy + 116*s);
+    ctx.textAlign = 'left';
+
+    cy += 175*s;
+  });
+
+  drawCaptionOverlay(ctx, w, h, 'Stay motivated with challenges', 'Earn streaks and hit glucose goals');
+}
+
+function drawWatchPromoScreen(ctx, w, h) {
+  drawGradientBg(ctx, w, h);
+  const s = w / 1290;
+
+  // Large watch mockup in center
+  const watchW = 500*s;
+  const watchH = 620*s;
+  const watchX = (w - watchW) / 2;
+  const watchY = h * 0.25;
+
+  // Watch body
+  fillRoundRect(ctx, watchX, watchY, watchW, watchH, 100*s, '#2a2a2a');
+  strokeRoundRect(ctx, watchX, watchY, watchW, watchH, 100*s, '#444', 4*s);
+
+  // Crown
+  fillRoundRect(ctx, watchX + watchW + 4*s, watchY + 160*s, 16*s, 70*s, 6*s, '#444');
+  fillRoundRect(ctx, watchX + watchW + 2*s, watchY + 260*s, 12*s, 40*s, 4*s, '#3a3a3a');
+
+  // Screen
+  const screenInset = 30*s;
+  const screenX = watchX + screenInset;
+  const screenY = watchY + screenInset;
+  const screenW = watchW - screenInset*2;
+  const screenH = watchH - screenInset*2;
+  fillRoundRect(ctx, screenX, screenY, screenW, screenH, 70*s, '#000');
+
+  // Watch content
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${22*s}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('LINKLOOP', screenX + screenW/2, screenY + 60*s);
+
+  ctx.fillStyle = C.green;
+  ctx.font = `900 ${120*s}px -apple-system, sans-serif`;
+  ctx.fillText('112', screenX + screenW/2, screenY + screenH/2 + 20*s);
+
+  ctx.fillStyle = C.green;
+  ctx.font = `700 ${36*s}px -apple-system, sans-serif`;
+  ctx.fillText('→ Flat', screenX + screenW/2, screenY + screenH/2 + 70*s);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `500 ${24*s}px -apple-system, sans-serif`;
+  ctx.fillText('mg/dL', screenX + screenW/2, screenY + screenH/2 + 110*s);
+
+  // In Range badge
+  fillRoundRect(ctx, screenX + screenW/2 - 80*s, screenY + screenH - 80*s, 160*s, 40*s, 10*s, 'rgba(52,199,89,0.2)');
+  ctx.fillStyle = C.green;
+  ctx.font = `700 ${20*s}px -apple-system, sans-serif`;
+  ctx.fillText('In Range', screenX + screenW/2, screenY + screenH - 54*s);
+
+  ctx.textAlign = 'left';
+
+  // Feature bullets below watch
+  const bulletY = watchY + watchH + 80*s;
+  const bullets = [
+    { label: 'Real-time glucose on your wrist', color: C.green },
+    { label: 'Background sync every 2 minutes', color: C.accent },
+    { label: 'Color-coded complications', color: C.cyan },
+    { label: 'High and low alerts', color: C.orange },
+  ];
+
+  bullets.forEach((b, i) => {
+    const by = bulletY + i * 70*s;
+    ctx.beginPath();
+    ctx.arc(w/2 - 350*s, by, 10*s, 0, Math.PI*2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `600 ${32*s}px -apple-system, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.fillText(b.label, w/2 - 320*s, by + 10*s);
+  });
+
+  drawCaptionOverlay(ctx, w, h, 'Apple Watch companion', 'Glucose on your wrist, always updated');
+}
+
+// ════════════════════════════════════════════
+// Watch screen renderers (410 x 502)
+// ════════════════════════════════════════════
+
+function drawWatchGlucose(ctx, w, h) {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('LINKLOOP', w/2, 60);
+
+  ctx.fillStyle = C.green;
+  ctx.font = '900 96px -apple-system, sans-serif';
+  ctx.fillText('112', w/2, h/2 + 20);
+
+  ctx.fillStyle = C.green;
+  ctx.font = '700 28px -apple-system, sans-serif';
+  ctx.fillText('→ Flat', w/2, h/2 + 60);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '500 18px -apple-system, sans-serif';
+  ctx.fillText('mg/dL', w/2, h/2 + 90);
+
+  // In range pill
+  fillRoundRect(ctx, w/2 - 55, h - 100, 110, 32, 8, 'rgba(52,199,89,0.2)');
+  ctx.fillStyle = C.green;
+  ctx.font = '700 16px -apple-system, sans-serif';
+  ctx.fillText('In Range', w/2, h - 78);
+  ctx.textAlign = 'left';
+}
+
+function drawWatchComplication(ctx, w, h) {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+
+  // Simulated watch face
+  ctx.fillStyle = '#fff';
+  ctx.font = '200 80px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('9:41', w/2, 160);
+
+  ctx.fillStyle = '#FF9F0A';
+  ctx.font = '600 16px -apple-system, sans-serif';
+  ctx.fillText('FRIDAY MAR 8', w/2, 190);
+
+  // LinkLoop complication (circular)
+  const compX = w/2;
+  const compY = 290;
+  ctx.beginPath();
+  ctx.arc(compX, compY, 45, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = C.green;
+  ctx.font = '800 32px -apple-system, sans-serif';
+  ctx.fillText('112', compX, compY + 8);
+  ctx.font = '700 12px -apple-system, sans-serif';
+  ctx.fillText('→', compX, compY + 24);
+
+  // Other complications
+  // Activity rings (left)
+  ctx.beginPath();
+  ctx.arc(80, 290, 20, 0, Math.PI * 1.7);
+  ctx.strokeStyle = '#FF2D55';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(80, 290, 14, 0, Math.PI * 1.4);
+  ctx.strokeStyle = '#34C759';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+
+  // Weather (right)
+  ctx.fillStyle = '#4CC9F0';
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.fillText('72°', w - 80, 295);
+
+  // Bottom complications
+  ctx.fillStyle = '#FF2D55';
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.fillText('68', 120, h - 80);
+  ctx.fillStyle = '#888';
+  ctx.font = '500 10px -apple-system, sans-serif';
+  ctx.fillText('BPM', 120, h - 65);
+
+  ctx.fillStyle = '#4CC9F0';
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.fillText('72°', w - 120, h - 80);
+
+  ctx.textAlign = 'left';
+}
+
+function drawWatchHighAlert(ctx, w, h) {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+
+  // Red glow
+  const rg = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.6);
+  rg.addColorStop(0, 'rgba(255,59,48,0.15)');
+  rg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = rg;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = C.red;
+  ctx.font = '700 16px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('HIGH GLUCOSE', w/2, 80);
+
+  ctx.fillStyle = C.red;
+  ctx.font = '900 96px -apple-system, sans-serif';
+  ctx.fillText('245', w/2, h/2 + 20);
+
+  ctx.font = '700 28px -apple-system, sans-serif';
+  ctx.fillText('↑ Rising', w/2, h/2 + 60);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '500 18px -apple-system, sans-serif';
+  ctx.fillText('mg/dL', w/2, h/2 + 90);
+
+  // Alert pill
+  fillRoundRect(ctx, w/2 - 55, h - 100, 110, 32, 8, 'rgba(255,59,48,0.2)');
+  ctx.fillStyle = C.red;
+  ctx.font = '700 16px -apple-system, sans-serif';
+  ctx.fillText('Above Range', w/2, h - 78);
+  ctx.textAlign = 'left';
+}
+
+// ════════════════════════════════════════════
+// Google Play Feature Graphic (1024 x 500)
+// ════════════════════════════════════════════
+
+function drawFeatureGraphic(ctx, w, h) {
+  // Gradient background
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, '#0A0A1A');
+  g.addColorStop(0.5, '#0D1B2A');
+  g.addColorStop(1, '#0A0A1A');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle grid pattern
+  ctx.strokeStyle = 'rgba(74,144,217,0.05)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+
+  // Glow behind text
+  const glow = ctx.createRadialGradient(w * 0.35, h/2, 0, w * 0.35, h/2, 300);
+  glow.addColorStop(0, 'rgba(74,144,217,0.15)');
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+
+  // App name
+  ctx.fillStyle = '#fff';
+  ctx.font = '800 72px -apple-system, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('LinkLoop', 80, h/2 - 30);
+
+  // Tagline
+  ctx.fillStyle = C.accent;
+  ctx.font = '600 28px -apple-system, sans-serif';
+  ctx.fillText('T1D Glucose Tracking for Families', 80, h/2 + 20);
+
+  // Feature pills
+  const pills = ['Real-Time CGM', 'AI Insights', 'Care Circle', 'Apple Watch'];
+  let px = 80;
+  ctx.font = '600 18px -apple-system, sans-serif';
+  pills.forEach((p) => {
+    const tw = ctx.measureText(p).width + 30;
+    fillRoundRect(ctx, px, h/2 + 50, tw, 36, 18, 'rgba(74,144,217,0.2)');
+    ctx.fillStyle = C.accent;
+    ctx.fillText(p, px + 15, h/2 + 74);
+    ctx.fillStyle = '#fff';
+    px += tw + 12;
+  });
+
+  // Right side: glucose mockup
+  const mockX = w * 0.68;
+  const mockY = h * 0.15;
+  const mockW = 260;
+  const mockH = h * 0.7;
+
+  fillRoundRect(ctx, mockX, mockY, mockW, mockH, 24, 'rgba(26,26,36,0.9)');
+  strokeRoundRect(ctx, mockX, mockY, mockW, mockH, 24, 'rgba(255,255,255,0.08)', 1);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '600 12px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText("TODAY'S AVERAGE", mockX + mockW/2, mockY + 40);
+
+  ctx.fillStyle = C.green;
+  ctx.font = '900 56px -apple-system, sans-serif';
+  ctx.fillText('118', mockX + mockW/2, mockY + 110);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '500 14px -apple-system, sans-serif';
+  ctx.fillText('mg/dL', mockX + mockW/2, mockY + 135);
+
+  // Mini chart
+  const chartLeft2 = mockX + 20;
+  const chartRight2 = mockX + mockW - 20;
+  const chartTop2 = mockY + 160;
+  const chartBot2 = mockY + mockH - 30;
+  const chartW2 = chartRight2 - chartLeft2;
+  const chartH2 = chartBot2 - chartTop2;
+
+  ctx.fillStyle = 'rgba(52,199,89,0.08)';
+  ctx.fillRect(chartLeft2, chartTop2, chartW2, chartH2);
+
+  const pts = [130, 140, 135, 148, 155, 142, 130, 122, 118, 125, 120, 115, 112];
+  ctx.beginPath();
+  ctx.strokeStyle = C.green;
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  pts.forEach((val, i) => {
+    const x = chartLeft2 + (chartW2 / (pts.length - 1)) * i;
+    const y = chartTop2 + chartH2 * (1 - (val - 70) / 130);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.textAlign = 'left';
+}
+
+// ════════════════════════════════════════════
+// Text wrapping helper
+// ════════════════════════════════════════════
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let ly = y;
+  for (const word of words) {
+    const test = line + word + ' ';
+    if (ctx.measureText(test).width > maxWidth && line !== '') {
+      ctx.fillText(line.trim(), x, ly);
+      line = word + ' ';
+      ly += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line.trim(), x, ly);
+}
+
+// ════════════════════════════════════════════
+// RENDER + EXPORT ENGINE
+// ════════════════════════════════════════════
+
+const SIZES = {
+  'iphone67':       { w: 1290, h: 2796 },
+  'iphone65':       { w: 1284, h: 2778 },
+  'ipad':           { w: 2048, h: 2732 },
+  'watch':          { w: 410,  h: 502  },
+  'google-feature': { w: 1024, h: 500  },
+  'google-phone':   { w: 1080, h: 1920 },
+  'google-tablet':  { w: 1200, h: 1600 },
+};
+
+function renderCanvas(drawFn, w, h) {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+  drawFn(ctx, w, h);
+  return c;
+}
+
+function buildPreviews() {
+  // iPhone 6.7"
+  const grid67 = document.getElementById('grid-iphone67');
+  SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['iphone67'].w, SIZES['iphone67'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['iphone67'].w * 0.2) + 'px';
+    pw.style.height = (SIZES['iphone67'].h * 0.2) + 'px';
+    c.style.transform = 'scale(0.2)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">1290x2796</div>`;
+    grid67.appendChild(wrap);
+  });
+
+  // iPhone 6.5"
+  const grid65 = document.getElementById('grid-iphone65');
+  SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['iphone65'].w, SIZES['iphone65'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['iphone65'].w * 0.2) + 'px';
+    pw.style.height = (SIZES['iphone65'].h * 0.2) + 'px';
+    c.style.transform = 'scale(0.2)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">1284x2778</div>`;
+    grid65.appendChild(wrap);
+  });
+
+  // iPad
+  const gridIpad = document.getElementById('grid-ipad');
+  SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['ipad'].w, SIZES['ipad'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['ipad'].w * 0.12) + 'px';
+    pw.style.height = (SIZES['ipad'].h * 0.12) + 'px';
+    c.style.transform = 'scale(0.12)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">2048x2732</div>`;
+    gridIpad.appendChild(wrap);
+  });
+
+  // Watch
+  const gridWatch = document.getElementById('grid-watch');
+  WATCH_SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['watch'].w, SIZES['watch'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['watch'].w * 0.6) + 'px';
+    pw.style.height = (SIZES['watch'].h * 0.6) + 'px';
+    c.style.transform = 'scale(0.6)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">410x502</div>`;
+    gridWatch.appendChild(wrap);
+  });
+
+  // Google Feature Graphic
+  const gridGF = document.getElementById('grid-google-feature');
+  const fgc = renderCanvas(drawFeatureGraphic, SIZES['google-feature'].w, SIZES['google-feature'].h);
+  const fgWrap = document.createElement('div');
+  fgWrap.className = 'card';
+  const fgPw = document.createElement('div');
+  fgPw.className = 'preview-wrap';
+  fgPw.style.width = (SIZES['google-feature'].w * 0.5) + 'px';
+  fgPw.style.height = (SIZES['google-feature'].h * 0.5) + 'px';
+  fgc.style.transform = 'scale(0.5)';
+  fgc.style.transformOrigin = 'top left';
+  fgPw.appendChild(fgc);
+  fgWrap.appendChild(fgPw);
+  fgWrap.innerHTML += `<div class="label">feature-graphic</div><div class="size">1024x500</div>`;
+  gridGF.appendChild(fgWrap);
+
+  // Google Phone
+  const gridGP = document.getElementById('grid-google-phone');
+  SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['google-phone'].w, SIZES['google-phone'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['google-phone'].w * 0.2) + 'px';
+    pw.style.height = (SIZES['google-phone'].h * 0.2) + 'px';
+    c.style.transform = 'scale(0.2)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">1080x1920</div>`;
+    gridGP.appendChild(wrap);
+  });
+
+  // Google Tablet
+  const gridGT = document.getElementById('grid-google-tablet');
+  SCREENS.forEach((scr) => {
+    const c = renderCanvas(scr.render, SIZES['google-tablet'].w, SIZES['google-tablet'].h);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const pw = document.createElement('div');
+    pw.className = 'preview-wrap';
+    pw.style.width = (SIZES['google-tablet'].w * 0.15) + 'px';
+    pw.style.height = (SIZES['google-tablet'].h * 0.15) + 'px';
+    c.style.transform = 'scale(0.15)';
+    c.style.transformOrigin = 'top left';
+    pw.appendChild(c);
+    wrap.appendChild(pw);
+    wrap.innerHTML += `<div class="label">${scr.id}</div><div class="size">1200x1600</div>`;
+    gridGT.appendChild(wrap);
+  });
+}
+
+// ════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════
+
+function downloadCanvas(canvas, filename) {
+  const a = document.createElement('a');
+  a.download = filename;
+  a.href = canvas.toDataURL('image/png');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+async function exportSection(section) {
+  const status = document.getElementById('status');
+  let count = 0;
+
+  if (section === 'iphone67' || section === 'iphone65' || section === 'google-phone' || section === 'google-tablet') {
+    const size = section === 'iphone67' ? SIZES['iphone67'] :
+                 section === 'iphone65' ? SIZES['iphone65'] :
+                 section === 'google-phone' ? SIZES['google-phone'] :
+                 SIZES['google-tablet'];
+    const prefix = section;
+    for (const scr of SCREENS) {
+      status.textContent = `Exporting ${prefix}/${scr.id}...`;
+      const c = renderCanvas(scr.render, size.w, size.h);
+      downloadCanvas(c, `${prefix}_${scr.id}.png`);
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } else if (section === 'ipad') {
+    for (const scr of SCREENS) {
+      status.textContent = `Exporting ipad/${scr.id}...`;
+      const c = renderCanvas(scr.render, SIZES['ipad'].w, SIZES['ipad'].h);
+      downloadCanvas(c, `ipad_${scr.id}.png`);
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } else if (section === 'watch') {
+    for (const scr of WATCH_SCREENS) {
+      status.textContent = `Exporting watch/${scr.id}...`;
+      const c = renderCanvas(scr.render, SIZES['watch'].w, SIZES['watch'].h);
+      downloadCanvas(c, `watch_${scr.id}.png`);
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } else if (section === 'google') {
+    // Feature graphic
+    status.textContent = 'Exporting feature graphic...';
+    const fg = renderCanvas(drawFeatureGraphic, SIZES['google-feature'].w, SIZES['google-feature'].h);
+    downloadCanvas(fg, 'google_feature-graphic.png');
+    count++;
+    await new Promise(r => setTimeout(r, 400));
+    // Phone screenshots
+    for (const scr of SCREENS) {
+      status.textContent = `Exporting google-phone/${scr.id}...`;
+      const c = renderCanvas(scr.render, SIZES['google-phone'].w, SIZES['google-phone'].h);
+      downloadCanvas(c, `google-phone_${scr.id}.png`);
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    }
+    // Tablet screenshots
+    for (const scr of SCREENS) {
+      status.textContent = `Exporting google-tablet/${scr.id}...`;
+      const c = renderCanvas(scr.render, SIZES['google-tablet'].w, SIZES['google-tablet'].h);
+      downloadCanvas(c, `google-tablet_${scr.id}.png`);
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    }
+  }
+
+  status.textContent = `Done! Exported ${count} images.`;
+}
+
+async function exportAll() {
+  const status = document.getElementById('status');
+  let total = 0;
+  const sections = ['iphone67', 'iphone65', 'ipad', 'watch', 'google'];
+  for (const sec of sections) {
+    await exportSection(sec);
+    total++;
+  }
+  status.textContent = `All done! All store images exported.`;
+}
+
+// Build previews on load
+buildPreviews();
+</script>
+
+</body>
+</html>

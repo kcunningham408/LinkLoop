@@ -1,0 +1,370 @@
+================================================================================
+  LINKLOOP — ANDROID BUILD & STORE REFERENCE
+  Generated: March 8, 2026
+  Purpose: Everything needed to build Android on Windows
+================================================================================
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  1. PROJECT IDENTIFIERS
+═══════════════════════════════════════════════════════════════════════════════
+
+App Name:            LinkLoop
+Expo Slug:           linkloop-lite
+Package Name:        com.vibecmd.linkloop
+Version:             1.5.0
+Android versionCode: 10  (auto-increments via EAS)
+Runtime Version:     1.5.0
+
+EAS Project ID:      fe571b30-5832-4068-b4cd-327399d778c6
+EAS Owner:           kcunningham408
+
+GitHub Repo:         https://github.com/kcunningham408/LinkLoop
+Branch:              main
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  2. EXPO / EAS CONFIGURATION
+═══════════════════════════════════════════════════════════════════════════════
+
+--- app.json (android section) ---
+{
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#4A90D9"
+    },
+    "package": "com.vibecmd.linkloop",
+    "versionCode": 10,
+    "permissions": []
+  }
+}
+
+--- eas.json (full) ---
+{
+  "cli": {
+    "version": ">= 3.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "ios": { "simulator": true }
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "ios": { "simulator": false }
+    },
+    "production": {
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://linkloop-9l3x.onrender.com/api"
+      },
+      "ios": { "autoIncrement": true },
+      "android": { "autoIncrement": true }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "vibetech@vibecmd.net",
+        "ascAppId": "6759566762",
+        "appleTeamId": "CT3KS56744"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": "internal"
+      }
+    }
+  }
+}
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  3. ANDROID SIGNING / KEYSTORE
+═══════════════════════════════════════════════════════════════════════════════
+
+Keystore File:       android/app/upload-keystore.jks
+Store Password:      linkloop2026
+Key Alias:           upload
+Key Password:        linkloop2026
+
+⚠️  IMPORTANT: Copy the keystore file to your Windows machine!
+    Source: LinkLoopLiteApp/android/app/upload-keystore.jks
+    Dest:   LinkLoopLiteApp/android/app/upload-keystore.jks
+
+Debug Keystore:      android/app/debug.keystore  (standard Android debug key)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  4. GOOGLE PLAY STORE SUBMISSION
+═══════════════════════════════════════════════════════════════════════════════
+
+--- EAS Submit (automated) ---
+Requires: google-service-account.json in project root
+  - Create at: Google Cloud Console → IAM → Service Accounts
+  - Grant "Service Account User" role
+  - Link to Google Play Console → API access
+  - Download JSON key → save as ./google-service-account.json
+  - Run:  npx eas-cli submit -p android --profile production
+
+--- Manual Upload ---
+Go to: https://play.google.com/console
+Upload the AAB from: EAS build output or local build
+
+--- Build Commands ---
+EAS cloud build:    npx eas-cli build --platform android --profile production --non-interactive
+Local Gradle build: cd android && ./gradlew bundleRelease
+  Output AAB:       android/app/build/outputs/bundle/release/app-release.aab
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  5. GOOGLE PLAY STORE LISTING TEXT
+═══════════════════════════════════════════════════════════════════════════════
+
+--- App Name (30 chars max) ---
+LinkLoop T1D
+
+--- Short Description (80 chars max) ---
+Track glucose, share with family, and get AI-powered T1D wellness insights.
+
+--- Full Description (4000 chars max) ---
+LinkLoop keeps your Type 1 Diabetes support team in the loop — effortlessly.
+
+Connect your Dexcom CGM (via Dexcom Share or Nightscout) and see your glucose readings update in real time. Share them with the people who care about you through Care Circles — a private family hub where members can monitor your levels, receive low/high alerts, and chat in one place.
+
+✦ REAL-TIME GLUCOSE TRACKING
+• Live glucose value with trend arrows and color-coded status
+• 24-hour trend charts and Time in Range analysis
+• Automatic sync from Dexcom Share or Nightscout every 5 minutes
+
+✦ CARE CIRCLES — FAMILY SHARING
+• Invite family members with a simple code
+• Members see your live glucose from their own device
+• Group chat keeps everyone connected
+• Customizable low/high alerts per member
+
+✦ AI-POWERED INSIGHTS
+• Daily AI summary of your glucose patterns
+• Ask Loop — chat with an AI assistant about your data
+• Motivational messages tailored to your day
+• Pattern detection for highs, lows, and trends
+
+✦ CHALLENGES & ACHIEVEMENTS
+• Fun daily and weekly wellness challenges
+• Track streaks and earn achievements
+• Stay motivated with gamified glucose goals
+
+✦ SUPPLIES TRACKER
+• Log insulin, test strips, CGM sensors, and more
+• Get reminders when supplies run low
+
+✦ BUILT FOR PRIVACY
+• Your data stays yours — no ads, no analytics SDKs
+• End-to-end auth with JWT tokens stored locally
+• Only shared with people YOU invite to your Care Circle
+
+Whether you're a warrior managing T1D daily or a family member who wants to help — LinkLoop keeps everyone connected, informed, and in range.
+
+--- Category ---
+Health & Fitness
+
+--- Content Rating ---
+Everyone
+
+--- Contact Email ---
+vibetech@vibecmd.net
+
+--- Privacy Policy URL ---
+https://linkloop-9l3x.onrender.com/privacy
+
+--- Tags / Keywords ---
+diabetes, T1D, type 1 diabetes, glucose, CGM, Dexcom, blood sugar,
+health tracker, family sharing, care circle, insulin, glucose monitor
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  6. STORE ASSETS (already generated)
+═══════════════════════════════════════════════════════════════════════════════
+
+All in: LinkLoopLiteApp/store-assets/google-play/
+
+Feature Graphic (1024x500):
+  google-play/feature-graphic/feature-graphic.png
+
+Phone Screenshots (1080x1920) — 6 images:
+  google-play/phone/home.png
+  google-play/phone/glucose.png
+  google-play/phone/insights.png
+  google-play/phone/care-circle.png
+  google-play/phone/challenges.png
+  google-play/phone/watch-promo.png
+
+Tablet Screenshots (1200x1600) — in:
+  google-play/tablet-7/
+
+App Icon:
+  Already embedded in app.json → assets/adaptive-icon.png (foreground)
+  Hi-res 512x512 icon: assets/icon.png (use for store listing)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  7. SERVER / API DETAILS
+═══════════════════════════════════════════════════════════════════════════════
+
+Production API URL:  https://linkloop-9l3x.onrender.com/api
+Health Check:        https://linkloop-9l3x.onrender.com/api/health
+
+Server Repo:         Same repo → LinkLoopLiteServer/
+Hosting:             Render (auto-deploys from main branch)
+
+Server Stack:        Node.js + Express + MongoDB (Mongoose)
+Key Dependencies:    bcryptjs, jsonwebtoken, expo-server-sdk, groq-sdk, node-cron
+
+Server Env Vars (on Render):
+  MONGODB_URI        — MongoDB Atlas connection string
+  JWT_SECRET         — JWT signing secret
+  GROQ_API_KEY       — Groq AI API key (free tier)
+  PORT               — 5000 (Render default)
+
+Static Pages Served:
+  /privacy           — Privacy policy
+  /support           — Support page
+  /terms             — Terms of service
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  8. APP DEPENDENCIES (package.json)
+═══════════════════════════════════════════════════════════════════════════════
+
+Framework:           Expo SDK 54, React Native 0.81.5, React 19.1.0
+Navigation:          @react-navigation/native 6.1.9, bottom-tabs 6.5.11, stack 6.3.20
+Storage:             @react-native-async-storage/async-storage 2.2.0
+UI:                  expo-blur, expo-linear-gradient, react-native-reanimated 4.1.1,
+                     react-native-svg, react-native-gesture-handler
+Push:                expo-notifications 0.32.16, expo-device
+Updates:             expo-updates 29.0.16 (currently disabled)
+Other:               expo-haptics, expo-constants, expo-font, expo-status-bar
+
+babel.config.js:     babel-preset-expo + react-native-reanimated/plugin
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  9. API CONFIGURATION (client-side)
+═══════════════════════════════════════════════════════════════════════════════
+
+File: config/api.js
+
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||          // set in eas.json for builds
+  'https://linkloop-9l3x.onrender.com/api';   // production default
+
+For local dev on Windows, change to:
+  const API_URL = 'http://<your-local-ip>:5000/api';
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  10. DEMO / TEST ACCOUNT
+═══════════════════════════════════════════════════════════════════════════════
+
+Email:     demo@linkloop.test
+Password:  DemoPass123!
+
+Seed script: cd LinkLoopLiteServer && node seedDemoUser.js
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  11. BUILD COMMANDS QUICK REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+# Install dependencies
+npm install
+
+# Start dev server (Expo)
+npx expo start
+
+# EAS Android production build (cloud)
+npx eas-cli build --platform android --profile production --non-interactive
+
+# EAS Android submit to Google Play
+npx eas-cli submit --platform android --profile production
+
+# Local Android build (requires Android SDK + JDK)
+cd android && ./gradlew bundleRelease
+# Output: android/app/build/outputs/bundle/release/app-release.aab
+
+# Bump version before new build
+# - app.json → android.versionCode (auto-incremented by EAS if using remote versioning)
+# - app.json → version for display version
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  12. FILES TO COPY TO WINDOWS
+═══════════════════════════════════════════════════════════════════════════════
+
+CRITICAL (must copy separately — not in git):
+  ☐ android/app/upload-keystore.jks      — Android signing keystore
+  ☐ google-service-account.json          — Google Play API key (if you have one)
+
+From Git (just clone the repo):
+  git clone https://github.com/kcunningham408/LinkLoop.git
+  cd LinkLoop/LinkLoopLiteApp
+  npm install
+
+Then copy the keystore:
+  Place upload-keystore.jks into LinkLoopLiteApp/android/app/
+
+EAS login on Windows:
+  npx eas-cli login
+  Username: kcunningham408
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  13. WINDOWS-SPECIFIC SETUP NOTES
+═══════════════════════════════════════════════════════════════════════════════
+
+Prerequisites:
+  - Node.js 18+ (LTS recommended)
+  - npm or yarn
+  - Git
+  - EAS CLI:  npm install -g eas-cli
+  - For local builds: Android Studio + JDK 17
+
+EAS builds happen in the cloud — you do NOT need Android Studio
+  unless you want to do local Gradle builds.
+
+To run the dev server:
+  cd LinkLoopLiteApp
+  npm install
+  npx expo start
+
+To build Android via EAS:
+  npx eas-cli login        (use kcunningham408 account)
+  npx eas-cli build --platform android --profile production
+
+To build locally on Windows:
+  cd android
+  gradlew.bat bundleRelease
+  # Output: app/build/outputs/bundle/release/app-release.aab
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  14. CURRENT STATUS
+═══════════════════════════════════════════════════════════════════════════════
+
+iOS:     Build 64 uploaded to App Store Connect (this Mac handles iOS)
+Android: Build 10 (versionCode) — last EAS build completed successfully
+Server:  Live on Render, auto-deploys from main branch
+
+Recent fixes in latest commit:
+  - LoginScreen: checkAuth() after joinCircle (member view bug fix)
+  - MessagesScreen: Android bottom padding for nav bar overlap
+
+Both fixes are pushed to main and ready for the next Android build.
+
+================================================================================
+  END OF REFERENCE
+================================================================================

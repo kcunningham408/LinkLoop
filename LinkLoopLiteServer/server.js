@@ -50,15 +50,18 @@ app.use('/api/nightscout', require('./routes/nightscout'));
 app.use('/api/mood', require('./routes/mood'));
 app.use('/api/achievements', require('./routes/achievements'));
 app.use('/api/notes', require('./routes/notes'));
+app.use('/api/challenges', require('./routes/challenges'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  const groqConfigured = !!(process.env.GROQ_API_KEY && process.env.GROQ_API_KEY !== 'PASTE_YOUR_KEY_HERE');
   res.json({
     status: dbState === 1 ? 'ok' : 'degraded',
     message: 'LinkLoop Server is running! ⚡',
-    database: states[dbState] || 'unknown'
+    database: states[dbState] || 'unknown',
+    ai: groqConfigured ? 'configured' : 'not configured',
   });
 });
 

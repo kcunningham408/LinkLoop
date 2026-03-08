@@ -26,6 +26,7 @@ router.get('/me', auth, async (req, res) => {
       name: user.name,
       role: user.role,
       linkedOwnerId: user.linkedOwnerId ? user.linkedOwnerId.toString() : null,
+      activeViewingId: user.activeViewingId ? user.activeViewingId.toString() : null,
       warriorDisplayName: user.warriorDisplayName || null,
       profileEmoji: user.profileEmoji,
       settings: user.settings,
@@ -65,6 +66,7 @@ router.put('/me', auth, async (req, res) => {
         name: user.name,
         role: user.role,
         linkedOwnerId: user.linkedOwnerId ? user.linkedOwnerId.toString() : null,
+        activeViewingId: user.activeViewingId ? user.activeViewingId.toString() : null,
         warriorDisplayName: user.warriorDisplayName || null,
         profileEmoji: user.profileEmoji,
         settings: user.settings,
@@ -82,12 +84,15 @@ router.put('/me', auth, async (req, res) => {
 // @access  Private
 router.put('/push-token', auth, async (req, res) => {
   try {
-    const { pushToken } = req.body;
+    const { pushToken, timezone } = req.body;
     if (!pushToken) {
       return res.status(400).json({ message: 'pushToken is required' });
     }
 
-    await User.findByIdAndUpdate(req.user.userId, { pushToken });
+    const update = { pushToken };
+    if (timezone) update.timezone = timezone;
+
+    await User.findByIdAndUpdate(req.user.userId, update);
     res.json({ message: 'Push token saved' });
   } catch (err) {
     console.error('Save push token error:', err);

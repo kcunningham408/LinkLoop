@@ -3,13 +3,16 @@
  * Scheduled tasks that run once per day:
  *   1. Supply countdown — decrement daysLeft, push when low
  *   2. Daily glucose summary — recap to circle members
+ *   3. Daily insights push — AI-powered insight to warriors at 7 PM EST
  */
 
 const cron = require('node-cron');
+const Groq = require('groq-sdk');
 const User = require('../models/User');
 const Supply = require('../models/Supply');
 const GlucoseReading = require('../models/GlucoseReading');
 const CareCircle = require('../models/CareCircle');
+const MoodEntry = require('../models/MoodEntry');
 const { sendPushToUsers } = require('./pushNotifications');
 
 // ── Supply countdown — runs daily at 8 AM UTC ─────────────────────
@@ -110,6 +113,131 @@ function startDailyJobs() {
   // Daily summary — 1 AM UTC (8 PM EST / 5 PM PST)
   cron.schedule('0 1 * * *', sendDailySummaries);
   console.log('⏱  Daily summary cron started (daily 1 AM UTC / 8 PM EST)');
+
+  // Daily insights push — runs EVERY HOUR, sends to warriors whose local time is 7 PM
+  cron.schedule('0 * * * *', sendDailyInsightsPush);
+  console.log('⏱  Daily insights push cron started (hourly — delivers at 7 PM local per user)');
+}
+
+// ── Daily insights push — AI-powered evening insight for warriors ──
+// Runs every hour. For each warrior, checks if their timezone's local hour is 19 (7 PM).
+// This way every warrior gets the notification at 7 PM *their* time, not one fixed UTC offset.
+async function sendDailyInsightsPush() {
+  const nowUTC = new Date();
+  console.log(`[DailyInsights] Hourly check at ${nowUTC.toISOString()}`);
+
+  try {
+    // Get Groq client
+    if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'PASTE_YOUR_KEY_HERE') {
+      return; // silently skip if not configured
+    }
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    // Find all warriors with a push token and daily insights enabled
+    const warriors = await User.find({
+      role: 'warrior',
+      pushToken: { $ne: null, $exists: true },
+      'pushPreferences.dailyInsights': { $ne: false },
+    }).select('_id name settings pushToken timezone');
+
+    if (warriors.length === 0) return;
+
+    // Filter to warriors whose local time is currently 7 PM (hour 19)
+    const eligibleWarriors = warriors.filter(w => {
+      try {
+        const tz = w.timezone || 'America/New_York';
+        const localHour = parseInt(
+          new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: tz }).format(nowUTC)
+        );
+        return localHour === 19;
+      } catch {
+        return false; // invalid timezone — skip
+      }
+    });
+
+    if (eligibleWarriors.length === 0) return;
+
+    console.log(`[DailyInsights] ${eligibleWarriors.length} warrior(s) at 7 PM local — generating insights...`);
+    let sentCount = 0;
+
+    for (const warrior of eligibleWarriors) {
+      try {
+        // Get today's readings (last 24h)
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const [readings, moodEntries] = await Promise.all([
+          GlucoseReading.find({ userId: warrior._id, timestamp: { $gte: since } }).sort({ timestamp: -1 }),
+          MoodEntry.find({ userId: warrior._id, timestamp: { $gte: since } }).sort({ timestamp: -1 }).limit(5),
+        ]);
+
+        if (readings.length < 2) continue; // need some data
+
+        const values = readings.map(r => r.value);
+        const avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+        const low = warrior.settings?.lowThreshold || 70;
+        const high = warrior.settings?.highThreshold || 180;
+        const inRange = values.filter(v => v >= low && v <= high).length;
+        const tir = Math.round((inRange / values.length) * 100);
+        const lowCount = values.filter(v => v < low).length;
+        const highCount = values.filter(v => v > high).length;
+        const name = warrior.name || 'there';
+
+        // Build a quick mood context
+        let moodContext = '';
+        if (moodEntries.length > 0) {
+          const moodLabels = { great: 'Great', good: 'Good', okay: 'Okay', tired: 'Tired', stressed: 'Stressed', sick: 'Sick', low_energy: 'Low Energy', anxious: 'Anxious' };
+          const lastMood = moodEntries[0];
+          moodContext = `\nRecent mood: ${moodLabels[lastMood.label] || lastMood.label} ${lastMood.emoji}${lastMood.note ? ` ("${lastMood.note}")` : ''}`;
+        }
+
+        const prompt = `Write a 1-sentence evening glucose recap for ${name}. This will be a push notification so it must be very short — under 120 characters ideally.
+
+DATA (last 24h): ${readings.length} readings, avg ${avg} mg/dL, ${tir}% in range (${low}-${high}), ${lowCount} lows, ${highCount} highs${moodContext}
+
+RULES:
+- ONE sentence, conversational and warm
+- Reference their actual numbers (TIR% or avg)
+- If day was good, celebrate briefly. If tough, be encouraging.
+- 1 emoji at start
+- NO medical advice, NO suggestions, NO actions
+- NO bullet points
+- Do NOT mention the app name
+
+Return ONLY the notification text, nothing else.`;
+
+        const completion = await groq.chat.completions.create({
+          messages: [
+            { role: 'system', content: 'You write ultra-short push notification text (1 sentence) for a glucose wellness app. Never give medical advice. Just a warm, data-informed evening recap.' },
+            { role: 'user', content: prompt },
+          ],
+          model: 'llama-3.3-70b-versatile',
+          temperature: 0.7,
+          max_tokens: 80,
+        });
+
+        let insightText = completion.choices[0]?.message?.content?.trim();
+        if (!insightText) {
+          insightText = `📊 Today: ${tir}% in range with an avg of ${avg} mg/dL — nice work, ${name}!`;
+        }
+
+        await sendPushToUsers(
+          [warrior._id.toString()],
+          '✨ Your Daily Insight',
+          insightText,
+          { type: 'daily_insight' }
+        );
+        sentCount++;
+
+        // Small delay between API calls to avoid rate limiting
+        await new Promise(r => setTimeout(r, 500));
+      } catch (userErr) {
+        console.error(`[DailyInsights] Push error for ${warrior._id}:`, userErr.message);
+      }
+    }
+
+    console.log(`[DailyInsights] Sent insights to ${sentCount}/${eligibleWarriors.length} warrior(s).`);
+  } catch (err) {
+    console.error('[DailyInsights] Job error:', err.message);
+  }
 }
 
 module.exports = { startDailyJobs };

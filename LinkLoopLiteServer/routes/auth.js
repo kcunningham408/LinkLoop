@@ -22,6 +22,7 @@ const userResponse = (user) => ({
   name: user.name,
   role: user.role,
   linkedOwnerId: user.linkedOwnerId || null,
+  activeViewingId: user.activeViewingId || null,
   profileEmoji: user.profileEmoji,
   settings: user.settings,
   createdAt: user.createdAt
@@ -299,6 +300,7 @@ router.post('/watch-claim', async (req, res) => {
         name: user.name,
         role: user.role,
         linkedOwnerId: user.linkedOwnerId || null,
+        activeViewingId: user.activeViewingId || null,
         lowThreshold: user.settings?.lowThreshold || 70,
         highThreshold: user.settings?.highThreshold || 180,
       }

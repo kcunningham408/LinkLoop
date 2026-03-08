@@ -27,11 +27,19 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['warrior', 'member', 'admin'],
+    enum: ['warrior', 'member', 'hybrid', 'admin'],
     default: 'warrior'
   },
   // For Loop Members: the T1D Warrior whose data they are linked to
+  // DEPRECATED — kept for backward compatibility. Use activeViewingId + CareCircle lookup instead.
   linkedOwnerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  // Cross-Circle: which warrior's data this user is currently viewing
+  // null = viewing own data (warrior default) or no active circle (member default)
+  activeViewingId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: null
@@ -84,6 +92,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  // IANA timezone string (e.g. "America/Los_Angeles") — sent alongside push token
+  timezone: {
+    type: String,
+    default: 'America/New_York'
+  },
   // Per-category push notification preferences (all ON by default)
   pushPreferences: {
     glucoseAlerts:   { type: Boolean, default: true },  // low, high, urgent, rapid change
@@ -91,6 +104,7 @@ const userSchema = new mongoose.Schema({
     alertResolved:   { type: Boolean, default: true },  // warrior resolved an alert
     newMessages:     { type: Boolean, default: true },  // 1-on-1 chat messages
     groupMessages:   { type: Boolean, default: true },  // group Care Circle messages
+    dailyInsights:   { type: Boolean, default: true },  // 7 PM daily AI insight push
   },
   // Last time the user opened the app / made an API call
   lastActive: {

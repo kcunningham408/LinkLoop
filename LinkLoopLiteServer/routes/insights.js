@@ -440,17 +440,18 @@ router.get('/ai-summary', auth, async (req, res) => {
     const prompt = `You are a friendly wellness companion in LinkLoop — a personal glucose journal app. Analyze this glucose data and give a brief, personalized summary.
 
 RULES:
+- MAXIMUM 2 SENTENCES. This is an absolute hard limit. No exceptions.
 - Warm & conversational, like a knowledgeable friend
-- KEEP IT SHORT: One paragraph, 3-5 sentences max. Be concise and punchy.
+- Be punchy — every word should earn its place
 - Highlight the single most interesting or important pattern you see
-- If mood/notes data is available, reference it — connect how they felt with glucose patterns
-- 1-2 emojis total, not more
+- If mood/notes data is available, weave it in naturally — connect how they felt with glucose patterns
+- 1 emoji max
 - NEVER give medical advice, suggest medication or dosage changes, or recommend any specific actions
 - Do NOT suggest eating, snacking, correcting, or any treatment actions
 - If data looks good, celebrate it briefly
 - Refer to the app as a "wellness journal" not a "medical tool"
-- End with a short encouraging note, NOT a reminder to see a doctor
-- Do NOT use bullet points, numbered lists, or headers — just a flowing paragraph
+- End on a positive or encouraging note, NOT a reminder to see a doctor
+- Do NOT use bullet points, numbered lists, or headers — just 1-2 flowing sentences
 
 DATA (last ${stats.hours}h):
 - Name: ${stats.userName}
@@ -466,15 +467,22 @@ DATA (last ${stats.hours}h):
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        { role: 'system', content: 'You are a friendly wellness companion in LinkLoop, a personal glucose journal app. You help users see patterns in the data they log. Keep responses to ONE short paragraph (3-5 sentences). You NEVER give medical advice, suggest medication changes, or recommend specific health actions. You only observe patterns and celebrate progress.' },
+        { role: 'system', content: 'You are a friendly wellness companion in LinkLoop, a personal glucose journal app. You help users see patterns in the data they log. Keep responses to EXACTLY 1-2 sentences — never more. You NEVER give medical advice, suggest medication changes, or recommend specific health actions. You only observe patterns and celebrate progress.' },
         { role: 'user', content: prompt }
       ],
       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
-      max_tokens: 250,
+      max_tokens: 80,
     });
 
-    res.json({ aiSummary: chatCompletion.choices[0]?.message?.content || 'No summary available.' });
+    // Hard-limit: trim to 2 sentences max
+    let summary = chatCompletion.choices[0]?.message?.content || 'No summary available.';
+    const sentences = summary.match(/[^.!?]+[.!?]+/g);
+    if (sentences && sentences.length > 2) {
+      summary = sentences.slice(0, 2).join('').trim();
+    }
+
+    res.json({ aiSummary: summary });
   } catch (err) {
     console.error('AI summary error:', err);
     res.json({ aiSummary: 'I couldn\'t generate an AI summary right now. Your pattern-based insights above are still available! 🧠' });
@@ -530,8 +538,8 @@ router.get('/ai-trends', auth, async (req, res) => {
 
 RULES:
 - Return ONLY valid JSON — an array of objects, no markdown, no explanation outside the JSON
-- Each object: { "type": "alert|warning|success|info|streak", "icon": "emoji", "title": "short title (5 words max)", "message": "ONE concise sentence, max 20 words", "category": "one of: trend, pattern, streak, spike, timing, comparison, stability, milestone" }
-- Identify the 3-4 most important observations only — quality over quantity
+- Each object: { "type": "alert|warning|success|info|streak", "icon": "emoji", "title": "short title (5 words max)", "message": "ONE concise sentence, max 12 words", "category": "one of: trend, pattern, streak, spike, timing, comparison, stability, milestone" }
+- Identify the 2 most important observations only — quality over quantity
 - Keep each message to ONE short, punchy sentence
 - Be specific — use actual numbers from the data
 - NEVER suggest medication changes, dosing, eating, or any health actions
@@ -558,7 +566,7 @@ Return the JSON array now:`;
       ],
       model: 'llama-3.3-70b-versatile',
       temperature: 0.4,
-      max_tokens: 500,
+      max_tokens: 350,
     });
 
     let raw = chatCompletion.choices[0]?.message?.content || '[]';
@@ -678,7 +686,7 @@ Return ONLY the quote text, nothing else.`;
       ],
       model: 'llama-3.3-70b-versatile',
       temperature: 0.9,
-      max_tokens: 150,
+      max_tokens: 100,
     });
 
     const message = chatCompletion.choices[0]?.message?.content?.trim() || 
@@ -700,6 +708,539 @@ Return ONLY the quote text, nothing else.`;
       motivation: "Some days are harder than others, but not a single one has beaten you yet. That's a pretty amazing track record. 💛",
       emoji: '💛'
     });
+  }
+});
+
+// ============================================================
+// ASK LOOP — Conversational AI chat with your glucose data
+// ============================================================
+
+// In-memory conversation buffer per user (last 5 messages)
+const conversationCache = new Map(); // key: userId → [{ role, content }]
+
+// @route   POST /api/insights/ask
+// @desc    Ask Loop a question about your glucose data
+// @access  Private
+router.post('/ask', auth, async (req, res) => {
+  try {
+    // Only warriors, hybrids, and admins can use Ask Loop
+    const askUser = await User.findById(req.user.userId).select('role');
+    if (askUser && askUser.role === 'member') {
+      return res.json({
+        answer: "Ask Loop is a warrior feature — it uses your glucose data to answer questions! 🧠",
+        context: null
+      });
+    }
+
+    const { question } = req.body;
+    if (!question || question.trim().length === 0) {
+      return res.json({
+        answer: "Hmm, I didn't catch a question there. Try asking something like 'How are my mornings?' 🤔",
+        context: null
+      });
+    }
+
+    const groq = getGroqClient();
+    if (!groq) {
+      return res.json({
+        answer: "AI isn't configured yet — but I'll be ready to chat about your glucose data soon! 🧠",
+        context: null
+      });
+    }
+
+    const userId = req.user.userId;
+
+    // Gather user data context (last 72h)
+    const since72h = new Date();
+    since72h.setHours(since72h.getHours() - 72);
+    const since24h = new Date();
+    since24h.setHours(since24h.getHours() - 24);
+
+    const [readings72h, readings24h, user, moodEntries] = await Promise.all([
+      GlucoseReading.find({ userId, timestamp: { $gte: since72h } }).sort({ timestamp: -1 }),
+      GlucoseReading.find({ userId, timestamp: { $gte: since24h } }).sort({ timestamp: -1 }),
+      User.findById(userId).select('settings name'),
+      MoodEntry.find({ userId, timestamp: { $gte: since72h } }).sort({ timestamp: -1 }).limit(20),
+    ]);
+
+    let stats72h = null;
+    let stats24h = null;
+    try {
+      stats72h = readings72h.length > 0 ? buildGlucoseStats(readings72h, user, 72) : null;
+      stats24h = readings24h.length > 0 ? buildGlucoseStats(readings24h, user, 24) : null;
+    } catch (statsErr) {
+      console.error('Ask Loop stats build error:', statsErr.message);
+      // Continue with null stats — AI can still respond
+    }
+
+    // Build context string
+    let dataContext = 'NO DATA AVAILABLE — the user has no glucose readings yet.';
+    if (stats72h) {
+      dataContext = `USER: ${stats72h.userName}
+
+LAST 24 HOURS:
+${stats24h ? `- ${stats24h.readingCount} readings | Avg: ${stats24h.avg} mg/dL | Range: ${stats24h.min}-${stats24h.max}
+- TIR (${stats24h.low}-${stats24h.high}): ${stats24h.tir}% | Lows: ${stats24h.lowCount} | Highs: ${stats24h.highCount}
+- StdDev: ${stats24h.stdDev} | CV: ${stats24h.cv}%
+- In-range streak: ${stats24h.inRangeStreak} consecutive readings
+- Spikes: ${stats24h.spikes.length > 0 ? stats24h.spikes.map(s => `${s.direction} ${s.from}→${s.to} at ${new Date(s.time).toLocaleTimeString()}`).join(', ') : 'none'}
+- Periods: ${stats24h.periodStats.map(p => p.text).join(' | ')}` : 'No readings in last 24h'}
+
+LAST 72 HOURS:
+- ${stats72h.readingCount} readings | Avg: ${stats72h.avg} mg/dL | Range: ${stats72h.min}-${stats72h.max}
+- TIR: ${stats72h.tir}% | Lows: ${stats72h.lowCount} | Highs: ${stats72h.highCount}
+- StdDev: ${stats72h.stdDev} | CV: ${stats72h.cv}%
+- Periods: ${stats72h.periodStats.map(p => p.text).join(' | ')}
+- Today avg: ${stats72h.todayAvg ?? 'N/A'} | Yesterday avg: ${stats72h.yesterdayAvg ?? 'N/A'}`;
+
+      // Add recent readings timeline
+      if (readings24h.length > 0) {
+        const timeline = readings24h.slice(0, 15).map(r => {
+          const t = new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const trend = r.trend ? ` (${r.trend})` : '';
+          return `${t}: ${r.value} mg/dL${trend}`;
+        }).join('\n  ');
+        dataContext += `\n\nRECENT READINGS TIMELINE:\n  ${timeline}`;
+      }
+    }
+
+    // Add mood context
+    if (moodEntries.length > 0) {
+      const moodLabels = { great: 'Great', good: 'Good', okay: 'Okay', tired: 'Tired', stressed: 'Stressed', sick: 'Sick', low_energy: 'Low Energy', anxious: 'Anxious' };
+      const moodTimeline = moodEntries.slice(0, 10).map(m => {
+        const t = new Date(m.timestamp).toLocaleString();
+        const noteStr = m.note ? ` — "${m.note}"` : '';
+        return `${m.emoji} ${moodLabels[m.label] || m.label} (${t})${noteStr}`;
+      }).join('\n  ');
+      dataContext += `\n\nMOOD ENTRIES:\n  ${moodTimeline}`;
+    }
+
+    // Get/create conversation history
+    const cacheKey = userId;
+    if (!conversationCache.has(cacheKey)) {
+      conversationCache.set(cacheKey, []);
+    }
+    const history = conversationCache.get(cacheKey);
+
+    // Build messages array
+    const messages = [
+      {
+        role: 'system',
+        content: `You are "Loop" — the friendly AI wellness companion inside LinkLoop, a personal glucose journal app for people with Type 1 Diabetes. Users can ask you questions about their glucose data and you answer using the real data provided below.
+
+PERSONALITY:
+- Warm, knowledgeable, encouraging — like a smart friend who really understands T1D
+- Conversational but very concise — aim for 1-2 sentences per response
+- Use specific numbers from their data when relevant
+- Remember context from previous messages in this conversation
+
+ABSOLUTE RULES:
+- NEVER give medical advice, suggest medication changes, or recommend specific dosages
+- NEVER tell them to eat, snack, correct, or take any specific health action
+- NEVER diagnose anything or suggest they have a condition
+- You OBSERVE and ANALYZE patterns — you do NOT prescribe
+- If asked for medical advice, warmly redirect: "That's a great question for your care team!"
+- Refer to the app as a "wellness journal" — not a medical device
+- 1 emoji per response max
+
+DATA CONTEXT:
+${dataContext}
+
+You can answer questions like:
+- "Why did I spike?" → Look at the timeline for rapid rises and nearby mood entries
+- "How are my mornings?" → Use period stats for morning data
+- "Am I doing better than yesterday?" → Compare today vs yesterday averages
+- "What's my best time of day?" → Find the period with highest TIR
+- General T1D wellness chat`
+      },
+      ...history.slice(-8), // Last 4 exchanges (8 messages)
+      { role: 'user', content: question }
+    ];
+
+    const chatCompletion = await Promise.race([
+      groq.chat.completions.create({
+        messages,
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Groq timeout')), 20000))
+    ]);
+
+    const answer = chatCompletion.choices[0]?.message?.content?.trim() ||
+      "Hmm, I'm having trouble answering that right now. Try asking in a different way! 🤔";
+
+    // Update conversation cache
+    history.push({ role: 'user', content: question });
+    history.push({ role: 'assistant', content: answer });
+    // Keep only last 10 messages
+    if (history.length > 10) history.splice(0, history.length - 10);
+
+    res.json({
+      answer,
+      context: stats24h ? {
+        readingCount: stats24h.readingCount,
+        avg: stats24h.avg,
+        tir: stats24h.tir,
+      } : null
+    });
+  } catch (err) {
+    console.error('Ask Loop error:', err?.message || err, err?.status || '', err?.error?.message || '');
+    res.json({
+      answer: "I'm having a moment — try asking again in a sec! 🧠",
+      context: null
+    });
+  }
+});
+
+// @route   DELETE /api/insights/ask/history
+// @desc    Clear conversation history
+// @access  Private
+router.delete('/ask/history', auth, (req, res) => {
+  conversationCache.delete(req.user.userId);
+  res.json({ message: 'Conversation cleared' });
+});
+
+// ============================================================
+// WEEKLY REPORT — Auto-generated weekly glucose summary
+// ============================================================
+
+// @route   GET /api/insights/weekly-report
+// @desc    Get a weekly report card (last 7 days vs previous 7 days)
+// @access  Private
+router.get('/weekly-report', auth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId).select('settings name');
+    const low = user?.settings?.lowThreshold || 70;
+    const high = user?.settings?.highThreshold || 180;
+
+    // This week (last 7 days) and previous week
+    const now = new Date();
+    const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+    const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(now.getDate() - 14);
+
+    const [thisWeekReadings, prevWeekReadings, thisWeekMoods, prevWeekMoods] = await Promise.all([
+      GlucoseReading.find({ userId, timestamp: { $gte: weekAgo } }).sort({ timestamp: -1 }),
+      GlucoseReading.find({ userId, timestamp: { $gte: twoWeeksAgo, $lt: weekAgo } }).sort({ timestamp: -1 }),
+      MoodEntry.find({ userId, timestamp: { $gte: weekAgo } }).sort({ timestamp: -1 }),
+      MoodEntry.find({ userId, timestamp: { $gte: twoWeeksAgo, $lt: weekAgo } }).sort({ timestamp: -1 }),
+    ]);
+
+    if (thisWeekReadings.length === 0) {
+      return res.json({
+        report: null,
+        message: 'No readings this week — log some glucose data to generate your report!'
+      });
+    }
+
+    // Calculate this week's stats
+    const thisWeekStats = buildWeekStats(thisWeekReadings, low, high);
+    const prevWeekStats = prevWeekReadings.length > 0 ? buildWeekStats(prevWeekReadings, low, high) : null;
+
+    // Daily breakdown
+    let dailyBreakdown = [];
+    try { dailyBreakdown = buildDailyBreakdown(thisWeekReadings, low, high); } catch (e) {
+      console.error('Daily breakdown error:', e.message);
+    }
+
+    // Mood summary
+    let moodSummary = { count: 0, topMood: null, topMoodCount: 0, distribution: {} };
+    try { moodSummary = buildMoodSummary(thisWeekMoods); } catch (e) {
+      console.error('Mood summary error:', e.message);
+    }
+
+    // Trends vs last week
+    const trends = prevWeekStats ? {
+      tirChange: thisWeekStats.tir - prevWeekStats.tir,
+      avgChange: thisWeekStats.avg - prevWeekStats.avg,
+      cvChange: thisWeekStats.cv - prevWeekStats.cv,
+      readingsChange: thisWeekStats.readingCount - prevWeekStats.readingCount,
+    } : null;
+
+    // Best day & toughest day
+    const bestDay = dailyBreakdown.length > 0
+      ? dailyBreakdown.reduce((a, b) => a.tir > b.tir ? a : b, dailyBreakdown[0])
+      : { dayName: 'N/A', tir: 0 };
+    const toughestDay = dailyBreakdown.length > 0
+      ? dailyBreakdown.reduce((a, b) => a.tir < b.tir ? a : b, dailyBreakdown[0])
+      : { dayName: 'N/A', tir: 0 };
+
+    // Generate AI narrative
+    let aiNarrative = null;
+    const groq = getGroqClient();
+    if (groq && thisWeekReadings.length >= 5) {
+      try {
+        const prompt = `Write a friendly, encouraging weekly glucose journal recap for ${user?.name || 'there'}. This is for the "Weekly Report Card" screen in their personal wellness journal app.
+
+WEEK STATS:
+- ${thisWeekStats.readingCount} readings | Avg: ${thisWeekStats.avg} mg/dL
+- TIR: ${thisWeekStats.tir}% | Lows: ${thisWeekStats.lowCount} | Highs: ${thisWeekStats.highCount}
+- CV: ${thisWeekStats.cv}% | StdDev: ${thisWeekStats.stdDev}
+- Best day: ${bestDay.dayName} (${bestDay.tir}% TIR)
+- Toughest day: ${toughestDay.dayName} (${toughestDay.tir}% TIR)
+${prevWeekStats ? `\nVS LAST WEEK: TIR ${trends.tirChange >= 0 ? '+' : ''}${trends.tirChange}%, Avg ${trends.avgChange >= 0 ? '+' : ''}${trends.avgChange} mg/dL` : ''}
+${moodSummary.topMood ? `\nMost frequent mood: ${moodSummary.topMood} (${moodSummary.topMoodCount}x)` : ''}
+
+RULES:
+- 2-3 sentences, warm and personal
+- Mention their best day by name (e.g. "Tuesday was your star day!")
+- If they improved vs last week, celebrate it
+- If TIR was tough, be encouraging — focus on what went well
+- NEVER give medical advice or suggestions
+- 1 emoji
+- End on a forward-looking, positive note`;
+
+        const completion = await groq.chat.completions.create({
+          messages: [
+            { role: 'system', content: 'You write short, warm weekly recap narratives for a glucose wellness journal app. Never give medical advice. Celebrate wins and encourage through tough weeks.' },
+            { role: 'user', content: prompt }
+          ],
+          model: 'llama-3.3-70b-versatile',
+          temperature: 0.7,
+          max_tokens: 130,
+        });
+        aiNarrative = completion.choices[0]?.message?.content?.trim() || null;
+      } catch (aiErr) {
+        console.error('Weekly report AI error:', aiErr.message);
+      }
+    }
+
+    const report = {
+      weekOf: weekAgo.toISOString(),
+      endDate: now.toISOString(),
+      userName: user?.name || 'Warrior',
+      thisWeek: thisWeekStats,
+      prevWeek: prevWeekStats,
+      trends,
+      dailyBreakdown,
+      bestDay,
+      toughestDay,
+      moodSummary,
+      aiNarrative,
+    };
+
+    res.json({ report });
+  } catch (err) {
+    console.error('Weekly report error:', err?.message || err);
+    // Return a minimal report instead of 500 so the client shows something
+    res.json({
+      report: null,
+      message: 'Could not generate report right now — pull to refresh to try again!'
+    });
+  }
+});
+
+function buildWeekStats(readings, low, high) {
+  const values = readings.map(r => r.value);
+  const avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  const inRange = values.filter(v => v >= low && v <= high).length;
+  const tir = Math.round((inRange / values.length) * 100);
+  const lowCount = values.filter(v => v < low).length;
+  const highCount = values.filter(v => v > high).length;
+  const variance = values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / values.length;
+  const stdDev = Math.round(Math.sqrt(variance));
+  const cv = avg > 0 ? Math.round((stdDev / avg) * 100) : 0;
+  const gmi = (3.31 + (0.02392 * avg)).toFixed(1);
+  return { readingCount: readings.length, avg, min: Math.min(...values), max: Math.max(...values), tir, lowCount, highCount, stdDev, cv, gmi };
+}
+
+function buildDailyBreakdown(readings, low, high) {
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayMap = {};
+  readings.forEach(r => {
+    const d = new Date(r.timestamp);
+    const key = d.toISOString().split('T')[0];
+    if (!dayMap[key]) dayMap[key] = { values: [], date: d };
+    dayMap[key].values.push(r.value);
+  });
+
+  return Object.entries(dayMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dateStr, data]) => {
+      const vals = data.values;
+      const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      const inRange = vals.filter(v => v >= low && v <= high).length;
+      const tir = Math.round((inRange / vals.length) * 100);
+      return {
+        date: dateStr,
+        dayName: dayNames[data.date.getDay()],
+        readingCount: vals.length,
+        avg,
+        tir,
+        low: vals.filter(v => v < low).length,
+        high: vals.filter(v => v > high).length,
+      };
+    });
+}
+
+function buildMoodSummary(moodEntries) {
+  if (moodEntries.length === 0) return { count: 0, topMood: null, topMoodCount: 0, distribution: {} };
+  const freq = {};
+  moodEntries.forEach(m => { freq[m.label] = (freq[m.label] || 0) + 1; });
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+  const moodLabels = { great: 'Great 😄', good: 'Good 😊', okay: 'Okay 😐', tired: 'Tired 😴', stressed: 'Stressed 😰', sick: 'Sick 🤒', low_energy: 'Low Energy 😮‍💨', anxious: 'Anxious 😟' };
+  return {
+    count: moodEntries.length,
+    topMood: moodLabels[sorted[0][0]] || sorted[0][0],
+    topMoodCount: sorted[0][1],
+    distribution: freq,
+  };
+}
+
+// ============================================================
+// GLUCOSE STORY — Narrative timeline of your day
+// ============================================================
+
+// @route   GET /api/insights/glucose-story
+// @desc    Get an AI-generated narrative story of the user's glucose day
+// @access  Private
+router.get('/glucose-story', auth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId).select('settings name');
+    const low = user?.settings?.lowThreshold || 70;
+    const high = user?.settings?.highThreshold || 180;
+
+    const since24h = new Date();
+    since24h.setHours(since24h.getHours() - 24);
+
+    const [readings, moodEntries] = await Promise.all([
+      GlucoseReading.find({ userId, timestamp: { $gte: since24h } }).sort({ timestamp: 1 }), // chronological
+      MoodEntry.find({ userId, timestamp: { $gte: since24h } }).sort({ timestamp: 1 }),
+    ]);
+
+    if (readings.length < 3) {
+      return res.json({
+        story: null,
+        blocks: [],
+        message: 'Log at least 3 readings today to see your glucose story!'
+      });
+    }
+
+    // Build time blocks
+    const blockDefs = [
+      { key: 'overnight', label: 'Overnight', emoji: '🌙', startHour: 0, endHour: 5 },
+      { key: 'morning', label: 'Morning', emoji: '🌅', startHour: 5, endHour: 12 },
+      { key: 'afternoon', label: 'Afternoon', emoji: '☀️', startHour: 12, endHour: 18 },
+      { key: 'evening', label: 'Evening', emoji: '🌆', startHour: 18, endHour: 24 },
+    ];
+
+    const blocks = blockDefs.map(def => {
+      const blockReadings = readings.filter(r => {
+        const h = new Date(r.timestamp).getHours();
+        return h >= def.startHour && h < def.endHour;
+      });
+      const blockMoods = moodEntries.filter(m => {
+        const h = new Date(m.timestamp).getHours();
+        return h >= def.startHour && h < def.endHour;
+      });
+
+      if (blockReadings.length === 0) {
+        return { ...def, hasData: false, stats: null, narrative: null, moods: [] };
+      }
+
+      const values = blockReadings.map(r => r.value);
+      const avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+      const inRange = values.filter(v => v >= low && v <= high).length;
+      const tir = Math.round((inRange / values.length) * 100);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const lowCount = values.filter(v => v < low).length;
+      const highCount = values.filter(v => v > high).length;
+
+      // Determine block quality
+      let quality = 'great';
+      if (tir >= 80) quality = 'great';
+      else if (tir >= 60) quality = 'good';
+      else if (tir >= 40) quality = 'mixed';
+      else quality = 'tough';
+
+      return {
+        ...def,
+        hasData: true,
+        stats: { avg, tir, min, max, count: blockReadings.length, lowCount, highCount },
+        quality,
+        moods: blockMoods.map(m => ({ emoji: m.emoji, label: m.label, note: m.note })),
+      };
+    });
+
+    const activeBlocks = blocks.filter(b => b.hasData);
+
+    // Generate AI narrative for each block
+    const groq = getGroqClient();
+    if (groq && activeBlocks.length > 0) {
+      try {
+        const blockDescriptions = activeBlocks.map(b => {
+          const moodStr = b.moods.length > 0
+            ? ` Moods: ${b.moods.map(m => `${m.emoji} ${m.label}${m.note ? ` ("${m.note}")` : ''}`).join(', ')}`
+            : '';
+          return `${b.emoji} ${b.label}: avg ${b.stats.avg} mg/dL, ${b.stats.tir}% TIR, range ${b.stats.min}-${b.stats.max}, ${b.stats.count} readings, ${b.stats.lowCount} lows, ${b.stats.highCount} highs${moodStr}`;
+        }).join('\n');
+
+        const prompt = `Write a "Glucose Story" for ${user?.name || 'there'}'s day. This is a narrative timeline that makes glucose data feel personal and engaging.
+
+TIME BLOCKS:
+${blockDescriptions}
+
+RULES:
+- Write ONE short sentence (max 10 words) per time block
+- Each sentence should feel like a chapter in their day's story
+- Use the block emoji at the start
+- Be specific — mention actual numbers
+- Great blocks: celebrate. Tough blocks: be kind and encouraging.
+- If mood data exists, weave it in naturally
+- NEVER give medical advice
+- Return as JSON array: [{ "key": "morning", "narrative": "🌅 Solid morning..." }, ...]
+- Return ONLY the JSON array, no markdown`;
+
+        const completion = await groq.chat.completions.create({
+          messages: [
+            { role: 'system', content: 'You write short narrative story sentences about glucose data blocks. Return only valid JSON arrays. Never give medical advice.' },
+            { role: 'user', content: prompt }
+          ],
+          model: 'llama-3.3-70b-versatile',
+          temperature: 0.6,
+          max_tokens: 200,
+        });
+
+        let raw = completion.choices[0]?.message?.content || '[]';
+        raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+
+        try {
+          const narratives = JSON.parse(raw);
+          if (Array.isArray(narratives)) {
+            narratives.forEach(n => {
+              const block = blocks.find(b => b.key === n.key);
+              if (block) block.narrative = n.narrative;
+            });
+          }
+        } catch (parseErr) {
+          console.error('Glucose story JSON parse error:', parseErr.message);
+        }
+      } catch (aiErr) {
+        console.error('Glucose story AI error:', aiErr.message);
+      }
+    }
+
+    // Overall day summary
+    const allValues = readings.map(r => r.value);
+    const dayAvg = Math.round(allValues.reduce((a, b) => a + b, 0) / allValues.length);
+    const dayTir = Math.round((allValues.filter(v => v >= low && v <= high).length / allValues.length) * 100);
+
+    res.json({
+      story: {
+        date: new Date().toISOString().split('T')[0],
+        userName: user?.name || 'Warrior',
+        readingCount: readings.length,
+        avg: dayAvg,
+        tir: dayTir,
+      },
+      blocks,
+    });
+  } catch (err) {
+    console.error('Glucose story error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

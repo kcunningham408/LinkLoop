@@ -103,9 +103,10 @@ async function verifyGroupAccess(ownerId, userId) {
 router.get('/group/messages', auth, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const user = await User.findById(userId).select('role linkedOwnerId');
+    const { resolveViewingContext } = require('../middleware/viewingContext');
+    const ctx = await resolveViewingContext(userId, req.query.viewAs);
 
-    const groupOwnerId = user.role === 'warrior' ? userId : (user.linkedOwnerId?.toString() || null);
+    const groupOwnerId = ctx.targetUserId;
     if (!groupOwnerId) {
       return res.status(400).json({ message: 'No care circle group found' });
     }
@@ -129,9 +130,11 @@ router.get('/group/messages', auth, async (req, res) => {
 router.post('/group/messages', auth, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const user = await User.findById(userId).select('name profileEmoji role linkedOwnerId');
+    const user = await User.findById(userId).select('name profileEmoji role linkedOwnerId activeViewingId');
+    const { resolveViewingContext } = require('../middleware/viewingContext');
+    const ctx = await resolveViewingContext(userId, req.query.viewAs || req.body.viewAs);
 
-    const groupOwnerId = user.role === 'warrior' ? userId : (user.linkedOwnerId?.toString() || null);
+    const groupOwnerId = ctx.targetUserId;
     if (!groupOwnerId) {
       return res.status(400).json({ message: 'No care circle group found' });
     }
@@ -180,9 +183,10 @@ router.post('/group/messages', auth, async (req, res) => {
 router.get('/group/info', auth, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const user = await User.findById(userId).select('name profileEmoji role linkedOwnerId');
+    const { resolveViewingContext } = require('../middleware/viewingContext');
+    const ctx = await resolveViewingContext(userId, req.query.viewAs);
 
-    const groupOwnerId = user.role === 'warrior' ? userId : (user.linkedOwnerId?.toString() || null);
+    const groupOwnerId = ctx.targetUserId;
     if (!groupOwnerId) {
       return res.status(400).json({ message: 'No care circle group found' });
     }

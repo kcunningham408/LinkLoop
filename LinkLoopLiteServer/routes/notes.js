@@ -21,28 +21,25 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ message: 'Note text is required' });
     }
 
-    const user = await User.findById(req.user.userId).select('name profileEmoji role linkedOwnerId');
+    const user = await User.findById(req.user.userId).select('name profileEmoji role linkedOwnerId activeViewingId');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    let ownerId;
-    if (user.role === 'warrior') {
-      // Warrior is adding a note to their own timeline
-      ownerId = user._id;
-    } else if (user.role === 'member' && user.linkedOwnerId) {
-      // Member is adding a note to their warrior's timeline
-      // Verify they're still an active member
+    const { resolveViewingContext } = require('../middleware/viewingContext');
+    const ctx = await resolveViewingContext(req.user.userId, req.body.viewAs);
+
+    // If viewing another warrior, verify circle membership
+    if (ctx.isViewingOther) {
       const membership = await CareCircle.findOne({
-        ownerId: user.linkedOwnerId,
+        ownerId: ctx.targetUserId,
         memberId: req.user.userId,
         status: { $in: ['active', 'paused'] }
       });
       if (!membership) {
         return res.status(403).json({ message: 'Not an active circle member' });
       }
-      ownerId = user.linkedOwnerId;
-    } else {
-      return res.status(403).json({ message: 'Cannot add notes without a circle' });
     }
+
+    const ownerId = ctx.targetUserId;
 
     const note = new CircleNote({
       ownerId,
@@ -67,16 +64,10 @@ router.post('/', auth, async (req, res) => {
 router.get('/', auth, async (req, res) => {
   try {
     const { hours = 24, limit = 50 } = req.query;
-    const user = await User.findById(req.user.userId).select('role linkedOwnerId');
+    const { resolveViewingContext } = require('../middleware/viewingContext');
+    const ctx = await resolveViewingContext(req.user.userId, req.query.viewAs);
 
-    let ownerId;
-    if (user.role === 'warrior') {
-      ownerId = user._id;
-    } else if (user.role === 'member' && user.linkedOwnerId) {
-      ownerId = user.linkedOwnerId;
-    } else {
-      return res.json([]);
-    }
+    const ownerId = ctx.targetUserId;
 
     const since = new Date();
     since.setHours(since.getHours() - parseInt(hours));

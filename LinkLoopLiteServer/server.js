@@ -72,7 +72,7 @@ app.listen(PORT, () => {
 });
 
 // ── Keep-alive ping — prevents Render free tier from sleeping ─────
-// Pings our own health endpoint every 10 minutes
+// Pings our own health endpoint every 4 minutes (must be < 5 min to keep cron alive)
 const SERVER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 setInterval(async () => {
   try {
@@ -81,4 +81,4 @@ setInterval(async () => {
   } catch (err) {
     console.log('[KeepAlive] Ping failed:', err.message);
   }
-}, 10 * 60 * 1000); // every 10 minutes
+}, 4 * 60 * 1000); // every 4 minutes — keeps server awake so Dexcom cron never misses

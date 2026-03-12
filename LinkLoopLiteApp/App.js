@@ -15,6 +15,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ViewingProvider, useViewing } from './context/ViewingContext';
 
 // Import screens
+import AIConsentModal from './components/AIConsentModal';
 import HealthDisclaimer from './components/HealthDisclaimer';
 import AchievementsScreen from './screens/AchievementsScreen';
 import AlertsScreen from './screens/AlertsScreen';
@@ -415,6 +416,7 @@ export default function App() {
             <StatusBar style="light" backgroundColor="#4A90D9" />
             <AppNavigator />
             <HealthDisclaimer />
+            <AIConsentModal />
           </NavigationContainer>
         </ViewingProvider>
       </AuthProvider>

@@ -1,47 +1,58 @@
 # Dependencies (EAS installs these)
+
 node_modules/
 
 # Expo cache
+
 .expo/
 
 # Build artifacts & outputs
+
 dist/
 web-build/
 builds/
 archive-output/
-*.ipa
-*.apk
-*.aab
+_.ipa
+_.apk
+\*.aab
 
 # Android build cache (EAS builds from source)
+
 android/app/build/
 android/.gradle/
 
 # iOS Pods (EAS runs pod install)
+
 ios/Pods/
 ios/build/
 
 # Store assets & docs (not needed for build)
+
 app-store/
-*.md
+\*.md
 
 # Secrets
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+
+_.jks
+_.p8
+_.p12
+_.key
+\*.mobileprovision
 .env
 
 # OS
+
 .DS_Store
 Thumbs.db
 
 # Editor
+
 .vscode/
 
 # Windows scripts
-*.bat
+
+\*.bat
 
 # Misc
+
 patch-rn-script.py

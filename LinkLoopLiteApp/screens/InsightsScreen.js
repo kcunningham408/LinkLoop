@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useNavigation } from '@react-navigation/native';
 import GlassCard from '../components/GlassCard';
@@ -39,6 +40,7 @@ const CATEGORY_ICONS = {
 };
 
 export default function InsightsScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
@@ -172,7 +174,7 @@ export default function InsightsScreen() {
         subtitle="Pattern analysis & trend notifications powered by AI"
       />
 
-      <View style={styles.content}>
+      <View style={[styles.content, { paddingBottom: 90 + insets.bottom }]}>
         {/* Daily Motivation Card — always visible */}
         <FadeIn delay={0}>
         <View style={[styles.motivationCard, { backgroundColor: accent }]}>
@@ -456,7 +458,7 @@ function SummaryPill({ label, value, color }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0A0A0F' },
-  content: { padding: 20, paddingBottom: 90 },
+  content: { padding: 20 },
 
   // Daily motivation
   motivationCard: { backgroundColor: '#4A90D9', borderRadius: 16, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#3A7BC8' },

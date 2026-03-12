@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -30,6 +31,7 @@ const MOOD_OPTIONS = [
 ];
 
 export default function MoodScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
@@ -145,6 +147,7 @@ export default function MoodScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         style={styles.container}
+        contentContainerStyle={{ paddingBottom: 40 + insets.bottom }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />}
       >
         {/* Header */}

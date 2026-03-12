@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenHeader from '../components/ScreenHeader';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
@@ -52,6 +53,7 @@ function getLastMessagePreview(lastMessage) {
 export default function MessagesScreen({ navigation }) {
   const { user } = useAuth();
   const { getAccent, getGradient } = useTheme();
+  const insets = useSafeAreaInsets();
   const isMember = user?.role === 'member';
   const accent = getAccent(isMember);
   const gradient = getGradient(isMember);
@@ -228,7 +230,7 @@ export default function MessagesScreen({ navigation }) {
             </View>
           }
           contentContainerStyle={[
-            { paddingBottom: Platform.OS === 'android' ? 40 : 20 },
+            { paddingBottom: Platform.OS === 'android' ? 40 + insets.bottom : 20 },
             conversations.length === 0 && styles.emptyContainer,
           ]}
         />

@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -40,6 +41,7 @@ const STATUS_CONFIG = {
 };
 
 export default function AlertsScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
@@ -340,7 +342,7 @@ export default function AlertsScreen({ navigation }) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 90 }}
+      contentContainerStyle={{ paddingBottom: 90 + insets.bottom }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />
       }

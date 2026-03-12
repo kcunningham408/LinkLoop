@@ -4,11 +4,11 @@ import {
     ActivityIndicator,
     FlatList,
     KeyboardAvoidingView, Platform,
-    SafeAreaView,
     StyleSheet, Text,
     TextInput, TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
 import { useAuth } from '../context/AuthContext';
@@ -36,7 +36,7 @@ export default function ChatScreen({ route, navigation }) {
       const msgs = await chatAPI.getMessages(circleId, beforeDate);
       const msgArray = Array.isArray(msgs) ? msgs : (msgs.messages || []);
       if (append) {
-        setMessages(prev => [...msgArray, ...prev]);
+        setMessages(prev => [...prev, ...msgArray.reverse()]);
       } else {
         setMessages(msgArray.reverse()); // reverse to newest-first for inverted FlatList
       }

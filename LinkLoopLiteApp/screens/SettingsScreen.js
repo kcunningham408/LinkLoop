@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Animated as RNAnimated, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -9,6 +10,7 @@ import { useTheme } from '../context/ThemeContext';
 import { circleAPI, glucoseAPI, usersAPI } from '../services/api';
 
 export default function SettingsScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { user, updateUser } = useAuth();
   const { palette, setTheme, palettes, getGradient } = useTheme();
   const isMember = user?.role === 'member';
@@ -136,7 +138,7 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.savedToastText}>✓ Saved</Text>
       </RNAnimated.View>
     )}
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 + insets.bottom }}>
       <View style={styles.content}>
 
         {/* ── Alert Thresholds ── */}

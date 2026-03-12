@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { haptic } from './config/haptics';
 
 // Import context
@@ -44,13 +45,14 @@ const navigationRef = createNavigationContainerRef();
 
 function MainTabs() {
   const { palette } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.warrior,
         tabBarInactiveTintColor: '#555',
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { bottom: 12 + insets.bottom }],
         tabBarBackground: () => (
           Platform.OS === 'ios' ? (
             <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
@@ -129,13 +131,14 @@ function MainTabs() {
 // Loop Member tab nav — sees the warrior's CGM data, can chat & get alerts
 function LoopMemberTabs() {
   const { palette } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenListeners={{ tabPress: () => haptic.light() }}
       screenOptions={{
         tabBarActiveTintColor: palette.member,
         tabBarInactiveTintColor: '#555',
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { bottom: 12 + insets.bottom }],
         tabBarBackground: () => (
           Platform.OS === 'ios' ? (
             <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
@@ -409,6 +412,7 @@ export default function App() {
   }, []);
 
   return (
+    <SafeAreaProvider>
     <ThemeProvider>
       <AuthProvider>
         <ViewingProvider>
@@ -421,6 +425,7 @@ export default function App() {
         </ViewingProvider>
       </AuthProvider>
     </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 

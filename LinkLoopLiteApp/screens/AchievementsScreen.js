@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -26,6 +27,7 @@ const CATEGORY_INFO = {
 const CATEGORY_ORDER = ['streak', 'milestone', 'consistency', 'explorer', 'community'];
 
 export default function AchievementsScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const accent = getAccent(user?.role === 'member');
@@ -97,6 +99,7 @@ export default function AchievementsScreen() {
   return (
     <ScrollView
       style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} tintColor={accent} />}
     >
       {/* Header */}

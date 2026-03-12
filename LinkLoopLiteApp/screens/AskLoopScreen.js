@@ -3,6 +3,7 @@ import {
     ActivityIndicator, Alert, FlatList, KeyboardAvoidingView,
     Platform, StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn } from '../config/animations';
@@ -24,6 +25,7 @@ const SUGGESTED_QUESTIONS = [
 export default function AskLoopScreen() {
   const { user } = useAuth();
   const { getAccent } = useTheme();
+  const insets = useSafeAreaInsets();
   const accent = getAccent(user?.role === 'member');
   const isMember = user?.role === 'member';
 
@@ -195,7 +197,7 @@ export default function AskLoopScreen() {
       />
 
       {/* Input bar */}
-      <View style={styles.inputBar}>
+      <View style={[styles.inputBar, { paddingBottom: Platform.OS === 'ios' ? 30 : 10 + insets.bottom }]}>
         {messages.length > 0 && (
           <TouchableOpacity onPress={clearHistory} style={styles.clearBtn}>
             <Text style={styles.clearBtnText}>🗑️</Text>

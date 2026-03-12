@@ -3,6 +3,7 @@ import {
     ActivityIndicator, RefreshControl, ScrollView,
     StyleSheet, Text, View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
@@ -20,6 +21,7 @@ const QUALITY_COLORS = {
 };
 
 export default function GlucoseStoryScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
@@ -52,7 +54,7 @@ export default function GlucoseStoryScreen() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 100 }}
+      contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} tintColor={accent} />}
     >
       <ScreenHeader

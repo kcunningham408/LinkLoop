@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Clipboard, Linking, Modal, Platform, RefreshControl, ScrollView, Share, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
@@ -25,6 +26,7 @@ const RELATIONSHIPS = [
 ];
 
 export default function CareCircleScreen() {
+  const insets = useSafeAreaInsets();
   const { user, updateUser, checkAuth } = useAuth();
   const { getAccent } = useTheme();
   const { isViewingOther, viewingId } = useViewing();
@@ -207,7 +209,7 @@ export default function CareCircleScreen() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 90 }}
+      contentContainerStyle={{ paddingBottom: 90 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} />}
     >
       <ScreenHeader

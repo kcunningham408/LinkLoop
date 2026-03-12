@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -9,6 +10,7 @@ import { useTheme } from '../context/ThemeContext';
 import { authAPI } from '../services/api';
 
 export default function WatchSyncScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { palette, getGradient } = useTheme();
   const isMember = user?.role === 'member';
@@ -31,7 +33,7 @@ export default function WatchSyncScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 + insets.bottom }}>
       <View style={styles.content}>
         {/* Hero illustration */}
         <FadeIn delay={0}>

@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.vibecmd.linkloop",
-      "buildNumber": "66",
+      "buildNumber": "67",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,7 +31,7 @@
         "backgroundColor": "#4A90D9"
       },
       "package": "com.vibecmd.linkloop",
-      "versionCode": 10,
+      "versionCode": 11,
       "permissions": []
     },
     "web": {

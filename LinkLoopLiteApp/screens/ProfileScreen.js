@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import { useState } from 'react';
 import { Alert, Linking, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import LinkLoopBanner from '../components/LinkLoopBanner';
 import { FadeIn, stagger } from '../config/animations';
@@ -13,6 +14,7 @@ import { useTheme } from '../context/ThemeContext';
 const APP_VERSION = Constants.expoConfig?.version || Constants.manifest?.version || '1.1.0';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { user, logout, deleteAccount, updateUser, checkAuth } = useAuth();
   const { palette, getGradient } = useTheme();
@@ -111,7 +113,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 90 }}
+      contentContainerStyle={{ paddingBottom: 90 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} />}
     >
       {/* ── Hero Banner ── */}

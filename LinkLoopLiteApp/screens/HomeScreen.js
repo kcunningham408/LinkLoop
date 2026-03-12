@@ -2,6 +2,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, RefreshControl, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BloomBackground from '../components/BloomBackground';
 import GlassCard from '../components/GlassCard';
 import GlucoseRing from '../components/GlucoseRing';
@@ -16,6 +17,7 @@ import { alertsAPI, glucoseAPI } from '../services/api';
 const AUTO_REFRESH_MS = 2 * 60 * 1000; // 2 minutes — matches Dexcom ~5min reading cadence
 
 export default function HomeScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { user, circleRemoved, clearCircleRemoved, checkAuth } = useAuth();
   const { getAccent, getGradient } = useTheme();
   const { isViewingOther, viewingId } = useViewing();
@@ -173,7 +175,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 90 }}
+      contentContainerStyle={{ paddingBottom: 90 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} />}
     >
       {/* ─── Hero gradient header ─── */}

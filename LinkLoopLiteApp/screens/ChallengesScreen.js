@@ -4,6 +4,7 @@ import {
     StyleSheet, Text,
     TouchableOpacity, View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassCard from '../components/GlassCard';
 import ScreenHeader from '../components/ScreenHeader';
 import { FadeIn, stagger } from '../config/animations';
@@ -23,6 +24,7 @@ const STATUS_COLORS = {
 const CHEER_EMOJIS = ['🎉', '🔥', '💪', '⭐', '👏', '🙌', '❤️', '🏆'];
 
 export default function ChallengesScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const isMember = user?.role === 'member';
@@ -142,7 +144,7 @@ export default function ChallengesScreen() {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[accent]} tintColor={accent} />}
       >
         <ScreenHeader
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
 
   // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%', padding: 20 },
+  modalContent: { backgroundColor: '#1C1C1E', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '80%', padding: 20, paddingBottom: 40 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   modalTitle: { fontSize: TYPE.xxl, fontWeight: TYPE.bold, color: '#fff' },
   modalClose: { fontSize: TYPE.h2, color: '#888', padding: 8 },

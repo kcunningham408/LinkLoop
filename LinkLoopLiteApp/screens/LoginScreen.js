@@ -8,6 +8,7 @@ import {
     TextInput, TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BloomBackground from '../components/BloomBackground';
 import { FadeIn } from '../config/animations';
 import { haptic } from '../config/haptics';
@@ -18,6 +19,7 @@ import { authAPI, circleAPI, pingServer } from '../services/api';
 
 // mode: 'landing' | 'login' | 'register' | 'join' | 'forgot' | 'reset'
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
   const [mode, setMode] = useState('landing');
   const [loginMethod, setLoginMethod] = useState('email');
   const [identifier, setIdentifier] = useState('');
@@ -423,7 +425,7 @@ export default function LoginScreen() {
         contentStyle={styles.gradient}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 40 + insets.bottom }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -448,7 +450,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   gradient: { flex: 1 },
-  scroll: { flexGrow: 1, paddingBottom: 40 },
+  scroll: { flexGrow: 1 },
 
   // ── Top logo (shown always) ──
   topLogo: {

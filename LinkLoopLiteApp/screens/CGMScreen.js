@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, Dimensions, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BloomBackground from '../components/BloomBackground';
 import GlassCard from '../components/GlassCard';
 import GlucoseChart from '../components/GlucoseChart';
@@ -26,6 +27,7 @@ const TREND_OPTIONS = [
 ];
 
 export default function CGMScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { getAccent } = useTheme();
   const { isViewingOther, viewingId } = useViewing();
@@ -266,7 +268,7 @@ export default function CGMScreen({ navigation }) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 90 }}
+      contentContainerStyle={{ paddingBottom: 90 + insets.bottom }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} />}
     >
       {/* ─── Hero: GlucoseRing on gradient ─── */}

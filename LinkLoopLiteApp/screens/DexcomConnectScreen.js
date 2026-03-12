@@ -12,12 +12,14 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FadeIn, stagger } from '../config/animations';
 import { haptic } from '../config/haptics';
 import TYPE from '../config/typography';
 import { dexcomAPI } from '../services/api';
 
 export default function DexcomConnectScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [region, setRegion] = useState('us');
@@ -69,7 +71,7 @@ export default function DexcomConnectScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom }]} keyboardShouldPersistTaps="handled">
         {/* Header */}
         <FadeIn delay={stagger(0, 100)} slideY={0}>
         <LinearGradient
